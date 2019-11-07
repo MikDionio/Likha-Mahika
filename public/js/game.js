@@ -53,96 +53,262 @@ var gest = new gestures({
 	drawColor: "#000000",
 	drawWidth: 5,
 	autoTrack: true,
-	allowRotation: true,
-	inverseShape: true,
+	allowRotation: false,
+	inverseShape: false,
 	points: 33
-});
+})
+//2nd
+gest.addGesture("Pa", [
+    {x: 0, y: 100},
+    {x: 0, y: 75},
+    {x: 0, y: 50},
+    {x: 0, y: 0},
+    
+], throwProjectile);
 
-gest.addGesture("Line", [
-	{x: 0, y: 0},
-	{x: 0, y: 25},
+gest.addGesture("Ka", [
+    {x: 0, y: 50},
+    {x: -15, y: 48},
+    {x: -30, y: 40},
+    {x: -40, y: 30},
+    
+], throwProjectile);
+
+gest.addGesture("Ga", [
+	{x: 0, y: 40},
+    {x: -30, y: 50},
+    {x: -40, y: 50},
+    {x: -45, y: 48},
+    {x: -50, y: 40},
+    {x: -45, y: 30},
+    {x: -45, y: 20},
+    {x: -48, y: 10},
+    {x: -55, y: 5},
+], throwProjectile);
+
+gest.addGesture("OU", [
+	{x: 0, y: 85},
+    {x: -10, y: 92},
+    {x: -20, y: 97},
+    {x: -30, y: 100},
+    {x: -40, y: 100},
+    {x: -45, y: 95},
+    {x: -47, y: 90},
+    {x: -45, y: 85},
+    {x: -40, y: 80},
+    {x: -35, y: 77},
+    {x: -50, y: 77},
+    {x: -55, y: 75},
+    {x: -60, y: 70},
+    {x: -57, y: 60},
+    {x: -50, y: 50},
+    {x: -45, y: 45},
+    {x: -33, y: 40},
+	{x: -20, y: 42},
+	{x: -10, y: 46},
+], throwProjectile);
+
+gest.addGesture("Sa", [
+    {x: 5, y: 87},
+    {x: 0, y: 85},
+    {x: -5, y: 80},
+    {x: -10, y: 75},
+    {x: -15, y: 65},
+    {x: -20, y: 75},
+    {x: -25, y: 90},
+    {x: -30, y: 100},
+    {x: -40, y: 100},
+    {x: -45, y: 95},
+    {x: -47, y: 90},
+    {x: -45, y: 85},
+    {x: -40, y: 80},
+    {x: -35, y: 77},
+    {x: -50, y: 77},
+    {x: -55, y: 75},
+    {x: -60, y: 70},
+    {x: -57, y: 60},
+    {x: -50, y: 50},
+    {x: -45, y: 45},
+    {x: -33, y: 40},
+	{x: -20, y: 40},
+	{x: -5, y: 46},
+], throwProjectile);
+
+gest.addGesture("Ba", [
+	{x: -50, y: 60},
+    {x: -45, y: 52},
+    {x: -35, y: 47},
+    {x: -20, y: 40},
+    {x: -10, y: 33},
+    {x: -5, y: 25},
+    {x: 0, y: 17},
+    {x: -5, y: 7},
+    {x: -10, y: 0},
+    {x: -20, y: 0},
+    {x: -30, y: 2},
+    {x: -40, y: 5},
+    {x: -45, y: 10},
+    {x: -50, y: 20},
+    {x: -55, y: 10},
+    {x: -60, y: 5},
+    {x: -70, y: 2},
+    {x: -80, y: 0},
+	{x: -90, y: 0},
+    {x: -95, y: 7},
+    {x: -100, y: 17},
+    {x: -95, y: 25},
+    {x: -90, y: 33},
+    {x: -80, y: 40},
+    {x: -65, y: 47},
+    {x: -55, y: 52},
+], throwProjectile);
+
+gest.addGesture("Ha", [
+	{x: -25, y: 50},
+    {x: -15, y: 45},
+    {x: -10, y: 40},
+    {x: -4, y: 32},
+    {x: 0, y: 20},
+    {x: -5, y: 10},
+    {x: -15, y: 5},
+    {x: -25, y: 5},
+    {x: -40, y: 10},
+    {x: -50, y: 25},
+    {x: -60, y: 40},
+    {x: -75, y: 45},
+    {x: -85, y: 45},
+    {x: -95, y: 40},
+    {x: -100, y: 30},
+    {x: -96, y: 22},
+    {x: -90, y: 10},
+    {x: -85, y: 5},
+    {x: -75, y: 0},
+], throwProjectile);
+
+gest.addGesture("Ya", [
 	{x: 0, y: 50},
-	{x: 0, y: 75},
-	{x: 0, y: 100}
+    {x: -10, y: 40},
+    {x: -15, y: 40},
+    {x: -18, y: 20},
+    {x: -22, y: 10},
+    {x: -30, y: 0},
+    {x: -45, y: 0},
+    {x: -55, y: 5},
+    {x: -60, y: 15},
+    {x: -65, y: 30},
+    {x: -60, y: 40},
+    {x: -70, y: 50},
+    {x: -80, y: 55},
+    {x: -90, y: 55},
+    {x: -100, y: 45},
+    {x: -90, y: 40},
+    {x: -80, y: 40},
+    {x: -70, y: 50},
 ], throwProjectile);
 
-gest.addGesture("Square", [
-	{x: 0, y: 0},
-	{x: 100, y: 0},
-	{x: 200, y: 0},
-	{x: 200, y: 100},
-	{x: 200, y: 200},
-	{x: 100, y: 200},
-	{x: 0, y: 200},
-	{x: 0, y: 100},
-	{x: 0, y: 0}
+gest.addGesture("Wa", [
+	{x: 0, y: 80},
+    {x: -20, y: 75},
+    {x: -30, y: 70},
+    {x: -20, y: 55},
+    {x: -10, y: 45},
+    {x: -5, y: 30},
+    {x: -10, y: 15},
+    {x: -25, y: 5},
+    {x: -50, y: 0},
+    {x: -75, y: 5},
+    {x: -90, y: 15},
+    {x: -95, y: 30},
+    {x: -90, y: 40},
+    {x: -80, y: 60},
 ], throwProjectile);
 
-gest.addGesture("Rectangle", [
-	{x: 0, y: 0},
-	{x: 105, y: 0},
-	{x: 210, y: 0},
-	{x: 210, y: 50},
-	{x: 210, y: 100},
-	{x: 105, y: 100},
-	{x: 0, y: 100},
-	{x: 0, y: 50},
-	{x: 0, y: 0}
-], throwProjectile);
 
-gest.addGesture("ZigZag", [
-	{x: 0, y: 0},
-	{x: 25, y: 44},
-	{x: 50, y: 87},
-	{x: 70, y: 44},
-	{x: 100, y: 0},
-	{x: 125, y: 44},
-	{x: 150, y: 87}
-], throwProjectile);
+// gest.addGesture("Line", [
+// 	{x: 0, y: 0},
+// 	{x: 0, y: 25},
+// 	{x: 0, y: 50},
+// 	{x: 0, y: 75},
+// 	{x: 0, y: 100}
+// ], throwProjectile);
 
-gest.addGesture("Triangle", [
-	{x: 0, y: 0},
-	{x: 50, y: 50},
-	{x: 100, y: 100},
-	{x: 50, y: 100},
-	{x: 0, y: 100},
-	{x: 0, y: 50},
-	{x: 0, y: 0}
-], throwProjectile);
+// gest.addGesture("Square", [
+// 	{x: 0, y: 0},
+// 	{x: 100, y: 0},
+// 	{x: 200, y: 0},
+// 	{x: 200, y: 100},
+// 	{x: 200, y: 200},
+// 	{x: 100, y: 200},
+// 	{x: 0, y: 200},
+// 	{x: 0, y: 100},
+// 	{x: 0, y: 0}
+// ], throwProjectile);
 
-gest.addGesture("Equilateral Triangle", [
-	{x: 0, y: 0},
-	{x: 25, y: 44},
-	{x: 50, y: 87},
-	{x: 75, y: 44},
-	{x: 100, y: 0},
-	{x: 50, y: 0},
-	{x: 0, y: 0}
-], throwProjectile);
+// gest.addGesture("Rectangle", [
+// 	{x: 0, y: 0},
+// 	{x: 105, y: 0},
+// 	{x: 210, y: 0},
+// 	{x: 210, y: 50},
+// 	{x: 210, y: 100},
+// 	{x: 105, y: 100},
+// 	{x: 0, y: 100},
+// 	{x: 0, y: 50},
+// 	{x: 0, y: 0}
+// ], throwProjectile);
 
-gest.addGesture("Check", [
-	{x: 0, y: 0},
-	{x: 25, y: 25},
-	{x: 50, y: 50},
-	{x: 75, y: 25},
-	{x: 100, y: 0},
-], throwProjectile);
+// // gest.addGesture("ZigZag", [
+// // 	{x: 0, y: 0},
+// // 	{x: 25, y: 44},
+// // 	{x: 50, y: 87},
+// // 	{x: 70, y: 44},
+// // 	{x: 100, y: 0},
+// // 	{x: 125, y: 44},
+// // 	{x: 150, y: 87}
+// // ], throwProjectile);
 
-var x = 0;
-var y = -100;
-var circle = [];
-var totalPoints = 72;
-var step = (Math.PI*2)/totalPoints;
+// gest.addGesture("Triangle", [
+// 	{x: 0, y: 0},
+// 	{x: 50, y: 50},
+// 	{x: 100, y: 100},
+// 	{x: 50, y: 100},
+// 	{x: 0, y: 100},
+// 	{x: 0, y: 50},
+// 	{x: 0, y: 0}
+// ], throwProjectile);
 
-for(var angle = 1; angle < totalPoints; angle++)
-{
-	var newX = x*Math.cos(angle*step)-y*Math.sin(angle*step);
-	var newY = y*Math.cos(angle*step)+x*Math.sin(angle*step);
-	var point = {x: newX, y: newY};
-	circle.push(point);
-}
+// gest.addGesture("Equilateral Triangle", [
+// 	{x: 0, y: 0},
+// 	{x: 25, y: 44},
+// 	{x: 50, y: 87},
+// 	{x: 75, y: 44},
+// 	{x: 100, y: 0},
+// 	{x: 50, y: 0},
+// 	{x: 0, y: 0}
+// ], throwProjectile);
 
-gest.addGesture("Circle", circle, throwProjectile);
+// gest.addGesture("Check", [
+// 	{x: 0, y: 0},
+// 	{x: 25, y: 25},
+// 	{x: 50, y: 50},
+// 	{x: 75, y: 25},
+// 	{x: 100, y: 0},
+// ], throwProjectile);
+
+// var x = 0;
+// var y = -100;
+// var circle = [];
+// var totalPoints = 72;
+// var step = (Math.PI*2)/totalPoints;
+
+// for(var angle = 1; angle < totalPoints; angle++)
+// {
+// 	var newX = x*Math.cos(angle*step)-y*Math.sin(angle*step);
+// 	var newY = y*Math.cos(angle*step)+x*Math.sin(angle*step);
+// 	var point = {x: newX, y: newY};
+// 	circle.push(point);
+// }
+
+// gest.addGesture("Circle", circle, throwProjectile);
 
 var config = {
     type: Phaser.AUTO,
@@ -168,6 +334,7 @@ var emitter = new Phaser.Events.EventEmitter();
 var otherPlayer;
 var player;
 var startGame = true;
+var chars="";
 
 function preload() {
     this.load.image('ship','assets/spaceShips_001.png');
@@ -398,6 +565,7 @@ function addProjectile(self, projectileType, posx, posy){
 
 function throwProjectile(name){
     // var self = this;
+    
     var type = "";
     console.log(name);
     switch(name){
@@ -417,6 +585,8 @@ function throwProjectile(name){
             type="fire";
             break;
     }
+    chars += name
+    console.log(chars)
     console.log(type);
     //const pointer = self.input.activePointer;
     //Emit projectile event
