@@ -64,7 +64,7 @@ gest.addGesture("Pa", [
     {x: 0, y: 50},
     {x: 0, y: 0},
     
-], throwProjectile);
+], updateGestureString);
 
 gest.addGesture("Ka", [
     {x: 0, y: 50},
@@ -72,7 +72,7 @@ gest.addGesture("Ka", [
     {x: -30, y: 40},
     {x: -40, y: 30},
     
-], throwProjectile);
+], updateGestureString);
 
 gest.addGesture("Ga", [
 	{x: 0, y: 40},
@@ -84,7 +84,7 @@ gest.addGesture("Ga", [
     {x: -45, y: 20},
     {x: -48, y: 10},
     {x: -55, y: 5},
-], throwProjectile);
+], updateGestureString);
 
 gest.addGesture("OU", [
 	{x: 0, y: 85},
@@ -106,7 +106,7 @@ gest.addGesture("OU", [
     {x: -33, y: 40},
 	{x: -20, y: 42},
 	{x: -10, y: 46},
-], throwProjectile);
+], updateGestureString);
 
 gest.addGesture("Sa", [
     {x: 5, y: 87},
@@ -132,7 +132,7 @@ gest.addGesture("Sa", [
     {x: -33, y: 40},
 	{x: -20, y: 40},
 	{x: -5, y: 46},
-], throwProjectile);
+], updateGestureString);
 
 gest.addGesture("Ba", [
 	{x: -50, y: 60},
@@ -161,7 +161,7 @@ gest.addGesture("Ba", [
     {x: -80, y: 40},
     {x: -65, y: 47},
     {x: -55, y: 52},
-], throwProjectile);
+], updateGestureString);
 
 gest.addGesture("Ha", [
 	{x: -25, y: 50},
@@ -183,7 +183,7 @@ gest.addGesture("Ha", [
     {x: -90, y: 10},
     {x: -85, y: 5},
     {x: -75, y: 0},
-], throwProjectile);
+], updateGestureString);
 
 gest.addGesture("Ya", [
 	{x: 0, y: 50},
@@ -204,7 +204,7 @@ gest.addGesture("Ya", [
     {x: -90, y: 40},
     {x: -80, y: 40},
     {x: -70, y: 50},
-], throwProjectile);
+], updateGestureString);
 
 gest.addGesture("Wa", [
 	{x: 0, y: 80},
@@ -221,7 +221,7 @@ gest.addGesture("Wa", [
     {x: -95, y: 30},
     {x: -90, y: 40},
     {x: -80, y: 60},
-], throwProjectile);
+], updateGestureString);
 
 
 // gest.addGesture("Line", [
@@ -373,13 +373,6 @@ function create() {
         }
     });
 
-    // console.log(this.myProjectiles);
-    // console.log(this.otherProjectiles);
-    //Handle projectile collisions
-    // console.log(this.physics.add.collider(this.myProjectiles, this.otherProjectiles, function(myProjectile, otherProjectile){
-    //     console.log("collision");
-    // }));
-
     this.socket.on('currentPlayers', function(players) {
         Object.keys(players).forEach(function (id) {
             if (players[id].playerId === self.socket.id) {
@@ -405,7 +398,7 @@ function create() {
     //Player input
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    //Change Lane
+    //Fire projectile on lane
     this.input.on('pointerdown', function(pointer){
         console.log(pointer.x + ", " + pointer.y);
         if(self.player){
@@ -418,9 +411,25 @@ function create() {
             }
             console.log(self.player.currLane);
         }
+        gest.clear();
+        var type = identifyProjectile();
+        if(type){
+            console.log(type);
+            self.myProjectiles.add(addProjectile(self, type, laneToCoord(self.player.currLane), 380));
+            this.socket.emit('playerInput', {type: type, x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+            chars = "";
+        }else{
+            console.log("No match");
+            chars="";
+        }
     }, this);
 
-    //Throw Projectile
+    // emitter.on('throw_projectile', function(type){
+    //     self.myProjectiles.add(addProjectile(self, type,laneToCoord(self.player.currLane), 380));
+    //     this.socket.emit('playerInput', {type: type, x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+    // }, this)
+
+    //Throw Projectile (For debugging)
     // this.input.keyboard.on('keydown_Q', function(event){//Fire
     //     const pointer = self.input.activePointer;
     //     self.myProjectiles.add(addProjectile(self, "fire",laneToCoord(self.player.currLane), 380));
@@ -456,11 +465,6 @@ function create() {
     //     self.myProjectiles.add(addProjectile(self, "stone",laneToCoord(self.player.currLane), 380));
     //     this.socket.emit('playerInput', {type: "stone", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
     // }, this);
-
-    emitter.on('throw_projectile', function(type){
-        self.myProjectiles.add(addProjectile(self, type,laneToCoord(self.player.currLane), 380));
-        this.socket.emit('playerInput', {type: type, x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
-    }, this)
 
     this.socket.on('playerClicked',function(projectileData){
         //const op = self.physics.add.image(projectileData.x,600 - projectileData.y,'otherPlayer');//relative to screen height
@@ -557,18 +561,20 @@ function addProjectile(self, projectileType, posx, posy){
             p.weaknesses = [p.type,"fire","lightning","wind","water","nature"];
             break;
     }
-    //const projectile = new Projectile(projectileType, p);
-    //self.myProjectiles.add(p);
-    //console.log(projectile.speed);
     return p;
 }
 
-function throwProjectile(name){
+function updateGestureString(fig){
+    chars += fig;
+    console.log(chars);
+}
+
+function identifyProjectile(){
     // var self = this;
     
     var type = "";
-    console.log(name);
-    switch(name){
+    //console.log(name);
+    switch(chars){
         case 'Line':
             type = "wind";
             break;
@@ -581,16 +587,16 @@ function throwProjectile(name){
         case 'Triangle':
             type="nature";
             break;
-        case 'Check':
+        case 'Pa':
             type="fire";
             break;
     }
-    chars += name
     console.log(chars)
     console.log(type);
     //const pointer = self.input.activePointer;
     //Emit projectile event
-    emitter.emit('throw_projectile', type);
+    //emitter.emit('throw_projectile', type);
+    return type;
 }
 
 function laneToCoord(lane){
@@ -603,10 +609,3 @@ function laneToCoord(lane){
             return 335;
     }
 }
-
-//Gestures
-// function callback(name)
-// {
-// 	// count++;
-// 	// document.getElementById("result").innerHTML = "Result: " + name;
-// }

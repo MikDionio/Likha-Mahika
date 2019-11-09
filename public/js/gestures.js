@@ -140,13 +140,15 @@ var gestures = function(config){
 		ob.reset();
 		if(conf.draw)
 		{
-			ctx.clearRect(0, 0, d.width, d.height);
+			//ctx.clearRect(0, 0, d.width, d.height);
 			ctx.lineWidth = conf.drawWidth;
 			ctx.strokeStyle = conf.drawColor;
 			ctx.lastX = (event.targetTouches[0] ? event.targetTouches[0].pageX : event.changedTouches[event.changedTouches.length-1].pageX);
 			ctx.lastY = (event.targetTouches[0] ? event.targetTouches[0].pageY : event.changedTouches[event.changedTouches.length-1].pageY);
 		}
-		if(conf.autoTrack && tracking)
+
+		elem = event.target.id
+		if(conf.autoTrack && tracking && elem == "gestures_canvas")
 		{
 			var point = {};
 			point.x = (event.targetTouches[0] ? event.targetTouches[0].pageX : event.changedTouches[event.changedTouches.length-1].pageX);
@@ -167,7 +169,9 @@ var gestures = function(config){
 			ctx.lastX = (event.targetTouches[0] ? event.targetTouches[0].pageX : event.changedTouches[event.changedTouches.length-1].pageX);
 			ctx.lastY = (event.targetTouches[0] ? event.targetTouches[0].pageY : event.changedTouches[event.changedTouches.length-1].pageY);
 		}
-		if(conf.autoTrack && tracking)
+
+		elem = event.target.id
+		if(conf.autoTrack && tracking && elem == "gestures_canvas")
 		{
 			var point = {};
 			point.x = (event.targetTouches[0] ? event.targetTouches[0].pageX : event.changedTouches[event.changedTouches.length-1].pageX);
