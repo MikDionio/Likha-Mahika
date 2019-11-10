@@ -575,16 +575,19 @@ function identifyProjectile(){
     var type = "";
     //console.log(name);
     switch(chars){
-        case 'Line':
+        case 'Ha':
             type = "wind";
             break;
-        case 'Rectangle':
+        case 'Ba':
             type = "stone";
             break;
-        case 'ZigZag':
-            type="lightning";
+        case 'Wa':
+            type="water";
             break;
-        case 'Triangle':
+        case 'OU':
+            type = "lightning";
+            break;
+        case 'Ya':
             type="nature";
             break;
         case 'Pa':
