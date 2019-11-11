@@ -333,7 +333,7 @@ var game = new Phaser.Game(config);
 var emitter = new Phaser.Events.EventEmitter();
 var otherPlayer;
 var player;
-var gamePhase = 0;
+var gamePhase = 0;//0 for finding opponent, 1 for game playing, 2 for win/lose
 var chars="";
 
 function preload() {
@@ -377,19 +377,20 @@ function create() {
         }
     });
 
-    this.socket.on('currentPlayers', function(players) {
-        Object.keys(players).forEach(function (id) {
-            if (players[id].playerId === self.socket.id) {
-                addPlayer(self, players[id]);
-            } else {
-                addOtherPlayer(self, players[id]);
-            }
-        });
+    this.socket.on('currentPlayers', function(player) {
+        console.log(player.playerId + " === " + self.socket.id);
+        if (player.playerId === self.socket.id) {
+            console.log("That's me");
+            addPlayer(self, player);
+        } else {
+            console.log("That's my opponent");
+            addOtherPlayer(self, player);
+        }
     });
 
-    this.socket.on('newPlayer',function(playerInfo){//when other player is found
-        addOtherPlayer(self, playerInfo);
-    });
+    // this.socket.on('newPlayer',function(playerInfo){//when other player is found
+    //     addOtherPlayer(self, playerInfo);
+    // });
 
     this.socket.on('disconnect', function(playerId){
         self.otherPlayers.getChildren().forEach(function (otherPlayer){
@@ -534,12 +535,14 @@ function update() {
 
 function addPlayer(self, playerInfo){
     self.player = new Player(playerInfo.playerId,playerInfo.roomId);//temp values
+    console.log("Player: " + self.player);
     self.player.healthBar = self.add.sprite(200,400,'health_bar').setOrigin(0.5,0.5).setDisplaySize(400*(self.player.health/100),40);
 }
 
 function addOtherPlayer(self, playerInfo) {
     //const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5,0.5).setDisplaySize(53,40);
     self.otherPlayer = new Player(playerInfo.name,playerInfo.sessionId)
+    console.log("Opponent: " + self.otherPlayer);
     self.otherPlayer.healthBar = self.add.sprite(200,10,'health_bar').setOrigin(0.5,0.5).setDisplaySize(400*(self.otherPlayer.health/100),40);
     self.otherPlayer.healthBar.setTint(0x00ff00);
 }

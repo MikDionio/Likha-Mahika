@@ -25,7 +25,7 @@ io.on('connection', function(socket){//when a new player connects
                 newPlayer(socket, i);
                 console.log(socket.id + ' has joined session ' + i);
                 break;
-            } else if(io.sockets.adapter.rooms['room'+i].length < 2){//If found room with 1 player, add player
+            } else if(io.sockets.adapter.rooms['room'+i].length < 2){//If found room with 1 player, add player and send waiting player data to new player
                 socket.join('room'+i);
                 newPlayer(socket, i);
                 console.log(socket.id + ' has joined session ' + i);
@@ -60,16 +60,20 @@ server.listen(8081, function() {
     console.log(`Listening on ${server.address().port}`);
 });
 
-function newPlayer(socket, roomNo){
+function newPlayer(socket, roomNo){//Create new player
     //create a new player and add it to our players object
+    room = 'room' + roomNo;
     players[socket.id] = {
         playerId: socket.id,
-        roomId: 'room' + roomNo,
+        roomId: room,
     };
 
-    //send the players object to the new player
-    socket.emit('currentPlayers', players);
+    console.log("Player " + players[socket.id].playerId + " broadcasting to " + players[socket.id].roomId);
+    io.in(room).emit('currentPlayers', players[socket.id]);//send to room a new player's data
 
-    //update all other players of the new player
-    socket.broadcast.emit('newPlayer',players[socket.id]);
+    io.of('/').in(room).clients((error, clients) => {//get list of clients in a room
+        if(clients[0]){//if room is occupied
+            io.in(room).emit('currentPlayers', players[clients[0]]);//retransmit data of player already in the room
+        }
+    })
 }
