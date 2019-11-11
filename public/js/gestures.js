@@ -183,11 +183,11 @@ var gestures = function(config){
 	this.Up = function(event){
 		if(conf.autoTrack && tracking)
 		{
+			console.log(ob.points)
 			ob.resolve(ob.points);
 		}
 		remove_event(document.body, "touchmove", ob.Move);
 	};
-
 
 	//some helping internal functions
 
@@ -318,7 +318,7 @@ var gestures = function(config){
 	var doc_size = function(){
 		var docsize = new Object();
 		docsize.width = 400;
-		docsize.height = 600;
+		docsize.height = 380;
 		// docsize.width = Math.max(
 		// 	Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
 		// 	Math.max(document.body.offsetWidth, document.documentElement.offsetWidth),
