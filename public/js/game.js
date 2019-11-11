@@ -6,7 +6,7 @@ class Projectile{
         if(this.type == "stone"){
             this.speed = 0;
         }else{
-            this.speed = 30;
+            this.speed = 100;
         }
 
         this.image = imageReference;
@@ -333,12 +333,10 @@ var game = new Phaser.Game(config);
 var emitter = new Phaser.Events.EventEmitter();
 var otherPlayer;
 var player;
-var startGame = true;
+var gamePhase = 0;
 var chars="";
 
 function preload() {
-    this.load.image('ship','assets/spaceShips_001.png');
-    this.load.image('otherPlayer','assets/enemyBlack5.png');
     this.load.image('fire','assets/star_full.png');
     this.load.image('nature','assets/triangle.png');
     this.load.image('wind','assets/wind.png');
@@ -347,6 +345,9 @@ function preload() {
     this.load.image('stone','assets/stone.png')
     this.load.image('health_bar','assets/bar.png');
     this.load.image('bg','assets/bg.png');
+    this.load.image('finding', 'assets/finding.png');
+    this.load.image('win','assets/win.png');
+    this.load.image('lose','assets/lose.png');
 }
    
 function create() {
@@ -354,14 +355,17 @@ function create() {
     this.socket = io();
     this.otherPlayers = this.physics.add.group();
     
-
     //Background
     this.background = this.add.image(200,200,'bg').setOrigin(0.5,0.5);
+
+    //Loading gif
+    this.loading = this.add.image(200, 300,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75);
+    
     //Projectiles
     this.myProjectiles = this.physics.add.group();//Projectiles sent by me on the field
     this.otherProjectiles = this.physics.add.group();//Projectiles sent by opponent on the field
 
-    this.physics.add.overlap(this.myProjectiles.getChildren(), this.otherProjectiles.getChildren(), function(myProjectile, otherProjectile){
+    this.physics.add.overlap(this.myProjectiles.getChildren(), this.otherProjectiles.getChildren(), function(myProjectile, otherProjectile){//collision for projectiles
         if(myProjectile.weaknesses.includes(otherProjectile.type)){
             self.myProjectiles.remove(myProjectile);
             myProjectile.destroy();
@@ -378,13 +382,13 @@ function create() {
             if (players[id].playerId === self.socket.id) {
                 addPlayer(self, players[id]);
             } else {
-                addOtherPlayers(self, players[id]);
+                addOtherPlayer(self, players[id]);
             }
         });
     });
 
-    this.socket.on('newPlayer',function(playerInfo){
-        addOtherPlayers(self, playerInfo);
+    this.socket.on('newPlayer',function(playerInfo){//when other player is found
+        addOtherPlayer(self, playerInfo);
     });
 
     this.socket.on('disconnect', function(playerId){
@@ -400,27 +404,29 @@ function create() {
 
     //Fire projectile on lane
     this.input.on('pointerdown', function(pointer){
-        console.log(pointer.x + ", " + pointer.y);
-        if(self.player){
-            if(pointer.x < 128){
-                self.player.currLane = 0;
-            }else if(pointer.x < 271){
-                self.player.currLane = 1;
-            }else{
-                self.player.currLane = 2;
+        if(gamePhase == 1){
+            console.log(pointer.x + ", " + pointer.y);
+            if(self.player){
+                if(pointer.x < 128){
+                    self.player.currLane = 0;
+                }else if(pointer.x < 271){
+                    self.player.currLane = 1;
+                }else{
+                    self.player.currLane = 2;
+                }
+                console.log(self.player.currLane);
             }
-            console.log(self.player.currLane);
-        }
-        gest.clear();
-        var type = identifyProjectile();
-        if(type){
-            console.log(type);
-            self.myProjectiles.add(addProjectile(self, type, laneToCoord(self.player.currLane), 380));
-            this.socket.emit('playerInput', {type: type, x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
-            chars = "";
-        }else{
-            console.log("No match");
-            chars="";
+            gest.clear();
+            var type = identifyProjectile();
+            if(type){
+                console.log(type);
+                self.myProjectiles.add(addProjectile(self, type, laneToCoord(self.player.currLane), 380));
+                this.socket.emit('playerInput', {type: type, x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+                chars = "";
+            }else{
+                console.log("No match");
+                chars="";
+            }
         }
     }, this);
 
@@ -430,93 +436,100 @@ function create() {
     // }, this)
 
     //Throw Projectile (For debugging)
-    // this.input.keyboard.on('keydown_Q', function(event){//Fire
-    //     const pointer = self.input.activePointer;
-    //     self.myProjectiles.add(addProjectile(self, "fire",laneToCoord(self.player.currLane), 380));
-    //     this.socket.emit('playerInput', {type: "fire", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
-    // }, this);
+    this.input.keyboard.on('keydown_Q', function(event){//Fire
+        const pointer = self.input.activePointer;
+        self.myProjectiles.add(addProjectile(self, "fire",laneToCoord(self.player.currLane), 380));
+        this.socket.emit('playerInput', {type: "fire", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+    }, this);
 
-    // this.input.keyboard.on('keydown_E', function(event){//Nature
-    //     const pointer = self.input.activePointer;
-    //     self.myProjectiles.add(addProjectile(self, "nature",laneToCoord(self.player.currLane), 380));
-    //     this.socket.emit('playerInput', {type: "nature", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
-    // }, this);
+    this.input.keyboard.on('keydown_E', function(event){//Nature
+        const pointer = self.input.activePointer;
+        self.myProjectiles.add(addProjectile(self, "nature",laneToCoord(self.player.currLane), 380));
+        this.socket.emit('playerInput', {type: "nature", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+    }, this);
 
-    // this.input.keyboard.on('keydown_W', function(event){//Water
-    //     const pointer = self.input.activePointer;
-    //     self.myProjectiles.add(addProjectile(self, "water",laneToCoord(self.player.currLane), 380));
-    //     this.socket.emit('playerInput', {type: "water", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
-    // }, this);
+    this.input.keyboard.on('keydown_W', function(event){//Water
+        const pointer = self.input.activePointer;
+        self.myProjectiles.add(addProjectile(self, "water",laneToCoord(self.player.currLane), 380));
+        this.socket.emit('playerInput', {type: "water", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+    }, this);
 
-    // this.input.keyboard.on('keydown_A', function(event){//Lightning
-    //     const pointer = self.input.activePointer;
-    //     self.myProjectiles.add(addProjectile(self, "lightning",laneToCoord(self.player.currLane), 380));
-    //     this.socket.emit('playerInput', {type: "lightning", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
-    // }, this);
+    this.input.keyboard.on('keydown_A', function(event){//Lightning
+        const pointer = self.input.activePointer;
+        self.myProjectiles.add(addProjectile(self, "lightning",laneToCoord(self.player.currLane), 380));
+        this.socket.emit('playerInput', {type: "lightning", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+    }, this);
 
-    // this.input.keyboard.on('keydown_D', function(event){//Wind
-    //     const pointer = self.input.activePointer;
-    //     self.myProjectiles.add(addProjectile(self, "wind",laneToCoord(self.player.currLane), 380));
-    //     this.socket.emit('playerInput', {type: "wind", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
-    // }, this);
+    this.input.keyboard.on('keydown_D', function(event){//Wind
+        const pointer = self.input.activePointer;
+        self.myProjectiles.add(addProjectile(self, "wind",laneToCoord(self.player.currLane), 380));
+        this.socket.emit('playerInput', {type: "wind", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+    }, this);
 
-    // this.input.keyboard.on('keydown_S', function(event){//Stone
-    //     const pointer = self.input.activePointer;
-    //     self.myProjectiles.add(addProjectile(self, "stone",laneToCoord(self.player.currLane), 380));
-    //     this.socket.emit('playerInput', {type: "stone", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
-    // }, this);
+    this.input.keyboard.on('keydown_S', function(event){//Stone
+        const pointer = self.input.activePointer;
+        self.myProjectiles.add(addProjectile(self, "stone",laneToCoord(self.player.currLane), 380));
+        this.socket.emit('playerInput', {type: "stone", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+    }, this);
 
     this.socket.on('playerClicked',function(projectileData){
         //const op = self.physics.add.image(projectileData.x,600 - projectileData.y,'otherPlayer');//relative to screen height
         //op.setVelocityY(3);
         self.otherProjectiles.add(addProjectile(self,projectileData.type,projectileData.x, 40));
-        console.log(self.otherProjectiles);
     }, this);
 }
 
 function update() {
     var self = this;
     
-    if(this.ship){
-        if(this.cursors.left.isDown){
-            this.ship.setAngularVelocity(-150);
-        }else if (this.cursors.right.isDown){
-            this.ship.setAngularVelocity(150);
-        } else {
-            this.ship.setAngularVelocity(0);
-        }
-
-        if (this.cursors.up.isDown){
-            this.physics.velocityFromRotation(this.ship.rotation + 1.5, 100, this.ship.body.acceleration);
-        } else {
-            this.ship.setAcceleration(0);
-        }
-    }
-
     this.myProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by me
         projectileObject.setVelocityY(-projectileObject.speed);
         //projectileObject.body.debugBodyColor = projectileObject.body.touching.none ? 0x0099ff : 0xff9900;
         if(projectileObject.y < 40){
-            if(self.otherPlayer){
+            if(self.otherPlayer && self.player.getHealth() > 0){
                 self.otherPlayer.takeDamage(10);
                 self.otherPlayer.healthBar.displayWidth = 400*(self.otherPlayer.getHealth()/100);
+
+                if(self.otherPlayer.getHealth() == 0){//if opponent health goes to zero
+                    gamePhase == 2;
+                    self.win = self.add.image(200, 300,'win').setOrigin(0.5,0.5).setDisplaySize(200, 75);
+                }
             }
             self.myProjectiles.remove(projectileObject);//stop tracking projectile
             projectileObject.destroy();
         }
     });
 
-    this.otherProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by other user
+    this.otherProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by opponent
         projectileObject.setVelocityY(projectileObject.speed);
         if(projectileObject.y > 380){
-            if(self.player){
+            if(self.player && self.player.getHealth() > 0){
                 self.player.takeDamage(10);
+                console.log(self.player.getHealth());
                 self.player.healthBar.displayWidth = 400*(self.player.getHealth()/100);
+
+                if(self.player.getHealth() == 0){//if player health goes to zero
+                    gamePhase == 2;
+                    self.lose = self.add.image(200, 300,'lose').setOrigin(0.5,0.5).setDisplaySize(200, 75);
+                }
             }
             self.otherProjectiles.remove(projectileObject);//stop tracking projectile
             projectileObject.destroy();
         }
-    });
+    }, this);
+
+    //Game Phases
+    if(!self.otherPlayer){//if still waiting for opponent
+        if(!this.loading){
+            this.loading = this.add.image(200, 300,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75); //Add loading gif if needed
+        }
+        gamePhase == 0;
+    }else if(self.otherPlayer){//if there is opponent
+        if(this.loading){//remove loading gif
+            this.loading.destroy();
+        }
+        gamePhase == 1;
+    }
 }
 
 function addPlayer(self, playerInfo){
@@ -524,7 +537,7 @@ function addPlayer(self, playerInfo){
     self.player.healthBar = self.add.sprite(200,400,'health_bar').setOrigin(0.5,0.5).setDisplaySize(400*(self.player.health/100),40);
 }
 
-function addOtherPlayers(self, playerInfo) {
+function addOtherPlayer(self, playerInfo) {
     //const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5,0.5).setDisplaySize(53,40);
     self.otherPlayer = new Player(playerInfo.name,playerInfo.sessionId)
     self.otherPlayer.healthBar = self.add.sprite(200,10,'health_bar').setOrigin(0.5,0.5).setDisplaySize(400*(self.otherPlayer.health/100),40);
@@ -537,7 +550,7 @@ function addProjectile(self, projectileType, posx, posy){
     if(projectileType == "stone"){
         p.speed = 0;
     }else{
-        p.speed = 30;
+        p.speed = 100;
     }
 
     //Weaknesses

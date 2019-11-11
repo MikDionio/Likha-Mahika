@@ -11,10 +11,9 @@ app.get('/', function (req, res){
     res.sendFile(__dirname + '/index.html');
 })
 
-io.on('connection', function(socket){
-    // console.log('a user connected');
+io.on('connection', function(socket){//when a new player connects
 
-    if(roomCount == 0){
+    if(roomCount == 0){//if no rooms, make new room
         socket.join('room'+roomCount);
         newPlayer(socket, roomCount);
         console.log(socket.id + ' has joined session ' + roomCount);
@@ -55,7 +54,6 @@ io.on('connection', function(socket){
         //console.log(projectileData.roomId);
         socket.broadcast.to(projectileData.roomId).emit('playerClicked',projectileData);
     });
-
 });
 
 server.listen(8081, function() {
