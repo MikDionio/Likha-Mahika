@@ -326,14 +326,15 @@ var config = {
       preload: preload,
       create: create,
       update: update
-    } 
+    },
+    gamePhase: 0,
 };
    
 var game = new Phaser.Game(config);
 var emitter = new Phaser.Events.EventEmitter();
 var otherPlayer;
 var player;
-var gamePhase = 0;//0 for finding opponent, 1 for game playing, 2 for win/lose
+// var gamePhase = 0;//0 for finding opponent, 1 for game playing, 2 for match end
 var chars="";
 
 function preload() {
@@ -380,10 +381,8 @@ function create() {
     this.socket.on('currentPlayers', function(player) {
         console.log(player.playerId + " === " + self.socket.id);
         if (player.playerId === self.socket.id) {
-            console.log("That's me");
             addPlayer(self, player);
         } else {
-            console.log("That's my opponent");
             addOtherPlayer(self, player);
         }
     });
@@ -405,7 +404,8 @@ function create() {
 
     //Fire projectile on lane
     this.input.on('pointerdown', function(pointer){
-        if(gamePhase == 1){
+        console.log(self.game.config.gamePhase);
+        if(self.game.config.gamePhase == 1){
             console.log(pointer.x + ", " + pointer.y);
             if(self.player){
                 if(pointer.x < 128){
@@ -428,6 +428,11 @@ function create() {
                 console.log("No match");
                 chars="";
             }
+        }
+
+        if(self.game.config.gamePhase == 2){
+            console.log("Restarting");
+            location.reload(true);
         }
     }, this);
 
@@ -482,7 +487,7 @@ function create() {
 
 function update() {
     var self = this;
-    
+
     this.myProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by me
         projectileObject.setVelocityY(-projectileObject.speed);
         //projectileObject.body.debugBodyColor = projectileObject.body.touching.none ? 0x0099ff : 0xff9900;
@@ -492,14 +497,14 @@ function update() {
                 self.otherPlayer.healthBar.displayWidth = 400*(self.otherPlayer.getHealth()/100);
 
                 if(self.otherPlayer.getHealth() == 0){//if opponent health goes to zero
-                    gamePhase == 2;
-                    self.win = self.add.image(200, 300,'win').setOrigin(0.5,0.5).setDisplaySize(200, 75);
+                    gameEnd(self, 1);
+                    gameEnd = true;
                 }
             }
             self.myProjectiles.remove(projectileObject);//stop tracking projectile
             projectileObject.destroy();
         }
-    });
+    }, this);
 
     this.otherProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by opponent
         projectileObject.setVelocityY(projectileObject.speed);
@@ -510,8 +515,8 @@ function update() {
                 self.player.healthBar.displayWidth = 400*(self.player.getHealth()/100);
 
                 if(self.player.getHealth() == 0){//if player health goes to zero
-                    gamePhase == 2;
-                    self.lose = self.add.image(200, 300,'lose').setOrigin(0.5,0.5).setDisplaySize(200, 75);
+                    gameEnd(self, 0);
+                    gameEnd = true;
                 }
             }
             self.otherProjectiles.remove(projectileObject);//stop tracking projectile
@@ -524,12 +529,16 @@ function update() {
         if(!this.loading){
             this.loading = this.add.image(200, 300,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75); //Add loading gif if needed
         }
-        gamePhase == 0;
+        self.game.config.gamePhase = 0;
     }else if(self.otherPlayer){//if there is opponent
         if(this.loading){//remove loading gif
             this.loading.destroy();
         }
-        gamePhase == 1;
+        self.game.config.gamePhase = 1;
+    }
+
+    if(gameEnd){
+        self.game.config.gamePhase = 2;
     }
 }
 
@@ -627,4 +636,13 @@ function laneToCoord(lane){
         case 2:
             return 335;
     }
+}
+
+function gameEnd(self, winner){
+    self.socket.disconnect()
+    if(winner){
+        self.win = self.add.image(200, 300,'win').setOrigin(0.5,0.5).setDisplaySize(200, 75);
+    }else{
+        self.lose = self.add.image(200, 300,'lose').setOrigin(0.5,0.5).setDisplaySize(200, 75);
+    }   
 }

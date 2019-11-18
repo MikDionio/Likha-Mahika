@@ -183,7 +183,7 @@ var gestures = function(config){
 	this.Up = function(event){
 		if(conf.autoTrack && tracking)
 		{
-			console.log(ob.points)
+			//console.log(ob.points)
 			ob.resolve(ob.points);
 		}
 		remove_event(document.body, "touchmove", ob.Move);
