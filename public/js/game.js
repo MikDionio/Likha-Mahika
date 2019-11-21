@@ -313,8 +313,8 @@ gest.addGesture("Circle", circle, updateGestureString);
 var config = {
     type: Phaser.AUTO,
     parent: 'phaser-example',
-    width: 400,
-    height: 600,
+    width: (2/3)*window.outerHeight,
+    height: window.outerHeight,
     physics: {
       default: 'arcade',
       arcade: {
@@ -355,12 +355,15 @@ function create() {
     var self = this;
     this.socket = io();
     this.otherPlayers = this.physics.add.group();
+
+    console.log(self.game.config.width);
+    console.log(self.game.config.height);
     
     //Background
-    this.background = this.add.image(200,200,'bg').setOrigin(0.5,0.5);
+    this.background = this.add.image(self.game.config.width/2,self.game.config.height/2,'bg').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.height);
 
     //Loading gif
-    this.loading = this.add.image(200, 300,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75);
+    this.loading = this.add.image(self.game.config.width/2, self.game.config.height/2,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75);
     
     //Projectiles
     this.myProjectiles = this.physics.add.group();//Projectiles sent by me on the field
@@ -408,9 +411,9 @@ function create() {
         if(self.game.config.gamePhase == 1){
             console.log(pointer.x + ", " + pointer.y);
             if(self.player){
-                if(pointer.x < 128){
+                if(pointer.x < self.game.config.width/3){
                     self.player.currLane = 0;
-                }else if(pointer.x < 271){
+                }else if(pointer.x < self.game.config.width*(2/3)){
                     self.player.currLane = 1;
                 }else{
                     self.player.currLane = 2;
@@ -421,8 +424,8 @@ function create() {
             var type = identifyProjectile();
             if(type){
                 console.log(type);
-                self.myProjectiles.add(addProjectile(self, type, laneToCoord(self.player.currLane), 380));
-                this.socket.emit('playerInput', {type: type, x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+                self.myProjectiles.add(addProjectile(self, type, laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
+                this.socket.emit('playerInput', {type: type, x: laneToCoord(self, self.player.currLane), y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
                 chars = "";
             }else{
                 console.log("No match");
@@ -437,61 +440,63 @@ function create() {
     }, this);
 
     // emitter.on('throw_projectile', function(type){
-    //     self.myProjectiles.add(addProjectile(self, type,laneToCoord(self.player.currLane), 380));
-    //     this.socket.emit('playerInput', {type: type, x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+    //     self.myProjectiles.add(addProjectile(self, type,laneToCoord(self.player.currLane), self.game.config.width - self.game.config.width/6));
+    //     this.socket.emit('playerInput', {type: type, x: laneToCoord(self.player.currLane), y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
     // }, this)
 
     //Throw Projectile (For debugging)
     this.input.keyboard.on('keydown_Q', function(event){//Fire
         const pointer = self.input.activePointer;
-        self.myProjectiles.add(addProjectile(self, "fire",laneToCoord(self.player.currLane), 380));
-        this.socket.emit('playerInput', {type: "fire", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+        this.socket.emit('playerInput', {type: "fire", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
+        self.myProjectiles.add(addProjectile(self, "fire",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
     }, this);
 
     this.input.keyboard.on('keydown_E', function(event){//Nature
         const pointer = self.input.activePointer;
-        self.myProjectiles.add(addProjectile(self, "nature",laneToCoord(self.player.currLane), 380));
-        this.socket.emit('playerInput', {type: "nature", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+        self.myProjectiles.add(addProjectile(self, "nature",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
+        this.socket.emit('playerInput', {type: "nature", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
     }, this);
 
     this.input.keyboard.on('keydown_W', function(event){//Water
         const pointer = self.input.activePointer;
-        self.myProjectiles.add(addProjectile(self, "water",laneToCoord(self.player.currLane), 380));
-        this.socket.emit('playerInput', {type: "water", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+        self.myProjectiles.add(addProjectile(self, "water",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
+        this.socket.emit('playerInput', {type: "water", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
     }, this);
 
     this.input.keyboard.on('keydown_A', function(event){//Lightning
         const pointer = self.input.activePointer;
-        self.myProjectiles.add(addProjectile(self, "lightning",laneToCoord(self.player.currLane), 380));
-        this.socket.emit('playerInput', {type: "lightning", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+        self.myProjectiles.add(addProjectile(self, "lightning",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
+        this.socket.emit('playerInput', {type: "lightning", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
     }, this);
 
     this.input.keyboard.on('keydown_D', function(event){//Wind
         const pointer = self.input.activePointer;
-        self.myProjectiles.add(addProjectile(self, "wind",laneToCoord(self.player.currLane), 380));
-        this.socket.emit('playerInput', {type: "wind", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+        self.myProjectiles.add(addProjectile(self, "wind",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
+        this.socket.emit('playerInput', {type: "wind", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
     }, this);
 
     this.input.keyboard.on('keydown_S', function(event){//Stone
         const pointer = self.input.activePointer;
-        self.myProjectiles.add(addProjectile(self, "stone",laneToCoord(self.player.currLane), 380));
-        this.socket.emit('playerInput', {type: "stone", x: laneToCoord(self.player.currLane), y: 380, roomId: self.player.roomId});
+        self.myProjectiles.add(addProjectile(self, "stone",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
+        this.socket.emit('playerInput', {type: "stone", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
     }, this);
 
     this.socket.on('playerClicked',function(projectileData){
         //const op = self.physics.add.image(projectileData.x,600 - projectileData.y,'otherPlayer');//relative to screen height
         //op.setVelocityY(3);
-        self.otherProjectiles.add(addProjectile(self,projectileData.type,projectileData.x, 40));
+        console.log(projectileData.lane);
+        self.otherProjectiles.add(addProjectile(self,projectileData.type, laneToCoord(self, projectileData.lane), self.game.config.width/10 + self.game.config.width/6));
     }, this);
 }
 
 function update() {
     var self = this;
+    var gameEnd = false;
 
     this.myProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by me
         projectileObject.setVelocityY(-projectileObject.speed);
         //projectileObject.body.debugBodyColor = projectileObject.body.touching.none ? 0x0099ff : 0xff9900;
-        if(projectileObject.y < 40){
+        if(projectileObject.y < (self.otherPlayer.healthBar.y + projectileObject.height)){
             if(self.otherPlayer && self.player.getHealth() > 0){
                 self.otherPlayer.takeDamage(10);
                 self.otherPlayer.healthBar.displayWidth = 400*(self.otherPlayer.getHealth()/100);
@@ -508,7 +513,7 @@ function update() {
 
     this.otherProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by opponent
         projectileObject.setVelocityY(projectileObject.speed);
-        if(projectileObject.y > 380){
+        if(projectileObject.y > (self.player.healthBar.y - projectileObject.height)){
             if(self.player && self.player.getHealth() > 0){
                 self.player.takeDamage(10);
                 console.log(self.player.getHealth());
@@ -527,7 +532,7 @@ function update() {
     //Game Phases
     if(!self.otherPlayer){//if still waiting for opponent
         if(!this.loading){
-            this.loading = this.add.image(200, 300,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75); //Add loading gif if needed
+            this.loading = this.add.image(self.game.config.width/2, self.game.config.height/2,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75); //Add loading gif if needed
         }
         self.game.config.gamePhase = 0;
     }else if(self.otherPlayer){//if there is opponent
@@ -538,6 +543,7 @@ function update() {
     }
 
     if(gameEnd){
+        console.log("Game done");
         self.game.config.gamePhase = 2;
     }
 }
@@ -545,19 +551,19 @@ function update() {
 function addPlayer(self, playerInfo){
     self.player = new Player(playerInfo.playerId,playerInfo.roomId);//temp values
     console.log("Player: " + self.player);
-    self.player.healthBar = self.add.sprite(200,400,'health_bar').setOrigin(0.5,0.5).setDisplaySize(400*(self.player.health/100),40);
+    self.player.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.width,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.player.health/100),self.game.config.width/10);
 }
 
 function addOtherPlayer(self, playerInfo) {
     //const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5,0.5).setDisplaySize(53,40);
     self.otherPlayer = new Player(playerInfo.name,playerInfo.sessionId)
     console.log("Opponent: " + self.otherPlayer);
-    self.otherPlayer.healthBar = self.add.sprite(200,10,'health_bar').setOrigin(0.5,0.5).setDisplaySize(400*(self.otherPlayer.health/100),40);
+    self.otherPlayer.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.width/20,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.otherPlayer.health/100),self.game.config.width/10);
     self.otherPlayer.healthBar.setTint(0x00ff00);
 }
 
 function addProjectile(self, projectileType, posx, posy){
-    const p = self.physics.add.image(posx,posy,projectileType);
+    const p = self.physics.add.image(posx,posy,projectileType).setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/6, self.game.config.width/6);
     p.type = projectileType;
     if(projectileType == "stone"){
         p.speed = 0;
@@ -627,22 +633,22 @@ function identifyProjectile(){
     return type;
 }
 
-function laneToCoord(lane){
+function laneToCoord(self, lane){
     switch(lane){
         case 0:
-            return 64;
+            return self.game.config.width/6;
         case 1:
-            return 200;
+            return self.game.config.width/2;
         case 2:
-            return 335;
+            return (self.game.config.width*5)/6;
     }
 }
 
 function gameEnd(self, winner){
     self.socket.disconnect()
     if(winner){
-        self.win = self.add.image(200, 300,'win').setOrigin(0.5,0.5).setDisplaySize(200, 75);
+        self.win = self.add.image(self.game.config.width/2, self.game.config.height/2,'win').setOrigin(0.5,0.5).setDisplaySize(200, 75);
     }else{
-        self.lose = self.add.image(200, 300,'lose').setOrigin(0.5,0.5).setDisplaySize(200, 75);
+        self.lose = self.add.image(self.game.config.width/2, self.game.config.height/2,'lose').setOrigin(0.5,0.5).setDisplaySize(200, 75);
     }   
 }

@@ -19,7 +19,7 @@ var gestures = function(config){
 		autoTrack: true,
 		allowRotation: true,
 		inverseShape: true,
-		points: 33
+		points: 20
 	};
 	
 	var d;
@@ -106,13 +106,14 @@ var gestures = function(config){
 			
 			var ivect = vectorize(map, conf.allowRotation);
 			
-			var maxScore = 0;
+			var maxScore = 3;
 			var match = "none";
 			for(var i = 0; i < this.gestures.length; i++)
 			{
 				var dist = optCosDist(this.gestures[i].map, ivect);
 				var score = 1/dist;
 				
+				console.log("Gesture score for " + this.gestures[i].name + ": " + score);
 				if(score > maxScore)
 				{
 					maxScore = score;
@@ -317,8 +318,8 @@ var gestures = function(config){
 	//get document dimensions
 	var doc_size = function(){
 		var docsize = new Object();
-		docsize.width = 400;
-		docsize.height = 380;
+		docsize.width = window.outerHeight*(2/3);
+		docsize.height = window.outerHeight*(2/3);
 		// docsize.width = Math.max(
 		// 	Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
 		// 	Math.max(document.body.offsetWidth, document.documentElement.offsetWidth),
