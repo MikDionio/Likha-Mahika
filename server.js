@@ -86,9 +86,17 @@ io.on('connection', function(socket){//when a new player connects
         io.emit('disconnect',socket.id);
     });
 
-    socket.on('playerInput', function(projectileData){
+    socket.on('playerChangeProjectile', function(projectileData){
+        socket.broadcast.to(projectileData.roomId).emit('otherPlayerChangeProjectile', projectileData);
+    });
+
+    socket.on('playerChangeWard', function(wardData){
+        socket.broadcast.to(wardData.roomId).emit('otherPlayerChangeWard', wardData);
+    });
+
+    socket.on('playerInput', function(inputData){
         //console.log(projectileData.roomId);
-        socket.broadcast.to(projectileData.roomId).emit('playerClicked',projectileData);
+        socket.broadcast.to(inputData.roomId).emit('playerClicked',inputData);
     });
 });
 

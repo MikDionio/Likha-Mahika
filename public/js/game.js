@@ -1,36 +1,12 @@
 //Classes
-class Projectile{
-    constructor(projectileType, imageReference){
-        this.type = projectileType;
-        
-        if(this.type == "stone"){
-            this.speed = 0;
-        }else{
-            this.speed = 100;
-        }
-
-        this.image = imageReference;
-    }
-
-    getType(){
-        return this.type;
-    }
-
-    getSpeed(){
-        return this.speed;
-    }
-
-    setSpeed(value){
-        this.speed = value;
-    }
-}
-
 class Player{
     constructor(playerID,roomId){
         this.playerID = playerID;
         this.roomId = roomId;
         this.currLane = 0;
-        this.health = 100;
+        this.health = 10;
+        this.projectile_type = "";
+        this.ward_type = "";
     }
 
     getHealth(){
@@ -44,6 +20,59 @@ class Player{
         }
         return this.health;
     }
+
+    getProjectile(){
+        return this.projectile_type;
+    }
+
+    setProjectile(p){
+        this.projectile_type = p;
+    }
+
+    setWard(w){
+        this.ward_type = w;
+    }
+
+    getWard(){
+        return this.ward_type;
+    }
+}
+
+class Projectile{
+    constructor(projectileType, imageReference){
+        this.type = projectileType;
+        
+        if(this.type == "stone"){
+            this.speed = 0;
+        }else{
+            this.speed = 200;
+        }
+
+        this.image = imageReference;
+
+        this.resistance = 1;
+    }
+
+    getType(){
+        return this.type;
+    }
+
+    getSpeed(){
+        return this.speed;
+    }
+
+    setSpeed(s){
+        this.speed = s;
+    }
+
+    getResistance(){
+        return this.resistance;
+    }
+
+    setResistance(r){
+        this.resistance = r;
+    }
+
 }
 
 //Gestures
@@ -294,21 +323,21 @@ gest.addGesture("Triangle", [
 // 	{x: 100, y: 0},
 // ], updateGestureString);
 
-var x = 0;
-var y = -100;
-var circle = [];
-var totalPoints = 72;
-var step = (Math.PI*2)/totalPoints;
+// var x = 0;
+// var y = -100;
+// var circle = [];
+// var totalPoints = 72;
+// var step = (Math.PI*2)/totalPoints;
 
-for(var angle = 1; angle < totalPoints; angle++)
-{
-	var newX = x*Math.cos(angle*step)-y*Math.sin(angle*step);
-	var newY = y*Math.cos(angle*step)+x*Math.sin(angle*step);
-	var point = {x: newX, y: newY};
-	circle.push(point);
-}
+// for(var angle = 1; angle < totalPoints; angle++)
+// {
+// 	var newX = x*Math.cos(angle*step)-y*Math.sin(angle*step);
+// 	var newY = y*Math.cos(angle*step)+x*Math.sin(angle*step);
+// 	var point = {x: newX, y: newY};
+// 	circle.push(point);
+// }
 
-gest.addGesture("Circle", circle, updateGestureString);
+// gest.addGesture("Circle", circle, updateGestureString);
 
 var config = {
     type: Phaser.AUTO,
@@ -318,7 +347,7 @@ var config = {
     physics: {
       default: 'arcade',
       arcade: {
-        debug: false,
+        debug: true,
         gravity: { y: 0 }
       }
     },
@@ -338,14 +367,28 @@ var player;
 var chars="";
 
 function preload() {
-    this.load.image('fire','assets/star_full.png');
-    this.load.image('nature','assets/triangle.png');
-    this.load.image('wind','assets/wind.png');
-    this.load.image('water','assets/water.png');
-    this.load.image('lightning','assets/lightning.png');
-    this.load.image('stone','assets/stone.png')
+    // this.load.image('fire','assets/star_full.png');
+    // this.load.image('nature','assets/triangle.png');
+    // this.load.image('PSky','assets/wind.png');
+    // this.load.image('WSky', 'assets/wind.png');
+    // this.load.image('PWater','assets/water.png');
+    // this.load.image('WWater','assets/water.png');
+    // this.load.image('lightning','assets/lightning.png');
+    // this.load.image('stone','assets/stone.png');
+    this.load.image('PWater','assets/PWater.png');
+    this.load.image('WWater','assets/WWater.png');
+    this.load.image('PWaterII','assets/PWaterII.png');
+    this.load.image('WWaterII','assets/WWaterII.png');
+    this.load.image('PSky','assets/PSky.png');
+    this.load.image('WSky','assets/WSky.png');
+    this.load.image('PSkyII','assets/PSkyII.png');
+    this.load.image('WSkyII','assets/WSkyII.png');
+    this.load.image('PEarth','assets/PEarth.png');
+    this.load.image('WEarth','assets/WEarth.png');
+    this.load.image('PEarthII','assets/PEarthII.png');
+    this.load.image('WEarthII','assets/WEarthII.png');
     this.load.image('health_bar','assets/bar.png');
-    this.load.image('bg','assets/bg.png');
+    this.load.image('bg','assets/bgII.png');
     this.load.image('finding', 'assets/finding.png');
     this.load.image('win','assets/win.png');
     this.load.image('lose','assets/lose.png');
@@ -369,17 +412,14 @@ function create() {
     this.myProjectiles = this.physics.add.group();//Projectiles sent by me on the field
     this.otherProjectiles = this.physics.add.group();//Projectiles sent by opponent on the field
 
-    this.physics.add.overlap(this.myProjectiles.getChildren(), this.otherProjectiles.getChildren(), function(myProjectile, otherProjectile){//collision for projectiles
-        if(myProjectile.weaknesses.includes(otherProjectile.type)){
-            self.myProjectiles.remove(myProjectile);
-            myProjectile.destroy();
-        }
+    //Wards
+    this.myWard = this.physics.add.group();
+    this.otherWard = this.physics.add.group();
 
-        if(otherProjectile.weaknesses.includes(myProjectile.type)){
-            self.otherProjectiles.remove(otherProjectile);
-            otherProjectile.destroy();
-        }
-    });
+    //Projectile Ward collision
+    this.physics.add.overlap(this.myProjectiles.getChildren(), this.otherWard.getChildren(), projectileWardCollision, null, this);
+
+    this.physics.add.overlap(this.otherProjectiles.getChildren(), this.myWard.getChildren(), projectileWardCollision, null, this);
 
     this.socket.on('currentPlayers', function(player) {
         console.log(player.playerId + " === " + self.socket.id);
@@ -407,29 +447,20 @@ function create() {
 
     //Fire projectile on lane
     this.input.on('pointerdown', function(pointer){
-        console.log(self.game.config.gamePhase);
         if(self.game.config.gamePhase == 1){
-            console.log(pointer.x + ", " + pointer.y);
-            if(self.player){
-                if(pointer.x < self.game.config.width/3){
-                    self.player.currLane = 0;
-                }else if(pointer.x < self.game.config.width*(2/3)){
-                    self.player.currLane = 1;
-                }else{
-                    self.player.currLane = 2;
-                }
-                console.log(self.player.currLane);
-            }
+            console.log("Clicked")
             gest.clear();
             var type = identifyProjectile();
-            if(type){
-                console.log(type);
-                self.myProjectiles.add(addProjectile(self, type, laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
-                this.socket.emit('playerInput', {type: type, x: laneToCoord(self, self.player.currLane), y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
-                chars = "";
-            }else{
-                console.log("No match");
-                chars="";
+            if(type[0] == 'P'){
+                self.player.setProjectile(type);
+                this.socket.emit('playerChangeProjectile', {projectile_type: self.player.getProjectile(), roomId: self.player.roomId});
+            }else if(type){
+                self.player.setWard(type);
+                if(self.myWard.type){
+                    self.myWard.destroy();
+                }
+                this.myWard = addWard(self, self.player.getWard(), laneToCoord(this, 0), this.player.healthBar.y - this.game.config.width/6);
+                this.socket.emit('playerChangeWard',{ward_type: self.player.getWard(), roomId: self.player.roomId});
             }
         }
 
@@ -439,95 +470,131 @@ function create() {
         }
     }, this);
 
-    // emitter.on('throw_projectile', function(type){
-    //     self.myProjectiles.add(addProjectile(self, type,laneToCoord(self.player.currLane), self.game.config.width - self.game.config.width/6));
-    //     this.socket.emit('playerInput', {type: type, x: laneToCoord(self.player.currLane), y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
-    // }, this)
-
     //Throw Projectile (For debugging)
-    this.input.keyboard.on('keydown_Q', function(event){//Fire
-        const pointer = self.input.activePointer;
-        this.socket.emit('playerInput', {type: "fire", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
-        self.myProjectiles.add(addProjectile(self, "fire",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
+    this.input.keyboard.on('keydown_Q', function(event){//Sky
+        // const pointer = self.input.activePointer;
+        // this.socket.emit('playerInput', {type: "fire", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
+        // self.myProjectiles.add(addProjectile(self, "fire",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
+        self.player.setProjectile("PSky");
+        this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
+        // console.log(self.player.getProjectile());
     }, this);
 
-    this.input.keyboard.on('keydown_E', function(event){//Nature
-        const pointer = self.input.activePointer;
-        self.myProjectiles.add(addProjectile(self, "nature",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
-        this.socket.emit('playerInput', {type: "nature", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
+    this.input.keyboard.on('keydown_E', function(event){//Sky Ward
+        // const pointer = self.input.activePointer;
+        // self.myProjectiles.add(addProjectile(self, "nature",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
+        // this.socket.emit('playerInput', {type: "nature", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
+        self.player.setWard("WSky");
+        if(self.myWard.type){
+            self.myWard.destroy();
+        }
+        this.myWard.add(addWard(self, self.player.getWard(), laneToCoord(this, 0), this.player.healthBar.y - this.game.config.width/6));
+        this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
     }, this);
 
     this.input.keyboard.on('keydown_W', function(event){//Water
-        const pointer = self.input.activePointer;
-        self.myProjectiles.add(addProjectile(self, "water",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
-        this.socket.emit('playerInput', {type: "water", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
+        self.player.setProjectile("PWater");
+        this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
     }, this);
 
-    this.input.keyboard.on('keydown_A', function(event){//Lightning
-        const pointer = self.input.activePointer;
-        self.myProjectiles.add(addProjectile(self, "lightning",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
-        this.socket.emit('playerInput', {type: "lightning", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
+    this.input.keyboard.on('keydown_A', function(event){//Water Ward
+        self.player.setWard("WWater");
+        if(self.myWard.type){
+            self.myWard.destroy();
+        }
+        this.myWard.add(addWard(self, self.player.getWard(), laneToCoord(this, 0), this.player.healthBar.y - this.game.config.width/6));
+        this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
     }, this);
 
-    this.input.keyboard.on('keydown_D', function(event){//Wind
-        const pointer = self.input.activePointer;
-        self.myProjectiles.add(addProjectile(self, "wind",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
-        this.socket.emit('playerInput', {type: "wind", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
+    // this.input.keyboard.on('keydown_A', function(event){//Lightning
+    //     const pointer = self.input.activePointer;
+    //     self.myProjectiles.add(addProjectile(self, "lightning",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
+    //     this.socket.emit('playerInput', {type: "lightning", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
+    // }, this);
+
+    // this.input.keyboard.on('keydown_D', function(event){//Wind
+    //     const pointer = self.input.activePointer;
+    //     self.myProjectiles.add(addProjectile(self, "wind",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
+    //     this.socket.emit('playerInput', {type: "wind", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
+    // }, this);
+
+    // this.input.keyboard.on('keydown_S', function(event){//Stone
+    //     const pointer = self.input.activePointer;
+    //     self.myProjectiles.add(addProjectile(self, "stone",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
+    //     this.socket.emit('playerInput', {type: "stone", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
+    // }, this);
+
+    this.socket.on('playerClicked',function(inputData){
+        self.otherPlayer.setProjectile(inputData.projectile_type);
+        if(self.otherPlayer.getWard() != inputData.ward_type){
+            self.otherPlayer.setWard(inputData.ward_type);
+            if(self.otherWard.getChildren()[0]){
+                self.otherWard.getChildren()[0].destroy();
+            }
+            self.otherWard.add(addWard(self, self.otherPlayer.getWard(), laneToCoord(self, 1), self.otherPlayer.healthBar.y + self.game.config.width/6));
+            self.otherWard.children.each(entity => entity.flipY = true)
+        }
+        
     }, this);
 
-    this.input.keyboard.on('keydown_S', function(event){//Stone
-        const pointer = self.input.activePointer;
-        self.myProjectiles.add(addProjectile(self, "stone",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
-        this.socket.emit('playerInput', {type: "stone", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
+    this.socket.on('otherPlayerChangeProjectile', function(projectileData){//change projectile only
+        self.otherPlayer.setProjectile(projectileData.projectile_type);
     }, this);
 
-    this.socket.on('playerClicked',function(projectileData){
-        //const op = self.physics.add.image(projectileData.x,600 - projectileData.y,'otherPlayer');//relative to screen height
-        //op.setVelocityY(3);
-        console.log(projectileData.lane);
-        self.otherProjectiles.add(addProjectile(self,projectileData.type, laneToCoord(self, projectileData.lane), self.game.config.width/10 + self.game.config.width/6));
-    }, this);
+    this.socket.on('otherPlayerChangeWard', function(wardData){//change ward only
+        if(self.otherPlayer.getWard() != wardData.ward_type){
+            self.otherPlayer.setWard(wardData.ward_type);
+            if(self.otherWard.getChildren()[0]){
+                self.otherWard.getChildren()[0].destroy();
+            }
+            self.otherWard.add(addWard(self, self.otherPlayer.getWard(), laneToCoord(self, 1), self.otherPlayer.healthBar.y + self.game.config.width/6));
+            self.otherWard.children.each(entity => entity.flipY = true)
+        }
+    }, this)
+
+    timedEvent = this.time.addEvent({ delay: 1500, callback: fireProjectiles, callbackScope: this, loop: true });
 }
 
 function update() {
     var self = this;
     var gameEnd = false;
 
-    this.myProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by me
-        projectileObject.setVelocityY(-projectileObject.speed);
-        //projectileObject.body.debugBodyColor = projectileObject.body.touching.none ? 0x0099ff : 0xff9900;
-        if(projectileObject.y < (self.otherPlayer.healthBar.y + projectileObject.height)){
-            if(self.otherPlayer && self.player.getHealth() > 0){
-                self.otherPlayer.takeDamage(10);
-                self.otherPlayer.healthBar.displayWidth = 400*(self.otherPlayer.getHealth()/100);
-
-                if(self.otherPlayer.getHealth() == 0){//if opponent health goes to zero
-                    gameEnd(self, 1);
-                    gameEnd = true;
+    if(self.game.config.gamePhase == 1){
+        this.myProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by me
+            projectileObject.setVelocityY(-projectileObject.speed);
+            //projectileObject.body.debugBodyColor = projectileObject.body.touching.none ? 0x0099ff : 0xff9900;
+            if(projectileObject.y < (self.otherPlayer.healthBar.y + projectileObject.height)){
+                if(self.otherPlayer && self.player.getHealth() > 0){
+                    self.otherPlayer.takeDamage(projectileObject.power);
+                    self.otherPlayer.healthBar.displayWidth = self.game.config.width*(self.otherPlayer.getHealth()/10);
+    
+                    if(self.otherPlayer.getHealth() == 0){//if opponent health goes to zero
+                        endGame(self, 1);
+                        gameEnd = true;
+                    }
                 }
+                self.myProjectiles.remove(projectileObject);//stop tracking projectile
+                projectileObject.destroy();
             }
-            self.myProjectiles.remove(projectileObject);//stop tracking projectile
-            projectileObject.destroy();
-        }
-    }, this);
-
-    this.otherProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by opponent
-        projectileObject.setVelocityY(projectileObject.speed);
-        if(projectileObject.y > (self.player.healthBar.y - projectileObject.height)){
-            if(self.player && self.player.getHealth() > 0){
-                self.player.takeDamage(10);
-                console.log(self.player.getHealth());
-                self.player.healthBar.displayWidth = 400*(self.player.getHealth()/100);
-
-                if(self.player.getHealth() == 0){//if player health goes to zero
-                    gameEnd(self, 0);
-                    gameEnd = true;
+        }, this);
+    
+        this.otherProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by opponent
+            projectileObject.setVelocityY(projectileObject.speed);
+            if(projectileObject.y > (self.player.healthBar.y - projectileObject.height)){
+                if(self.player && self.player.getHealth() > 0){
+                    self.player.takeDamage(projectileObject.power);
+                    console.log(self.player.getHealth());
+                    self.player.healthBar.displayWidth = self.game.config.width*(self.player.getHealth()/10);
+                    if(self.player.getHealth() == 0){//if player health goes to zero
+                        endGame(self, 0);
+                        gameEnd = true;
+                    }
                 }
+                self.otherProjectiles.remove(projectileObject);//stop tracking projectile
+                projectileObject.destroy();
             }
-            self.otherProjectiles.remove(projectileObject);//stop tracking projectile
-            projectileObject.destroy();
-        }
-    }, this);
+        }, this);
+    }
 
     //Game Phases
     if(!self.otherPlayer){//if still waiting for opponent
@@ -535,69 +602,127 @@ function update() {
             this.loading = this.add.image(self.game.config.width/2, self.game.config.height/2,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75); //Add loading gif if needed
         }
         self.game.config.gamePhase = 0;
-    }else if(self.otherPlayer){//if there is opponent
+    }else if(self.otherPlayer && self.game.config.gamePhase == 0){//if there is opponent
         if(this.loading){//remove loading gif
             this.loading.destroy();
         }
         self.game.config.gamePhase = 1;
     }
 
-    if(gameEnd){
-        console.log("Game done");
+    if(gameEnd && self.game.config.gamePhase == 1){
         self.game.config.gamePhase = 2;
     }
 }
 
+function projectileWardCollision(projectile, ward){//collision for projectiles
+        
+    temp = ward.resistance;
+    
+    if(ward.weaknesses.includes(projectile.type)){
+        ward.resistance = ward.resistance - projectile.power;
+    }
+
+    projectile.power = projectile.power - temp;
+
+    // console.log("Collide. Resistance: " + otherWard.resistance);
+
+    if(projectile.power <= 0){
+        projectile.destroy();
+    }
+
+    if(ward.resistance <= 0){
+        ward.destroy();
+    }
+}
+
+function fireProjectiles(){
+    if(this.game.config.gamePhase == 1){
+        if(this.player.getProjectile()){
+            this.myProjectiles.add(addProjectile(this, this.player.getProjectile(), laneToCoord(this, 1), this.player.healthBar.y - this.game.config.width/6)); 
+        }
+    
+        if(this.otherPlayer.getProjectile()){
+            this.otherProjectiles.add(addProjectile(this, this.otherPlayer.getProjectile(), laneToCoord(this, 0), this.otherPlayer.healthBar.y + this.game.config.width/6));
+            this.otherProjectiles.children.each(entity => entity.flipY = true)
+        }
+    }
+    
+}
+
 function addPlayer(self, playerInfo){
-    self.player = new Player(playerInfo.playerId,playerInfo.roomId);//temp values
-    console.log("Player: " + self.player);
-    self.player.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.width,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.player.health/100),self.game.config.width/10);
+    if(!self.player){
+        self.player = new Player(playerInfo.playerId,playerInfo.roomId);//temp values
+        console.log("Player: " + self.player);
+        self.player.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width/10,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.player.health/10),self.game.config.width/10);
+    }
+    
 }
 
 function addOtherPlayer(self, playerInfo) {
-    //const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5,0.5).setDisplaySize(53,40);
-    self.otherPlayer = new Player(playerInfo.name,playerInfo.sessionId)
-    console.log("Opponent: " + self.otherPlayer);
-    self.otherPlayer.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.width/20,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.otherPlayer.health/100),self.game.config.width/10);
-    self.otherPlayer.healthBar.setTint(0x00ff00);
+    if(!self.otherPlayer){
+        self.otherPlayer = new Player(playerInfo.name,playerInfo.sessionId)
+        console.log("Opponent: " + self.otherPlayer);
+        self.otherPlayer.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.width/20,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.otherPlayer.health/10),self.game.config.width/10);
+        self.otherPlayer.healthBar.setTint(0x00ff00);
+    }
 }
 
 function addProjectile(self, projectileType, posx, posy){
-    const p = self.physics.add.image(posx,posy,projectileType).setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/6, self.game.config.width/6);
+    const p = self.physics.add.image(posx,posy,projectileType).setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/12, self.game.config.width/6);
     p.type = projectileType;
-    if(projectileType == "stone"){
-        p.speed = 0;
-    }else{
-        p.speed = 100;
-    }
+    p.speed = 200;
 
-    //Weaknesses
     switch(projectileType){
-        case 'fire':
-            p.weaknesses = [p.type,"water","wind","stone"];
+        case 'PWaterII': 
+            p.power = 2;
             break;
-        case 'water':
-            p.weaknesses = [p.type,"lightning","nature","stone"];
+        case 'PEarthII': 
+            p.power = 2;
             break;
-        case 'wind':
-            p.weaknesses = [p.type,"water","nature","stone"];
+        case 'PSkyII': 
+            p.power = 2;
             break;
-        case 'lightning':
-            p.weaknesses = [p.type,"fire","wind","stone"];
-            break;
-        case 'nature':
-            p.weaknesses = [p.type,"fire","lightning","stone"];
-            break;
-        case 'stone':
-            p.weaknesses = [p.type,"fire","lightning","wind","water","nature"];
-            break;
+        default:
+            p.power = 1;
     }
     return p;
 }
 
-function updateGestureString(fig){
+function addWard(self, wardType, posx, posy){
+    const w = self.physics.add.image(posx, posy, wardType).setOrigin(0.5, 0.5).setDisplaySize(self.game.config.width/4, self.game.config.width/12);
+    w.type = wardType;
+    switch(wardType){
+        case 'WWaterII': 
+            w.resistance = 3;
+            w.weaknesses = ["PSkyII"];
+            break;
+        case 'WEarthII': 
+            w.resistance = 3;
+            w.weaknesses = ["PWaterII"];
+            break;
+        case 'WSkyII': 
+            w.resistance = 3;
+            w.weaknesses = ["PEarthII"];
+            break;
+        case 'WWater':
+            w.resistance = 1;
+            w.weaknesses = ["PSkyII", "PEarthII", "PSky"];
+            break;
+        case 'WEarth':
+            w.resistance = 1;
+            w.weaknesses = ["PWaterII", "PSkyII", "PWater"];
+            break;
+        case 'WSky':
+            w.resistance = 1;
+            w.weaknesses = ["PEarthII", "PWaterII", "PEarth"];
+            break;
+    }
+    return w;
+}
+
+function updateGestureString(fig, points){
+    console.log(points);
     chars += fig;
-    console.log(chars);
 }
 
 function identifyProjectile(){
@@ -607,10 +732,10 @@ function identifyProjectile(){
     //console.log(name);
     switch(chars){
         case 'Ha':
-            type = "wind";
+            type = "WWater";
             break;
         case 'Ba':
-            type = "stone";
+            type = "PWater";
             break;
         case 'Wa':
             type="water";
@@ -625,8 +750,10 @@ function identifyProjectile(){
             type="fire";
             break;
     }
-    console.log(chars)
+    console.log(chars);
     console.log(type);
+
+    chars = "";
     //const pointer = self.input.activePointer;
     //Emit projectile event
     //emitter.emit('throw_projectile', type);
@@ -636,19 +763,17 @@ function identifyProjectile(){
 function laneToCoord(self, lane){
     switch(lane){
         case 0:
-            return self.game.config.width/6;
+            return self.game.config.width*(4/10);
         case 1:
-            return self.game.config.width/2;
-        case 2:
-            return (self.game.config.width*5)/6;
+            return self.game.config.width*(6/10);
     }
 }
 
-function gameEnd(self, winner){
+function endGame(self, winner){
     self.socket.disconnect()
     if(winner){
         self.win = self.add.image(self.game.config.width/2, self.game.config.height/2,'win').setOrigin(0.5,0.5).setDisplaySize(200, 75);
     }else{
         self.lose = self.add.image(self.game.config.width/2, self.game.config.height/2,'lose').setOrigin(0.5,0.5).setDisplaySize(200, 75);
-    }   
+    }
 }

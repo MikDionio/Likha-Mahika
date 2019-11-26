@@ -122,7 +122,7 @@ var gestures = function(config){
 			}
 			if(match.callback)
 			{
-				match.callback(match.name);
+				match.callback(match.name, points); //also send points to callback for logging
 			}
 		}
 	};
@@ -184,10 +184,15 @@ var gestures = function(config){
 	this.Up = function(event){
 		if(conf.autoTrack && tracking)
 		{
-			//console.log(ob.points)
+			console.log(ob.points)
 			ob.resolve(ob.points);
 		}
 		remove_event(document.body, "touchmove", ob.Move);
+	};
+
+	// give points
+	this.getPoints = function(event){
+		return ob.points;
 	};
 
 	//some helping internal functions
