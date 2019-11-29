@@ -1,17 +1,22 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
  
-    <head>
-        <meta charset="utf-8">
-        <link rel="manifest" href="manifest.json" />
-        <link rel="icon" href="assets/192spaceShips_001.png" sizes="192x192" />
-        <link rel="icon" href="assets/512spaceShips_001.png" sizes="512x512" />
-    </head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Login Page</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="css/main.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/192spaceShips_001.png" sizes="192x192" />
+  <link rel="icon" href="assets/512spaceShips_001.png" sizes="512x512" />
+</head>
  
-    <body>
-        <!-- The Modal -->
+<body class="text-center">
+   <!-- The Modal
         <div id="myModal" class="modal">
-            <!-- Modal content -->
+            modal content
             <div class="modal-content">
                 <span class="close">&times;</span>
                 <p>Add to home screen?</p>
@@ -52,19 +57,36 @@
             function offlinePrompt() {
                 deferredPrompt.prompt();
             }
-        </script>
-        <div>
-            <script type="text/javascript" src="js/gestures.js"></script>
-            <script src = "/socket.io/socket.io.js"></script>
-            <script src="js/phaser.min.js"></script>
-            <!-- <script src="js/phaser.js"></script> -->
-            <script src="js/game.js"></script>
-        </div>
-        <!-- <div> -->
-            <!-- <h1 style='text-align: center;'>Baybayin Game</h1> -->
-            
-            <!-- <script type="text/javascript" src="js/gesture_list.js"></script> -->
-        <!-- </div> -->
-    </body>
+        </script> -->
+  <form class="form-signin">
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <label for="username" class="sr-only">Username</label>
+    <input type="text" id="username" class="form-control" placeholder="Username" required autofocus>
+    <label for="password" class="sr-only">Password</label>
+    <input type="password" id="password" class="form-control" placeholder="Password" required>
+    <a class="btn btn-lg btn-primary btn-block" onClick="signIn()">Sign in</a>
+    <a href="/signup.html">Don't have an account? Sign up here.</a>
+  </form>
+  <script>
+    function signIn() {
+      var data = {
+        username: document.forms[0].elements[0].value,
+        password: document.forms[0].elements[1].value
+      };
+      $.ajax({
+        type: 'POST',
+        url: '/login',
+        data,
+        success: function (data) {
+          self.location.replace('http://localhost:8081/game.html');
+        },
+        error: function (xhr) {
+          window.alert(JSON.stringify(xhr));
+          window.location.replace('/index.html');
+        }
+      });
+    }
+  </script>
+</body>
  
 </html>
