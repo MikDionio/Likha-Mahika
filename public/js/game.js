@@ -75,6 +75,51 @@ class Projectile{
 
 }
 
+class Log{//Log for learning analytics
+    constructor(player){
+        this.playerName = player;
+        this.opponentName = "";
+        this.startTime = "";
+        this.endTime = "";
+        this.winLose = "";
+        this.figures = [];
+    }
+
+    setOpponent(name){
+        this.opponentName = name;
+    }
+
+    setStartTime(t){
+        this.startTime = t;
+    }
+
+    setEndTime(t){
+        this.endTime = t;
+    }
+
+    setWinLose(didWin){
+        this.winLose = didWin;
+    }
+}
+
+//Figure object for learning analytics
+class Figure{
+    constructor(startT){
+        this.startTime = startT;
+        this.endTime = "";
+        this.strokes = [];
+        this.figName = "";
+    }
+
+    setEndTime(t){
+        this.endTime = t;
+    }
+
+    setFigName(name){
+        this.figName = name;
+    }
+}
+
 //Gestures
 var gest = new gestures({
 	debug: true,
@@ -358,11 +403,14 @@ var config = {
     },
     gamePhase: 0,
 };
-   
+
+
 var game = new Phaser.Game(config);
 var emitter = new Phaser.Events.EventEmitter();
 var otherPlayer;
 var player;
+var log;
+var f;
 // var gamePhase = 0;//0 for finding opponent, 1 for game playing, 2 for match end
 var chars="";
 
@@ -448,9 +496,16 @@ function create() {
     //Fire projectile on lane
     this.input.on('pointerdown', function(pointer){
         if(self.game.config.gamePhase == 1){
-            console.log("Clicked")
             gest.clear();
             var type = identifyProjectile();
+
+            //Logging
+            f.setEndTime(Date.now());
+            f.setFigName(self.chars);
+
+            self.log.figures.push(f);
+
+            console.log(self.log);
             if(type[0] == 'P'){
                 self.player.setProjectile(type);
                 this.socket.emit('playerChangeProjectile', {projectile_type: self.player.getProjectile(), roomId: self.player.roomId});
@@ -605,6 +660,8 @@ function update() {
     }else if(self.otherPlayer && self.game.config.gamePhase == 0){//if there is opponent
         if(this.loading){//remove loading gif
             this.loading.destroy();
+            self.log.setStartTime(Date.now());//log start time
+            console.log(self.log);
         }
         self.game.config.gamePhase = 1;
     }
@@ -654,6 +711,7 @@ function addPlayer(self, playerInfo){
         self.player = new Player(playerInfo.playerId,playerInfo.roomId);//temp values
         console.log("Player: " + self.player);
         self.player.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width/10,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.player.health/10),self.game.config.width/10);
+        self.log = new Log(playerInfo.playerId);
     }
     
 }
@@ -664,6 +722,7 @@ function addOtherPlayer(self, playerInfo) {
         console.log("Opponent: " + self.otherPlayer);
         self.otherPlayer.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.width/20,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.otherPlayer.health/10),self.game.config.width/10);
         self.otherPlayer.healthBar.setTint(0x00ff00);
+        self.log.setOpponent(playerInfo.playerId);
     }
 }
 
@@ -720,8 +779,14 @@ function addWard(self, wardType, posx, posy){
     return w;
 }
 
-function updateGestureString(fig, points){
-    console.log(points);
+function updateGestureString(fig, points, timeStart, timeEnd){
+    if(chars == ""){
+        f = new Figure(timeStart);
+        f.strokes.push(points);
+    }else{
+        f.strokes.push(points);
+    }
+    console.log(f);
     chars += fig;
 }
 
@@ -770,10 +835,20 @@ function laneToCoord(self, lane){
 }
 
 function endGame(self, winner){
-    self.socket.disconnect()
     if(winner){
         self.win = self.add.image(self.game.config.width/2, self.game.config.height/2,'win').setOrigin(0.5,0.5).setDisplaySize(200, 75);
+        self.log.setWinLose(true);
     }else{
         self.lose = self.add.image(self.game.config.width/2, self.game.config.height/2,'lose').setOrigin(0.5,0.5).setDisplaySize(200, 75);
+        self.log.setWinLose(false);
     }
+    self.log.setEndTime(Date.now());
+    console.log(self.log);
+    json = JSON.stringify(self.log);
+    // var fs = require('fs');
+    // fs.writeFile('log', json, 'utf8', callback);
+    // console.log(json);
+    fileName = self.log.playerName + "_" + new Date(self.log.startTime).toDateString();
+    self.socket.emit('log',{logName: fileName,logInfo: json});
+    self.socket.disconnect()
 }

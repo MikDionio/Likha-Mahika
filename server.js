@@ -98,6 +98,15 @@ io.on('connection', function(socket){//when a new player connects
         //console.log(projectileData.roomId);
         socket.broadcast.to(inputData.roomId).emit('playerClicked',inputData);
     });
+
+    socket.on('log', function(logData){
+        console.log("logging");
+        var fs = require('fs');
+        fs.writeFile(logData.logName.replace(/\s+/g, '_')+'.json', logData.logInfo, 'utf8', function (err) {
+            if (err) throw err;
+            console.log('Saved!');
+        });
+    });
 });
 
 server.listen(8081, function() {

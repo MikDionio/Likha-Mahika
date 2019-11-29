@@ -26,6 +26,8 @@ var gestures = function(config){
 	var ctx;
 	var tracking = false;
 	var ob = this;
+	var gestStart;
+	var gestEnd;
 	
 	this.gestures = [];
 	this.points = [];
@@ -122,7 +124,7 @@ var gestures = function(config){
 			}
 			if(match.callback)
 			{
-				match.callback(match.name, points); //also send points to callback for logging
+				match.callback(match.name, points, gestStart, gestEnd); //also send points to callback for logging
 			}
 		}
 	};
@@ -138,6 +140,7 @@ var gestures = function(config){
 	//gesture auto tracking
 	//mouse down
 	this.Down = function(event){
+		gestStart = Date.now();
 		ob.reset();
 		if(conf.draw)
 		{
@@ -182,6 +185,7 @@ var gestures = function(config){
 	};
 	//mouse up
 	this.Up = function(event){
+		gestEnd = Date.now();
 		if(conf.autoTrack && tracking)
 		{
 			console.log(ob.points)
