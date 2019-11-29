@@ -19,13 +19,15 @@ var gestures = function(config){
 		autoTrack: true,
 		allowRotation: true,
 		inverseShape: true,
-		points: 33
+		points: 20
 	};
 	
 	var d;
 	var ctx;
 	var tracking = false;
 	var ob = this;
+	var gestStart;
+	var gestEnd;
 	
 	this.gestures = [];
 	this.points = [];
@@ -106,13 +108,14 @@ var gestures = function(config){
 			
 			var ivect = vectorize(map, conf.allowRotation);
 			
-			var maxScore = 0;
+			var maxScore = 3;
 			var match = "none";
 			for(var i = 0; i < this.gestures.length; i++)
 			{
 				var dist = optCosDist(this.gestures[i].map, ivect);
 				var score = 1/dist;
 				
+				console.log("Gesture score for " + this.gestures[i].name + ": " + score);
 				if(score > maxScore)
 				{
 					maxScore = score;
@@ -121,7 +124,7 @@ var gestures = function(config){
 			}
 			if(match.callback)
 			{
-				match.callback(match.name);
+				match.callback(match.name, points, gestStart, gestEnd); //also send points to callback for logging
 			}
 		}
 	};
@@ -137,6 +140,7 @@ var gestures = function(config){
 	//gesture auto tracking
 	//mouse down
 	this.Down = function(event){
+		gestStart = Date.now();
 		ob.reset();
 		if(conf.draw)
 		{
@@ -181,12 +185,18 @@ var gestures = function(config){
 	};
 	//mouse up
 	this.Up = function(event){
+		gestEnd = Date.now();
 		if(conf.autoTrack && tracking)
 		{
 			console.log(ob.points)
 			ob.resolve(ob.points);
 		}
 		remove_event(document.body, "touchmove", ob.Move);
+	};
+
+	// give points
+	this.getPoints = function(event){
+		return ob.points;
 	};
 
 	//some helping internal functions
@@ -317,8 +327,8 @@ var gestures = function(config){
 	//get document dimensions
 	var doc_size = function(){
 		var docsize = new Object();
-		docsize.width = 400;
-		docsize.height = 380;
+		docsize.width = window.outerHeight*(2/3);
+		docsize.height = window.outerHeight*(2/3);
 		// docsize.width = Math.max(
 		// 	Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
 		// 	Math.max(document.body.offsetWidth, document.documentElement.offsetWidth),
