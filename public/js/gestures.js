@@ -50,7 +50,7 @@ var gestures = function(config){
 			canvas.setAttribute("width", d.width + "px");
 			canvas.setAttribute("height", d.height + "px");
 			canvas.style.position = "absolute";
-			canvas.style.top = "100px";
+			canvas.style.top = "0px";
 			canvas.style.left = "0px";
 			canvas.id = "gestures_canvas";
 			ctx = canvas.getContext("2d");
