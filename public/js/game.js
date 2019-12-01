@@ -1363,6 +1363,7 @@ function create() {
 
         if(self.game.config.gamePhase == 2){//Tap to return to home page when game ends
             location.replace('http://localhost:3000/home.html');
+            self.player.displayName.setText("Back to home");
         }
     }, this);
 
@@ -1642,10 +1643,10 @@ function errorString(fig, points, score, timeStart, timeEnd){
     if(chars == ""){
         f = new Figure(timeStart);
         f.strokes.push(points);
-        f.strokes.push(score);
+        f.scores.push(score);
     }else{
         f.strokes.push(points);
-        f.strokes.push(score);
+        f.scores.push(score);
     }
     chars += fig;
     console.log("Wrong stroke");//soon this will have proper error feedback
