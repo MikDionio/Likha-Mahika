@@ -1361,9 +1361,8 @@ function create() {
             }
         }
 
-        if(self.game.config.gamePhase == 2){
-            console.log("Restarting");
-            location.reload(true);
+        if(self.game.config.gamePhase == 2){//Tap to return to home page when game ends
+            location.replace('http://localhost:3000/home.html');
         }
     }, this);
 
