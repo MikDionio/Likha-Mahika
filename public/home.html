@@ -16,12 +16,7 @@
 <body class="text-center">
   <form class="form-signin">
     <h1 class="h3 mb-3 font-weight-normal" id="username"></h1>
-    <label for="username" class="sr-only">Username</label>
-    <input type="text" id="username" class="form-control" placeholder="Username" required autofocus>
-    <label for="password" class="sr-only">Password</label>
-    <input type="password" id="password" class="form-control" placeholder="Password" required>
-    <a class="btn btn-lg btn-primary btn-block" onClick="signIn()">Sign in</a>
-    <a href="/signup.html">Don't have an account? Sign up here.</a>
+    <a class="btn btn-lg btn-danger btn-block text-white" onClick="startGame()">Start Game</a>
   </form>
 
 </body>
@@ -32,13 +27,15 @@
     url: '/current',
     success: function (response) {
         loggedUser = response;
-        document.getElementById("username").innerHTML = loggedUser;
+        document.getElementById("username").innerHTML = "Hello " + loggedUser + "!";
     },
     error: function (xhr) {
         window.alert(JSON.stringify(xhr));
         window.location.replace('/index.html');
     }
     });
-
+    function startGame(){
+      self.location.replace('http://localhost:8081/game.html');
+    }
 </script>
 </html>
