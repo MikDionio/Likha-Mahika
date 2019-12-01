@@ -1599,15 +1599,15 @@ function addWard(self, wardType, posx, posy){
     switch(wardType){
         case 'WWaterII': 
             w.resistance = 3;
-            w.weaknesses = ["PSkyII"];
+            w.weaknesses = ["PSkyII", "PSky"];
             break;
         case 'WEarthII': 
             w.resistance = 3;
-            w.weaknesses = ["PWaterII"];
+            w.weaknesses = ["PWaterII", "PWater"];
             break;
         case 'WSkyII': 
             w.resistance = 3;
-            w.weaknesses = ["PEarthII"];
+            w.weaknesses = ["PEarthII", "PEarth"];
             break;
         case 'WWater':
             w.resistance = 1;
@@ -1658,7 +1658,7 @@ function identifyProjectile(){
     var type = "";
     //console.log(name);
     switch(chars){
-        case 'Ma':
+        case 'MaMa2':
             type = "PWater";
             break;
         case 'Sa':
