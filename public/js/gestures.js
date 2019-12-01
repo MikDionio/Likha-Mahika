@@ -331,7 +331,7 @@ var gestures = function(config){
 	var doc_size = function(){
 		var docsize = new Object();
 		docsize.width = window.outerHeight*(2/3);
-		docsize.height = window.outerHeight*(2/3);
+		docsize.height = window.outerHeight*(5/6);
 		// docsize.width = Math.max(
 		// 	Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
 		// 	Math.max(document.body.offsetWidth, document.documentElement.offsetWidth),

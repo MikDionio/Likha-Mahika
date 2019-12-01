@@ -1463,6 +1463,7 @@ function update() {
             if(projectileObject.y < (self.otherPlayer.healthBar.y + projectileObject.height)){
                 if(self.otherPlayer && self.player.getHealth() > 0){
                     self.otherPlayer.takeDamage(projectileObject.power);
+                    self.otherPlayer.displayName.setText(self.otherPlayer.playerName + "(" + self.otherPlayer.health  + "/10)");
                     self.otherPlayer.healthBar.displayWidth = self.game.config.width*(self.otherPlayer.getHealth()/10);
     
                     if(self.otherPlayer.getHealth() == 0){//if opponent health goes to zero
@@ -1480,7 +1481,7 @@ function update() {
             if(projectileObject.y > (self.player.healthBar.y - projectileObject.height)){
                 if(self.player && self.player.getHealth() > 0){
                     self.player.takeDamage(projectileObject.power);
-                    console.log(self.player.getHealth());
+                    self.player.displayName.setText(self.player.playerName + "(" + self.player.health  + "/10)");
                     self.player.healthBar.displayWidth = self.game.config.width*(self.player.getHealth()/10);
                     if(self.player.getHealth() == 0){//if player health goes to zero
                         endGame(self, 0);
@@ -1554,7 +1555,7 @@ function addPlayer(self, playerInfo){
         console.log("Player: " + self.player.playerName);
         self.player.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width/10,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.player.health/10),self.game.config.width/10);
         self.player.healthBar.setTint(0x00ff00);
-        self.player.displayName = self.add.text(self.game.config.width/2, self.game.config.height-self.game.config.width/10, self.player.playerName, { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
+        self.player.displayName = self.add.text(self.game.config.width/2, self.game.config.height-self.game.config.width/10, self.player.playerName + "(" + self.player.health  + "/10)", { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
         self.log = new Log(playerInfo.playerName);
     }
     
@@ -1566,7 +1567,7 @@ function addOtherPlayer(self, playerInfo) {
         console.log("Opponent: " + self.otherPlayer.playerName);
         self.otherPlayer.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.width/20,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.otherPlayer.health/10),self.game.config.width/10);
         self.otherPlayer.healthBar.setTint(0xff00ff);
-        self.otherPlayer.displayName = self.add.text(self.game.config.width/2, self.game.config.width/20, self.otherPlayer.playerName, { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
+        self.otherPlayer.displayName = self.add.text(self.game.config.width/2, self.game.config.width/20, self.otherPlayer.playerName + "(" + self.otherPlayer.health  + "/10)", { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
         self.log.setOpponent(playerInfo.playerName);
     }
 }
