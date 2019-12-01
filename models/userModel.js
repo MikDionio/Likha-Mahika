@@ -1,12 +1,14 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs');
- 
+const uniqueValidator = require('mongoose-unique-validator')
 const Schema = mongoose.Schema;
  
 const UserSchema = new Schema({
   username : {
     type: String,
-    required: true
+    required: true,
+    unique: true,
+    dropDups: true
   },
   password : {
     type : String,
@@ -18,7 +20,8 @@ const UserSchema = new Schema({
 //     default: 0
 //   }
 });
- 
+
+UserSchema.plugin(uniqueValidator)
 UserSchema.pre('save', async function (next) {
   const user = this;
   const hash = await bcrypt.hash(this.password, 10);
