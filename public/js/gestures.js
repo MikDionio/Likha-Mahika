@@ -110,7 +110,7 @@ var gestures = function(config){
 			
 			var maxScore = 3;
 			var match = "none";
-			for(var i = 0; i < this.gestures.length; i++)
+			for(var i = 0; i < this.gestures.length-1; i++)
 			{
 				var dist = optCosDist(this.gestures[i].map, ivect);
 				var score = 1/dist;
@@ -124,7 +124,10 @@ var gestures = function(config){
 			}
 			if(match.callback)
 			{
-				match.callback(match.name, points, gestStart, gestEnd); //also send points to callback for logging
+				match.callback(match.name, score, points, gestStart, gestEnd); //also send points to callback for logging
+			}else{
+				match = this.gestures[this.gestures.length-1];
+				match.callback(match.name, score, points, gestStart, gestEnd);
 			}
 		}
 	};
@@ -328,7 +331,7 @@ var gestures = function(config){
 	var doc_size = function(){
 		var docsize = new Object();
 		docsize.width = window.outerHeight*(2/3);
-		docsize.height = window.outerHeight*(2/3);
+		docsize.height = window.outerHeight*(5/6);
 		// docsize.width = Math.max(
 		// 	Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
 		// 	Math.max(document.body.offsetWidth, document.documentElement.offsetWidth),

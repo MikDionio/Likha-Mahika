@@ -46,7 +46,7 @@ gest.addGesture("A", [
     {x: 347.20241825306624, y: 304.1020202636719},
     {x: 366.5887451171875, y: 299.5025571118495},
     {x: 383.2518615722656, y: 292.9932861328125},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("A2", [
     {x: 193.0145263671875, y: 326.31951904296875},
@@ -82,7 +82,7 @@ gest.addGesture("A2", [
     {x: 82.50475863748622, y: 320.7651672363281},
     {x: 78.74441041615522, y: 320.7651672363281},
     {x: 74.98406219482422, y: 320.7651672363281},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("A3", [
     {x: 205.51187133789062, y: 383.2518615722656},
@@ -118,7 +118,7 @@ gest.addGesture("A3", [
  {x: 108.14638135804256, y: 402.69219970703125},
  {x: 106.14545630402131, y: 404.0807800292969},
  {x: 104.14453125, y: 405.4693603515625},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Ba", [
     {x: 265.2214050292969, y: 304.1020202636719},
@@ -154,7 +154,7 @@ gest.addGesture("Ba", [
      {x: 304.1020202636719, y: 333.9937824043866},
      {x: 284.50151800791167, y: 319.3765563964844},
      {x: 263.83282470703125, y: 305.4906311035156},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Da", [
     {x: 113.86468505859375, y: 301.3248291015625},
@@ -190,7 +190,7 @@ gest.addGesture("Da", [
  {x: 322.15374755859375, y: 302.28203277339156},
  {x: 328.0429440363734, y: 297.1590576171875},
  {x: 333.26251220703125, y: 292.9932861328125},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Da2", [
     {x: 73.59546661376953, y: 244.3925018310547},
@@ -226,7 +226,7 @@ gest.addGesture("Da2", [
      {x: 367.97735595703125, y: 425.1239722660482},
      {x: 379.0860900878906, y: 433.34840886251624},
      {x: 387.41766357421875, y: 444.3500061035156},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("EI", [
     {x: 34.71484375, y: 301.3248291015625},
@@ -262,7 +262,7 @@ gest.addGesture("EI", [
      {x: 342.36455905845, y: 304.1020202636719},
      {x: 352.68134180820306, y: 302.71343994140625},
      {x: 361.03436279296875, y: 298.54766845703125},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("EI2", [
     {x: 59.709529876708984, y: 363.8115539550781},
@@ -298,7 +298,7 @@ gest.addGesture("EI2", [
      {x: 365.2001647949219, y: 386.67885657520355},
      {x: 370.7545166015625, y: 374.2633046544844},
      {x: 376.30889892578125, y: 361.03436279296875},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Ga", [
     {x: 51.377967834472656, y: 261.0556335449219},
@@ -334,7 +334,7 @@ gest.addGesture("Ga", [
  {x: 120.80765533447266, y: 474.3487226435017},
  {x: 102.3368081118428, y: 476.28765869140625},
  {x: 84.70421600341797, y: 479.0648498535156},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Ga2", [
     {x: 151.35671997070312, y: 290.2160949707031},
@@ -370,7 +370,7 @@ gest.addGesture("Ga2", [
      {x: 408.2465515136719, y: 459.0963209931569},
      {x: 416.578125, y: 469.19969599291943},
      {x: 429.0754699707031, y: 473.5104675292969},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Ha", [
     {x: 170.79702758789062, y: 288.8275146484375},
@@ -406,7 +406,7 @@ gest.addGesture("Ha", [
  {x: 351.53160677243676, y: 476.0702609033445},
  {x: 321.3255856569987, y: 473.5104675292969},
  {x: 304.1020202636719, y: 456.84735107421875},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Ka", [
     {x: 98.59015655517578, y: 245.78109741210938},
@@ -442,7 +442,7 @@ gest.addGesture("Ka", [
      {x: 370.16328053318045, y: 315.2107849121094},
      {x: 357.14814392759024, y: 322.15374755859375},
      {x: 345.7598571777344, y: 329.0967102050781},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Ka2", [
     {x: 241.6153106689453, y: 302.71343994140625},
@@ -478,7 +478,7 @@ gest.addGesture("Ka2", [
  {x: 239.92260922986736, y: 400.5232202609684},
  {x: 238.83811950683594, y: 403.5625890784198},
  {x: 238.83811950683594, y: 406.85797119140625},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Ka3", [
     {x: 127.75062561035156, y: 388.8062438964844},
@@ -514,7 +514,7 @@ gest.addGesture("Ka3", [
      {x: 356.86859130859375, y: 429.4695223715549},
      {x: 358.2572021484375, y: 441.93373077021965},
      {x: 356.86859130859375, y: 455.458740234375},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("La", [
     {x: 130.52781677246094, y: 272.16436767578125},
@@ -550,7 +550,7 @@ gest.addGesture("La", [
  {x: 370.7545166015625, y: 344.3092967645404},
  {x: 354.69755637588094, y: 355.4800109863281},
  {x: 340.2054748535156, y: 366.5887451171875},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("La2", [
     {x: 209.6776580810547, y: 361.03436279296875},
@@ -586,7 +586,7 @@ gest.addGesture("La2", [
      {x: 152.7453155517578, y: 475.42962985671284},
      {x: 159.7915002685701, y: 465.0756731069119},
      {x: 169.40843200683594, y: 456.84735107421875},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Ma", [
     {x: 72.20687866210938, y: 227.7293701171875},
@@ -622,7 +622,7 @@ gest.addGesture("Ma", [
  {x: 341.01996640438773, y: 277.71875},
  {x: 357.6825491645963, y: 267.99859619140625},
  {x: 372.14312744140625, y: 256.88983154296875},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Ma2", [
     {x: 93.03578186035156, y: 370.7545166015625},
@@ -658,7 +658,7 @@ gest.addGesture("Ma2", [
  {x: 336.010456251784, y: 381.86328125},
  {x: 346.151943848362, y: 383.2518615722656},
  {x: 356.86859130859375, y: 383.2518615722656},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Na", [
     {x: 79.14984130859375, y: 481.842041015625},
@@ -694,7 +694,7 @@ gest.addGesture("Na", [
  {x: 346.0461039295243, y: 467.9560852050781},
  {x: 365.2001647949219, y: 476.59923617078516},
  {x: 384.6404724121094, y: 487.3963928222656},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Na2", [
     {x: 259.6670227050781, y: 273.552978515625},
@@ -730,7 +730,7 @@ gest.addGesture("Na2", [
  {x: 238.83811950683594, y: 480.67612671752164},
  {x: 230.50656127929688, y: 487.101036258582},
  {x: 223.5635986328125, y: 495.72796630859375},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Nga", [
     {x: 158.2996826171875, y: 237.44952392578125},
@@ -766,7 +766,7 @@ gest.addGesture("Nga", [
  {x: 105.53312683105469, y: 471.4131431973724},
  {x: 124.4999397752397, y: 476.28765869140625},
  {x: 144.41375732421875, y: 479.0648498535156},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Nga2", [
     {x: 269.3871765136719, y: 294.3818664550781},
@@ -802,7 +802,7 @@ gest.addGesture("Nga2", [
  {x: 367.97735595703125, y: 449.4946847535619},
  {x: 356.86859130859375, y: 457.1683155668556},
  {x: 348.5370178222656, y: 465.17889404296875},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("OU", [
     {x: 138.859375, y: 320.7651672363281},
@@ -838,7 +838,7 @@ gest.addGesture("OU", [
      {x: 163.85406494140625, y: 474.1772333387602},
      {x: 146.30420609780512, y: 465.17889404296875},
      {x: 130.52781677246094, y: 456.84735107421875},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Pa", [
     {x: 58.32093811035156, y: 330.4853210449219},
@@ -874,7 +874,7 @@ gest.addGesture("Pa", [
  {x: 367.82007678697784, y: 355.4800109863281},
  {x: 344.0543614165772, y: 365.2001647949219},
  {x: 317.98797607421875, y: 361.03436279296875},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Pa2", [
     {x: 186.07156372070312, y: 369.3659362792969},
@@ -910,7 +910,7 @@ gest.addGesture("Pa2", [
      {x: 320.7651672363281, y: 418.1352138986961},
      {x: 322.9076297570567, y: 421.497778682838},
      {x: 324.9309387207031, y: 424.9096984863281},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Sa", [
     {x: 81.92703247070312, y: 263.83282470703125},
@@ -946,7 +946,7 @@ gest.addGesture("Sa", [
  {x: 131.40704552719825, y: 467.4467239760139},
  {x: 111.0875015258789, y: 443.75159113278585},
  {x: 98.59015655517578, y: 415.1895446777344},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Ta", [
     {x: 166.63125610351562, y: 270.7757873535156},
@@ -982,7 +982,7 @@ gest.addGesture("Ta", [
      {x: 157.72563294372156, y: 419.3553161621094},
      {x: 165.24323087634397, y: 415.1895446777344},
      {x: 173.57421875, y: 411.02374267578125},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Ta2", [
     {x: 351.314208984375, y: 434.6298522949219},
@@ -1018,7 +1018,7 @@ gest.addGesture("Ta2", [
  {x: 392.03495969593587, y: 238.38658990779368},
  {x: 409.66683518612024, y: 236.06094360351562},
  {x: 427.6868591308594, y: 237.44952392578125},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Wa", [
     {x: 77.7612533569336, y: 226.3407745361328},
@@ -1054,7 +1054,7 @@ gest.addGesture("Wa", [
      {x: 367.97735595703125, y: 320.4483387981073},
      {x: 355.4800109863281, y: 303.0110705471416},
      {x: 338.8168640136719, y: 292.9932861328125},
-], updateGestureString)
+], updateCurrentStrokes)
 
 gest.addGesture("Ya", [
     {x: 79.14984130859375, y: 248.5582733154297},
@@ -1090,10 +1090,15 @@ gest.addGesture("Ya", [
      {x: 321.90813439897045, y: 319.13094323686107},
      {x: 301.3248291015625, y: 299.38918064449774},
      {x: 295.7704772949219, y: 272.16436767578125},
-], updateGestureString)
+], updateCurrentStrokes)
+
+gest.addGesture("Error", [//for handling wrong strokes
+    {x: 111, y:11111},
+], errorString)
 
 class Player{
-    constructor(playerID,roomId){
+    constructor(playerName, playerID,roomId){
+        this.playerName = playerName
         this.playerID = playerID;
         this.roomId = roomId;
         this.currLane = 0;
@@ -1169,8 +1174,8 @@ class Projectile{
 }
 
 class Log{//Log for learning analytics
-    constructor(player){
-        this.playerName = player;
+    constructor(playerName){
+        this.playerName = playerName;
         this.opponentName = "";
         this.startTime = "";
         this.endTime = "";
@@ -1201,6 +1206,7 @@ class Figure{
         this.startTime = startT;
         this.endTime = "";
         this.strokes = [];
+        this.scores = [];
         this.figName = "";
     }
 
@@ -1274,11 +1280,16 @@ function preload() {
    
 function create() {
     var self = this;
+    var username=document.location.search.replace(/^.*?\=/,'');
     this.socket = io();
+
+    this.socket.emit('connectPlayer', {name: username});//connect player to the server
+
     this.otherPlayers = this.physics.add.group();
 
     console.log(self.game.config.width);
     console.log(self.game.config.height);
+    console.log(localStorage);
     
     //Background
     this.background = this.add.image(self.game.config.width/2,self.game.config.height/2,'bg').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.height);
@@ -1350,9 +1361,8 @@ function create() {
             }
         }
 
-        if(self.game.config.gamePhase == 2){
-            console.log("Restarting");
-            location.reload(true);
+        if(self.game.config.gamePhase == 2){//Tap to return to home page when game ends
+            location.replace('http://localhost:3000/home.html');
         }
     }, this);
 
@@ -1452,6 +1462,7 @@ function update() {
             if(projectileObject.y < (self.otherPlayer.healthBar.y + projectileObject.height)){
                 if(self.otherPlayer && self.player.getHealth() > 0){
                     self.otherPlayer.takeDamage(projectileObject.power);
+                    self.otherPlayer.displayName.setText(self.otherPlayer.playerName + "(" + self.otherPlayer.health  + "/10)");
                     self.otherPlayer.healthBar.displayWidth = self.game.config.width*(self.otherPlayer.getHealth()/10);
     
                     if(self.otherPlayer.getHealth() == 0){//if opponent health goes to zero
@@ -1469,7 +1480,7 @@ function update() {
             if(projectileObject.y > (self.player.healthBar.y - projectileObject.height)){
                 if(self.player && self.player.getHealth() > 0){
                     self.player.takeDamage(projectileObject.power);
-                    console.log(self.player.getHealth());
+                    self.player.displayName.setText(self.player.playerName + "(" + self.player.health  + "/10)");
                     self.player.healthBar.displayWidth = self.game.config.width*(self.player.getHealth()/10);
                     if(self.player.getHealth() == 0){//if player health goes to zero
                         endGame(self, 0);
@@ -1539,21 +1550,24 @@ function fireProjectiles(){
 
 function addPlayer(self, playerInfo){
     if(!self.player){
-        self.player = new Player(playerInfo.playerId,playerInfo.roomId);//temp values
-        console.log("Player: " + self.player);
+        self.player = new Player(playerInfo.playerName, playerInfo.playerId,playerInfo.roomId);//temp values
+        console.log("Player: " + self.player.playerName);
         self.player.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width/10,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.player.health/10),self.game.config.width/10);
-        self.log = new Log(playerInfo.playerId);
+        self.player.healthBar.setTint(0x00ff00);
+        self.player.displayName = self.add.text(self.game.config.width/2, self.game.config.height-self.game.config.width/10, self.player.playerName + "(" + self.player.health  + "/10)", { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
+        self.log = new Log(playerInfo.playerName);
     }
     
 }
 
 function addOtherPlayer(self, playerInfo) {
     if(!self.otherPlayer){
-        self.otherPlayer = new Player(playerInfo.name,playerInfo.sessionId)
-        console.log("Opponent: " + self.otherPlayer);
+        self.otherPlayer = new Player(playerInfo.playerName,playerInfo.sessionId)
+        console.log("Opponent: " + self.otherPlayer.playerName);
         self.otherPlayer.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.width/20,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.otherPlayer.health/10),self.game.config.width/10);
-        self.otherPlayer.healthBar.setTint(0x00ff00);
-        self.log.setOpponent(playerInfo.playerId);
+        self.otherPlayer.healthBar.setTint(0xff00ff);
+        self.otherPlayer.displayName = self.add.text(self.game.config.width/2, self.game.config.width/20, self.otherPlayer.playerName + "(" + self.otherPlayer.health  + "/10)", { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
+        self.log.setOpponent(playerInfo.playerName);
     }
 }
 
@@ -1610,16 +1624,31 @@ function addWard(self, wardType, posx, posy){
     return w;
 }
 
-function updateGestureString(fig, points, timeStart, timeEnd){
+function updateCurrentStrokes(fig, points, score, timeStart, timeEnd){
     if(chars == ""){
         f = new Figure(timeStart);
         f.strokes.push(points);
+        f.scores.push(score);
     }else{
         f.strokes.push(points);
+        f.scores.push(score);
     }
     console.log(f);
     chars += fig;
     console.log(chars);
+}
+
+function errorString(fig, points, score, timeStart, timeEnd){
+    if(chars == ""){
+        f = new Figure(timeStart);
+        f.strokes.push(points);
+        f.strokes.push(score);
+    }else{
+        f.strokes.push(points);
+        f.strokes.push(score);
+    }
+    chars += fig;
+    console.log("Wrong stroke");//soon this will have proper error feedback
 }
 
 function identifyProjectile(){
@@ -1635,7 +1664,7 @@ function identifyProjectile(){
             type = "PEarth";
             break;
         case 'Ba':
-            type = "PWind";
+            type = "PSky";
             break;
         case 'AA2A3':
             type = "WWater";

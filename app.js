@@ -66,70 +66,55 @@ mongoose.connection.on('connected', function () {
   console.log('connected to mongo');
 });
 
-//
-io.on('connection', function(socket){//when a new player connects
 
-  if(roomCount == 0){//if no rooms, make new room
+// io.use(function(socket, next) {
+//   var handshakeData = socket.request;
+//   console.log("middleware:", handshakeData._query['username']);
+//   next();
+// });
+
+io.on('connection', function(socket){
+
+  socket.on('connectPlayer', function(playerData){//when a new player connects
+    if(roomCount == 0){//if no rooms, make new room
       console.log("No rooms");
       socket.join('room'+roomCount);
-      newPlayer(socket, roomCount);
+      newPlayer(socket, roomCount, playerData.name);
       console.log(socket.id + ' has joined session ' + roomCount);
       roomCount++;
-  }else{
-      // for(i = 0; i < roomCount; i++){
-      //     if(!io.sockets.adapter.rooms['room'+i]){//If room does not exist, fill in gap
-      //         socket.join('room'+i);
-      //         newPlayer(socket, i);
-      //         console.log(socket.id + ' has joined session ' + i);
-      //         break;
-      //         // console.log("Room " + i + " does not exist");
-      //     } else if(io.sockets.adapter.rooms['room'+i].length < 2){//If found room with 1 player, add player and send waiting player data to new player
-      //         console.log("Old Room");
-      //         socket.join('room'+i);
-      //         newPlayer(socket, i);
-      //         console.log(socket.id + ' has joined session ' + i);
-      //         roomCount++;
-      //         break;
-      //     } else if(i == roomCount - 1){//If found no room with 1 player, create new room
-      //         console.log("New Room");
-      //         socket.join('room'+roomCount);
-      //         newPlayer(socket, roomCount);
-      //         console.log(socket.id + ' has joined session ' + roomCount);
-      //         // roomCount++;
-      //         break;
-      //     }
-      // }
-      var foundRoom = false;
-      for(i = 0; i < roomCount; i++){//Look for room with waiting user
-          if(io.sockets.adapter.rooms['room'+i]){//If room exists
-              if(io.sockets.adapter.rooms['room'+i].length < 2){//check if it waiting user
-                  socket.join('room'+i);
-                  newPlayer(socket, i);
-                  console.log(socket.id + ' has joined session ' + i);
-                  foundRoom = true;
-                  break;
-              }
-          }
-      }
-      if(!foundRoom){//If no room with waiting user
-          for(i = 0; i < roomCount; i++){
-              if(!io.sockets.adapter.rooms['room'+i]){//If room does not exist, fill in gap
-                  socket.join('room'+i);
-                  newPlayer(socket, i);
-                  console.log(socket.id + ' has joined session ' + i);
-                  break;
-                  // console.log("Room " + i + " does not exist");
-              }else if(i == roomCount - 1){
-                  console.log("New Room");
-                  socket.join('room'+roomCount);
-                  newPlayer(socket, roomCount);
-                  console.log(socket.id + ' has joined session ' + roomCount);
-                  roomCount++;
-                  break;
-              }
-          }
-      }
-  }
+    }else{
+        var foundRoom = false;
+        for(i = 0; i < roomCount; i++){//Look for room with waiting user
+            if(io.sockets.adapter.rooms['room'+i]){//If room exists
+                if(io.sockets.adapter.rooms['room'+i].length < 2){//check if it waiting user
+                    socket.join('room'+i);
+                    newPlayer(socket, i, playerData.name);
+                    console.log(socket.id + ' has joined session ' + i);
+                    foundRoom = true;
+                    break;
+                }
+            }
+        }
+        if(!foundRoom){//If no room with waiting user
+            for(i = 0; i < roomCount; i++){
+                if(!io.sockets.adapter.rooms['room'+i]){//If room does not exist, fill in gap
+                    socket.join('room'+i);
+                    newPlayer(socket, i, playerData.name);
+                    console.log(socket.id + ' has joined session ' + i);
+                    break;
+                    // console.log("Room " + i + " does not exist");
+                }else if(i == roomCount - 1){
+                    console.log("New Room");
+                    socket.join('room'+roomCount);
+                    newPlayer(socket, roomCount, playerData.name);
+                    console.log(socket.id + ' has joined session ' + roomCount);
+                    roomCount++;
+                    break;
+                }
+            }
+        }
+    }
+  });
   // roomCount = roomCount % 128;
 
   socket.on('disconnect', function() {
@@ -168,15 +153,16 @@ server.listen(8081, function() {
   console.log(`Listening on ${server.address().port}`);
 });
 
-function newPlayer(socket, roomNo){//Create new player
+function newPlayer(socket, roomNo, name){//Create new player
   //create a new player and add it to our players object
   room = 'room' + roomNo;
   players[socket.id] = {
+      playerName: name,
       playerId: socket.id,
       roomId: room,
   };
 
-  console.log("Player " + players[socket.id].playerId + " broadcasting to " + players[socket.id].roomId);
+  console.log("Player " + players[socket.id].playerName + " broadcasting to " + players[socket.id].roomId);
   io.in(room).emit('currentPlayers', players[socket.id]);//send to room a new player's data
 
   io.of('/').in(room).clients((error, clients) => {//get list of clients in a room
