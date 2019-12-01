@@ -1,124 +1,4 @@
 //Classes
-class Player{
-    constructor(playerID,roomId){
-        this.playerID = playerID;
-        this.roomId = roomId;
-        this.currLane = 0;
-        this.health = 10;
-        this.projectile_type = "";
-        this.ward_type = "";
-    }
-
-    getHealth(){
-        return this.health;
-    }
-
-    takeDamage(damageAmount){
-        this.health = this.health - damageAmount;
-        if(this.health < 0){
-            this.health = 0;
-        }
-        return this.health;
-    }
-
-    getProjectile(){
-        return this.projectile_type;
-    }
-
-    setProjectile(p){
-        this.projectile_type = p;
-    }
-
-    setWard(w){
-        this.ward_type = w;
-    }
-
-    getWard(){
-        return this.ward_type;
-    }
-}
-
-class Projectile{
-    constructor(projectileType, imageReference){
-        this.type = projectileType;
-        
-        if(this.type == "stone"){
-            this.speed = 0;
-        }else{
-            this.speed = 200;
-        }
-
-        this.image = imageReference;
-
-        this.resistance = 1;
-    }
-
-    getType(){
-        return this.type;
-    }
-
-    getSpeed(){
-        return this.speed;
-    }
-
-    setSpeed(s){
-        this.speed = s;
-    }
-
-    getResistance(){
-        return this.resistance;
-    }
-
-    setResistance(r){
-        this.resistance = r;
-    }
-
-}
-
-class Log{//Log for learning analytics
-    constructor(player){
-        this.playerName = player;
-        this.opponentName = "";
-        this.startTime = "";
-        this.endTime = "";
-        this.winLose = "";
-        this.figures = [];
-    }
-
-    setOpponent(name){
-        this.opponentName = name;
-    }
-
-    setStartTime(t){
-        this.startTime = t;
-    }
-
-    setEndTime(t){
-        this.endTime = t;
-    }
-
-    setWinLose(didWin){
-        this.winLose = didWin;
-    }
-}
-
-//Figure object for learning analytics
-class Figure{
-    constructor(startT){
-        this.startTime = startT;
-        this.endTime = "";
-        this.strokes = [];
-        this.figName = "";
-    }
-
-    setEndTime(t){
-        this.endTime = t;
-    }
-
-    setFigName(name){
-        this.figName = name;
-    }
-}
 
 //Gestures
 var gest = new gestures({
@@ -1212,6 +1092,126 @@ gest.addGesture("Ya", [
      {x: 295.7704772949219, y: 272.16436767578125},
 ], updateGestureString)
 
+class Player{
+    constructor(playerID,roomId){
+        this.playerID = playerID;
+        this.roomId = roomId;
+        this.currLane = 0;
+        this.health = 10;
+        this.projectile_type = "";
+        this.ward_type = "";
+    }
+
+    getHealth(){
+        return this.health;
+    }
+
+    takeDamage(damageAmount){
+        this.health = this.health - damageAmount;
+        if(this.health < 0){
+            this.health = 0;
+        }
+        return this.health;
+    }
+
+    getProjectile(){
+        return this.projectile_type;
+    }
+
+    setProjectile(p){
+        this.projectile_type = p;
+    }
+
+    setWard(w){
+        this.ward_type = w;
+    }
+
+    getWard(){
+        return this.ward_type;
+    }
+}
+
+class Projectile{
+    constructor(projectileType, imageReference){
+        this.type = projectileType;
+        
+        if(this.type == "stone"){
+            this.speed = 0;
+        }else{
+            this.speed = 200;
+        }
+
+        this.image = imageReference;
+
+        this.resistance = 1;
+    }
+
+    getType(){
+        return this.type;
+    }
+
+    getSpeed(){
+        return this.speed;
+    }
+
+    setSpeed(s){
+        this.speed = s;
+    }
+
+    getResistance(){
+        return this.resistance;
+    }
+
+    setResistance(r){
+        this.resistance = r;
+    }
+
+}
+
+class Log{//Log for learning analytics
+    constructor(player){
+        this.playerName = player;
+        this.opponentName = "";
+        this.startTime = "";
+        this.endTime = "";
+        this.winLose = "";
+        this.figures = [];
+    }
+
+    setOpponent(name){
+        this.opponentName = name;
+    }
+
+    setStartTime(t){
+        this.startTime = t;
+    }
+
+    setEndTime(t){
+        this.endTime = t;
+    }
+
+    setWinLose(didWin){
+        this.winLose = didWin;
+    }
+}
+
+//Figure object for learning analytics
+class Figure{
+    constructor(startT){
+        this.startTime = startT;
+        this.endTime = "";
+        this.strokes = [];
+        this.figName = "";
+    }
+
+    setEndTime(t){
+        this.endTime = t;
+    }
+
+    setFigName(name){
+        this.figName = name;
+    }
+}
 
 var config = {
     type: Phaser.AUTO,
@@ -1282,7 +1282,7 @@ function create() {
     
     //Background
     this.background = this.add.image(self.game.config.width/2,self.game.config.height/2,'bg').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.height);
-    this.letter = this.add.image(self.game.config.width/2,self.game.config.height/2,'letter').setOrigin(0.5,0.5)
+    // this.letter = this.add.image(self.game.config.width/2,self.game.config.height/2,'letter').setOrigin(0.5,0.5)
     //Loading gif
     this.loading = this.add.image(self.game.config.width/2, self.game.config.height/2,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75);
     
@@ -1325,8 +1325,9 @@ function create() {
 
     //Fire projectile on lane
     this.input.on('pointerdown', function(pointer){
+        gest.clear();
         if(self.game.config.gamePhase == 1){
-            gest.clear();
+            
             var type = identifyProjectile();
 
             //Logging
@@ -1618,6 +1619,7 @@ function updateGestureString(fig, points, timeStart, timeEnd){
     }
     console.log(f);
     chars += fig;
+    console.log(chars);
 }
 
 function identifyProjectile(){
@@ -1626,23 +1628,41 @@ function identifyProjectile(){
     var type = "";
     //console.log(name);
     switch(chars){
-        case 'Ha':
-            type = "WWater";
-            break;
-        case 'Ba':
+        case 'Ma':
             type = "PWater";
             break;
-        case 'Wa':
-            type="water";
+        case 'Sa':
+            type = "PEarth";
             break;
-        case 'OU':
-            type = "lightning";
+        case 'Ba':
+            type = "PWind";
             break;
-        case 'Ya':
-            type="nature";
+        case 'AA2A3':
+            type = "WWater";
             break;
-        case 'Pa':
-            type="fire";
+        case 'EIEI2':
+            type = "WEarth";
+            break;
+        case 'O':
+            type = "WWind";
+            break;
+        case 'MaWaTaTa2':
+            type = "PWaterII";
+            break;
+        case 'SaKaKa2Ka3Ma':
+            type = "PEarthII";
+            break;
+        case 'BaLaLa2Ha':
+            type = "PSkyII";
+            break;
+        case 'AA2A3YaYa2DaDa2':
+            type = "WWaterII";
+            break;
+        case 'EIEI2PaPa2NaNa2':
+            type = "WEarthII";
+            break;
+        case 'OGaGa2NgaNga2':
+            type = "WSkyII";
             break;
     }
     console.log(chars);
