@@ -1,6 +1,7 @@
 //Classes
 class Player{
-    constructor(playerID,roomId){
+    constructor(playerName, playerID,roomId){
+        this.playerName = playerName
         this.playerID = playerID;
         this.roomId = roomId;
         this.currLane = 0;
@@ -76,8 +77,8 @@ class Projectile{
 }
 
 class Log{//Log for learning analytics
-    constructor(player){
-        this.playerName = player;
+    constructor(playerName){
+        this.playerName = playerName;
         this.opponentName = "";
         this.startTime = "";
         this.endTime = "";
@@ -444,11 +445,16 @@ function preload() {
    
 function create() {
     var self = this;
+    var username=document.location.search.replace(/^.*?\=/,'');
     this.socket = io();
+
+    this.socket.emit('connectPlayer', {name: username});//connect player to the server
+
     this.otherPlayers = this.physics.add.group();
 
     console.log(self.game.config.width);
     console.log(self.game.config.height);
+    console.log(localStorage);
     
     //Background
     this.background = this.add.image(self.game.config.width/2,self.game.config.height/2,'bg').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.height);
@@ -708,21 +714,24 @@ function fireProjectiles(){
 
 function addPlayer(self, playerInfo){
     if(!self.player){
-        self.player = new Player(playerInfo.playerId,playerInfo.roomId);//temp values
-        console.log("Player: " + self.player);
+        self.player = new Player(playerInfo.playerName, playerInfo.playerId,playerInfo.roomId);//temp values
+        console.log("Player: " + self.player.playerName);
         self.player.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width/10,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.player.health/10),self.game.config.width/10);
-        self.log = new Log(playerInfo.playerId);
+        self.player.healthBar.setTint(0x00ff00);
+        self.player.displayName = self.add.text(self.game.config.width/2, self.game.config.height-self.game.config.width/10, self.player.playerName, { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
+        self.log = new Log(playerInfo.playerName);
     }
     
 }
 
 function addOtherPlayer(self, playerInfo) {
     if(!self.otherPlayer){
-        self.otherPlayer = new Player(playerInfo.name,playerInfo.sessionId)
-        console.log("Opponent: " + self.otherPlayer);
+        self.otherPlayer = new Player(playerInfo.playerName,playerInfo.sessionId)
+        console.log("Opponent: " + self.otherPlayer.playerName);
         self.otherPlayer.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.width/20,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.otherPlayer.health/10),self.game.config.width/10);
-        self.otherPlayer.healthBar.setTint(0x00ff00);
-        self.log.setOpponent(playerInfo.playerId);
+        self.otherPlayer.healthBar.setTint(0xff00ff);
+        self.otherPlayer.displayName = self.add.text(self.game.config.width/2, self.game.config.width/20, self.otherPlayer.playerName, { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
+        self.log.setOpponent(playerInfo.playerName);
     }
 }
 

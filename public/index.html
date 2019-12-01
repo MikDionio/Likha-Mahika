@@ -78,7 +78,9 @@
         url: '/login',
         data,
         success: function (data) {
-          self.location.replace('http://localhost:8081/game.html');
+          // localStorage.setItem('username',  document.forms[0].elements[0].value);
+          self.location.assign('http://localhost:8081/game.html'+'?username='+document.forms[0].elements[0].value);
+          // console.log(localStorage);
         },
         error: function (xhr) {
           window.alert(JSON.stringify(xhr));
