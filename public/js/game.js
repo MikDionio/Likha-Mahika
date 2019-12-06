@@ -1270,12 +1270,20 @@ function preload() {
     this.load.image('WEarth','assets/WEarth.png');
     this.load.image('PEarthII','assets/PEarthII.png');
     this.load.image('WEarthII','assets/WEarthII.png');
+
+    //UI Elements
     this.load.image('health_bar','assets/bar.png');
     this.load.image('bg','assets/bgII.png');
     this.load.image('letter','assets/ya.png')
     this.load.image('finding', 'assets/finding.png');
     this.load.image('win','assets/win.png');
     this.load.image('lose','assets/lose.png');
+
+    //Hints
+    this.load.image('ma_hint', 'assets/ma.png');
+
+    //Hint buttons
+    this.load.image('PWaterbtn', 'assets/PWater_btn.png');
 }
    
 function create() {
@@ -1450,6 +1458,11 @@ function create() {
     }, this)
 
     timedEvent = this.time.addEvent({ delay: 1500, callback: fireProjectiles, callbackScope: this, loop: true });
+
+    //Hints
+    const PWaterButton = this.add.image(self.game.config.width/7, self.game.config.height-self.game.config.width/5, 'PWaterbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    PWaterButton.setInteractive();
+    PWaterButton.on('pointerdown',() => displayHint("PWater", self));
 }
 
 function update() {
@@ -1549,13 +1562,22 @@ function fireProjectiles(){
     
 }
 
+function displayHint(hint, self){
+    if(self.hintImage){
+        self.hintImage.destroy();
+    }
+    if(hint == "PWater"){
+        self.hintImage = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5)
+    }
+}
+
 function addPlayer(self, playerInfo){
     if(!self.player){
         self.player = new Player(playerInfo.playerName, playerInfo.playerId,playerInfo.roomId);//temp values
         console.log("Player: " + self.player.playerName);
-        self.player.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width/10,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.player.health/10),self.game.config.width/10);
+        self.player.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width/3,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.player.health/10),self.game.config.width/10);
         self.player.healthBar.setTint(0x00ff00);
-        self.player.displayName = self.add.text(self.game.config.width/2, self.game.config.height-self.game.config.width/10, self.player.playerName + "(" + self.player.health  + "/10)", { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
+        self.player.displayName = self.add.text(self.game.config.width/2, self.game.config.height-self.game.config.width/3, self.player.playerName + "(" + self.player.health  + "/10)", { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
         self.log = new Log(playerInfo.playerName);
     }
     
