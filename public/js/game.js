@@ -1280,10 +1280,39 @@ function preload() {
     this.load.image('lose','assets/lose.png');
 
     //Hints
+    this.load.image('a_hint', 'assets/a.png');
+    this.load.image('ba_hint', 'assets/ba.png');
+    this.load.image('da_hint', 'assets/da.png');
+    this.load.image('ei_hint', 'assets/ei.png');
+    this.load.image('ga_hint', 'assets/ga.png');
+    this.load.image('ha_hint', 'assets/ha.png');
+    this.load.image('ka_hint', 'assets/ka.png');
+    this.load.image('la_hint', 'assets/la.png');
     this.load.image('ma_hint', 'assets/ma.png');
+    this.load.image('na_hint', 'assets/na.png');
+    this.load.image('nga_hint', 'assets/nga.png');
+    this.load.image('ou_hint', 'assets/ou.png');
+    this.load.image('pa_hint', 'assets/pa.png');
+    this.load.image('sa_hint', 'assets/sa.png');
+    this.load.image('ta_hint', 'assets/ta.png');
+    this.load.image('wa_hint', 'assets/wa.png');
+    this.load.image('ya_hint', 'assets/ya.png');
+    
 
     //Hint buttons
     this.load.image('PWaterbtn', 'assets/PWater_btn.png');
+    this.load.image('PEarthbtn', 'assets/PEarth_btn.png');
+    this.load.image('PSkybtn','assets/PSky_btn.png');
+    this.load.image('WWaterbtn', 'assets/WWater_btn.png');
+    this.load.image('WEarthbtn', 'assets/WEarth_btn.png');
+    this.load.image('WSkybtn','assets/WSky_btn.png');
+
+    this.load.image('PWaterIIbtn', 'assets/PWaterII_btn.png');
+    this.load.image('PEarthIIbtn', 'assets/PEarthII_btn.png');
+    this.load.image('PSkyIIbtn','assets/PSkyII_btn.png');
+    this.load.image('WWaterIIbtn', 'assets/WWaterII_btn.png');
+    this.load.image('WEarthIIbtn', 'assets/WEarthII_btn.png');
+    this.load.image('WSkyIIbtn','assets/WSkyII_btn.png');
 }
    
 function create() {
@@ -1344,6 +1373,7 @@ function create() {
 
     //Fire projectile on lane
     this.input.on('pointerdown', function(pointer){
+        // clearHint(self);
         gest.clear();
         if(self.game.config.gamePhase == 1){
             
@@ -1459,10 +1489,42 @@ function create() {
 
     timedEvent = this.time.addEvent({ delay: 1500, callback: fireProjectiles, callbackScope: this, loop: true });
 
-    //Hints
-    const PWaterButton = this.add.image(self.game.config.width/7, self.game.config.height-self.game.config.width/5, 'PWaterbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
-    PWaterButton.setInteractive();
-    PWaterButton.on('pointerdown',() => displayHint("PWater", self));
+    //Hints UI
+    const PWaterButton = this.add.image(self.game.config.width/10, self.game.config.height-self.game.config.width/5, 'PWaterbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    PWaterButton.setInteractive().on('pointerdown',() => displayHint("PWater", self));
+
+    const PEarthButton = this.add.image(self.game.config.width*9/40, self.game.config.height-self.game.config.width/5, 'PEarthbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    PEarthButton.setInteractive().on('pointerdown',() => displayHint("PEarth", self));
+
+    const PSkyButton = this.add.image(self.game.config.width*14/40, self.game.config.height-self.game.config.width/5, 'PSkybtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    PSkyButton.setInteractive().on('pointerdown',() => displayHint("PSky", self));
+
+    const WWaterButton = this.add.image(self.game.config.width/10, self.game.config.height-self.game.config.width/12, 'WWaterbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    WWaterButton.setInteractive().on('pointerdown',() => displayHint("WWater", self));
+
+    const WEarthButton = this.add.image(self.game.config.width*9/40, self.game.config.height-self.game.config.width/12, 'WEarthbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    WEarthButton.setInteractive().on('pointerdown',() => displayHint("WEarth", self));
+
+    const WSkyButton = this.add.image(self.game.config.width*14/40, self.game.config.height-self.game.config.width/12, 'WSkybtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    WSkyButton.setInteractive().on('pointerdown',() => displayHint("WSky", self));
+
+    const PWaterIIButton = this.add.image(self.game.config.width*25/40, self.game.config.height-self.game.config.width/5, 'PWaterIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    PWaterIIButton.setInteractive().on('pointerdown',() => displayHint("PWaterII", self));
+
+    const PEarthIIButton = this.add.image(self.game.config.width*30/40, self.game.config.height-self.game.config.width/5, 'PEarthIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    PEarthIIButton.setInteractive().on('pointerdown',() => displayHint("PEarthII", self));
+
+    const PSkyIIButton = this.add.image(self.game.config.width*35/40, self.game.config.height-self.game.config.width/5, 'PSkyIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    PSkyIIButton.setInteractive().on('pointerdown',() => displayHint("PSkyII", self));
+
+    const WWaterIIButton = this.add.image(self.game.config.width*25/40, self.game.config.height-self.game.config.width/12, 'WWaterIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    WWaterIIButton.setInteractive().on('pointerdown',() => displayHint("WWaterII", self));
+
+    const WEarthIIButton = this.add.image(self.game.config.width*30/40, self.game.config.height-self.game.config.width/12, 'WEarthIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    WEarthIIButton.setInteractive().on('pointerdown',() => displayHint("WEarthII", self));
+
+    const WSkyIIButton = this.add.image(self.game.config.width*35/40, self.game.config.height-self.game.config.width/12, 'WSkyIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+    WSkyIIButton.setInteractive().on('pointerdown',() => displayHint("WSkyII", self));
 }
 
 function update() {
@@ -1562,12 +1624,74 @@ function fireProjectiles(){
     
 }
 
-function displayHint(hint, self){
-    if(self.hintImage){
-        self.hintImage.destroy();
+function clearHint(self){//Clear hint
+    if(self.hintImage1){
+        self.hintImage1.destroy();
     }
-    if(hint == "PWater"){
-        self.hintImage = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5)
+
+    if(self.hintImage2){
+        self.hintImage2.destroy();
+    }
+
+    if(self.hintImage3){
+        self.hintImage3.destroy();
+    }
+}
+
+function displayHint(hint, self){//display hint based on button
+    clearHint(self);
+
+    switch(hint){
+        case 'PWater':
+            self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
+            console.log(self.hintImage2.width + " , " + self.hintImage2.height);
+            break;
+        case 'WWater':
+            self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
+            break;
+        case 'PEarth':
+            self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'sa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
+            break;
+        case 'WEarth':
+            self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ei_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
+            break;
+        case 'PSky':
+            self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ba_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
+            break;
+        case 'WSky':
+            self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ou_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
+            break;
+
+        case 'PWaterII':
+            self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'wa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'ta_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            break;
+        case 'WWaterII':
+            self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ya_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'da_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            break;
+        case 'PEarthII':
+            self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'sa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ka_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            break;
+        case 'WEarthII':
+            self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'ei_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'pa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'na_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            break;
+        case 'PSkyII':
+            self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'ba_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'la_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'ha_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            break;
+    case 'WSkyII':
+            self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'ou_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'nga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+            break;
     }
 }
 
@@ -1696,8 +1820,9 @@ function identifyProjectile(){
             type = "WEarth";
             break;
         case 'O':
-            type = "WWind";
+            type = "WSky";
             break;
+
         case 'MaWaTaTa2':
             type = "PWaterII";
             break;
