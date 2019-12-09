@@ -1208,6 +1208,7 @@ class Figure{
         this.strokes = [];
         this.scores = [];
         this.figName = "";
+        this.usedHint = false;
     }
 
     setEndTime(t){
@@ -1216,6 +1217,10 @@ class Figure{
 
     setFigName(name){
         this.figName = name;
+    }
+
+    setUsedHint(didUseHint){
+        this.usedHint = didUseHint;
     }
 }
 
@@ -1607,8 +1612,9 @@ function clearHint(self){//Clear hint
 
 function displayHint(hint, self){//display hint based on button
     clearHint(self);
+    self.usedHint = true;
     if(hint == self.activeHint){//if user presses button again, do nothing (this just clears the hint)
-        continue;
+        
     }else{//else display new hint
         switch(hint){
             case 'PWater':
@@ -1681,21 +1687,24 @@ function addPlayer(self, playerInfo){
     
                 //Logging
                 f.setEndTime(Date.now());
-                f.setFigName(self.chars);
-    
+                f.setFigName(chars);
+                console.log(f.figName);
+                chars="";
+                f.setUsedHint(self.usedHint);
                 self.log.figures.push(f);
-    
+
+                self.usedHint = false;
                 console.log(self.log);
                 if(type[0] == 'P'){
                     self.player.setProjectile(type);
-                    this.socket.emit('playerChangeProjectile', {projectile_type: self.player.getProjectile(), roomId: self.player.roomId});
+                    self.socket.emit('playerChangeProjectile', {projectile_type: self.player.getProjectile(), roomId: self.player.roomId});
                 }else if(type){
                     self.player.setWard(type);
                     if(self.myWard.type){
                         self.myWard.destroy();
                     }
-                    this.myWard = addWard(self, self.player.getWard(), laneToCoord(this, 0), this.player.healthBar.y - this.game.config.width/6);
-                    this.socket.emit('playerChangeWard',{ward_type: self.player.getWard(), roomId: self.player.roomId});
+                    self.myWard = addWard(self, self.player.getWard(), laneToCoord(self, 0), self.player.healthBar.y - self.game.config.width/6);
+                    self.socket.emit('playerChangeWard',{ward_type: self.player.getWard(), roomId: self.player.roomId});
                 }
             }
     
@@ -1703,7 +1712,7 @@ function addPlayer(self, playerInfo){
                 location.replace('http://localhost:3000/home.html');
                 self.player.displayName.setText("Back to home");
             }
-        }, this);
+        });
         self.player.healthBar.setTint(0x00ff00);
         self.player.displayName = self.add.text(self.game.config.width/2, self.game.config.height-self.game.config.width/3, self.player.playerName + "(" + self.player.health  + "/10)", { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
         self.log = new Log(playerInfo.playerName);
@@ -1778,10 +1787,10 @@ function addWard(self, wardType, posx, posy){
 function updateCurrentStrokes(fig, points, score, timeStart, timeEnd){
     if(chars == ""){
         f = new Figure(timeStart);
-        f.strokes.push(points);
+        // f.strokes.push(points);
         f.scores.push(score);
     }else{
-        f.strokes.push(points);
+        // f.strokes.push(points);
         f.scores.push(score);
     }
     console.log(f);
@@ -1792,10 +1801,10 @@ function updateCurrentStrokes(fig, points, score, timeStart, timeEnd){
 function errorString(fig, points, score, timeStart, timeEnd){
     if(chars == ""){
         f = new Figure(timeStart);
-        f.strokes.push(points);
+        // f.strokes.push(points);
         f.scores.push(score);
     }else{
-        f.strokes.push(points);
+        // f.strokes.push(points);
         f.scores.push(score);
     }
     chars += fig;
@@ -1849,7 +1858,7 @@ function identifyProjectile(){
     console.log(chars);
     console.log(type);
 
-    chars = "";
+    // chars = "";
     //const pointer = self.input.activePointer;
     //Emit projectile event
     //emitter.emit('throw_projectile', type);
@@ -1879,7 +1888,9 @@ function endGame(self, winner){
     // var fs = require('fs');
     // fs.writeFile('log', json, 'utf8', callback);
     // console.log(json);
-    fileName = self.log.playerName + "_" + new Date(self.log.startTime).toDateString();
+    d = new Date(self.log.startTime)
+    fileName = self.log.playerName + "_" + d.toDateString() + "_" + d.getHours() + "_" + d.getMinutes();
+    console.log(fileName);
     self.socket.emit('log',{logName: fileName,logInfo: json});
     self.socket.disconnect()
 }

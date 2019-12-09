@@ -104,7 +104,7 @@ io.on('connection', function(socket){//when a new player connects
         var fs = require('fs');
         fs.writeFile(logData.logName.replace(/\s+/g, '_')+'.json', logData.logInfo, 'utf8', function (err) {
             if (err) throw err;
-            console.log('Saved!');
+            console.log('Log Saved!');
         });
     });
 });
