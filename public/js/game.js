@@ -1709,8 +1709,13 @@ function addPlayer(self, playerInfo){
             }
     
             if(self.game.config.gamePhase == 2){//Tap to return to home page when game ends
-                location.replace('http://localhost:3000/home.html');
                 self.player.displayName.setText("Back to home");
+                if(self.location.hostname=="localhost"){
+                    self.location.assign('//' + self.location.hostname+ ':8081' + '/home.html');
+                }
+                else{
+                    self.location.assign('//' + self.location.hostname+ ':8081' + 'thesis/public/home.html');
+                }
             }
         });
         self.player.healthBar.setTint(0x00ff00);
