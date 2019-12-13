@@ -13,7 +13,7 @@ router.post('/signup', passport.authenticate('signup', { session: false }), asyn
   res.status(200).json({ message: 'signup successful' });
 });
  
-router.post('/login', async (req, res, next) => {
+router.post('/thesis/public/login', async (req, res, next) => {
   passport.authenticate('login', async (err, user, info) => {
     try {
       if (err || !user) {
