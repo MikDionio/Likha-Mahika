@@ -78,11 +78,11 @@
         url: '/thesis/public/login',
         data,
         success: function (data) {
-          self.location.replace('/thesis/public/home.html');
+          self.location.replace('thesis/public/home.html');
         },
         error: function (xhr) {
           window.alert(JSON.stringify(xhr));
-          window.location.replace('/thesis/public/index.html');
+          window.location.replace('thesis/public/index.html');
         }
       });
     }
