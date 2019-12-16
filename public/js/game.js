@@ -1354,9 +1354,8 @@ function create() {
     this.otherWard = this.physics.add.group();
 
     //Projectile Ward collision
-    this.physics.add.overlap(this.myProjectiles.getChildren(), this.otherWard.getChildren(), projectileWardCollision, null, this);
-
     this.physics.add.overlap(this.otherProjectiles.getChildren(), this.myWard.getChildren(), projectileWardCollision, null, this);
+    this.physics.add.overlap(this.myProjectiles.getChildren(), this.otherWard.getChildren(), projectileWardCollision, null, this);
 
     this.socket.on('currentPlayers', function(player) {
         console.log(player.playerId + " === " + self.socket.id);
@@ -1495,24 +1494,6 @@ function create() {
 
     const WSkyButton = this.add.image(self.game.config.width*14/40, self.game.config.height-self.game.config.width/12, 'WSkybtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
     WSkyButton.setInteractive().on('pointerdown',() => displayHint("WSky", self));
-
-    const PWaterIIButton = this.add.image(self.game.config.width*25/40, self.game.config.height-self.game.config.width/5, 'PWaterIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
-    PWaterIIButton.setInteractive().on('pointerdown',() => displayHint("PWaterII", self));
-
-    const PEarthIIButton = this.add.image(self.game.config.width*30/40, self.game.config.height-self.game.config.width/5, 'PEarthIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
-    PEarthIIButton.setInteractive().on('pointerdown',() => displayHint("PEarthII", self));
-
-    const PSkyIIButton = this.add.image(self.game.config.width*35/40, self.game.config.height-self.game.config.width/5, 'PSkyIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
-    PSkyIIButton.setInteractive().on('pointerdown',() => displayHint("PSkyII", self));
-
-    const WWaterIIButton = this.add.image(self.game.config.width*25/40, self.game.config.height-self.game.config.width/12, 'WWaterIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
-    WWaterIIButton.setInteractive().on('pointerdown',() => displayHint("WWaterII", self));
-
-    const WEarthIIButton = this.add.image(self.game.config.width*30/40, self.game.config.height-self.game.config.width/12, 'WEarthIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
-    WEarthIIButton.setInteractive().on('pointerdown',() => displayHint("WEarthII", self));
-
-    const WSkyIIButton = this.add.image(self.game.config.width*35/40, self.game.config.height-self.game.config.width/12, 'WSkyIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
-    WSkyIIButton.setInteractive().on('pointerdown',() => displayHint("WSkyII", self));
 }
 
 function update() {
@@ -1526,7 +1507,7 @@ function update() {
         this.myProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by me
             projectileObject.setVelocityY(-projectileObject.speed);
             //projectileObject.body.debugBodyColor = projectileObject.body.touching.none ? 0x0099ff : 0xff9900;
-            if(projectileObject.y < (self.otherPlayer.healthBar.y + projectileObject.height)){
+            if(projectileObject.y < (self.otherPlayer.healthBar.y)){
                 if(self.otherPlayer && self.player.getHealth() > 0){
                     self.otherPlayer.takeDamage(projectileObject.power);
                     self.otherPlayer.displayName.setText(self.otherPlayer.playerName + "(" + self.otherPlayer.health  + "/10)");
@@ -1544,7 +1525,7 @@ function update() {
     
         this.otherProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by opponent
             projectileObject.setVelocityY(projectileObject.speed);
-            if(projectileObject.y > (self.player.healthBar.y - projectileObject.height)){
+            if(projectileObject.y > (self.player.healthBar.y)){
                 if(self.player && self.player.getHealth() > 0){
                     self.player.takeDamage(projectileObject.power);
                     self.player.displayName.setText(self.player.playerName + "(" + self.player.health  + "/10)");
@@ -1604,6 +1585,25 @@ function projectileWardCollision(projectile, ward){//collision for projectiles
 function endRound(){
     round = round + 1;
 
+    if(round == 2){//Display 2nd level hints
+        const PWaterIIButton = this.add.image(self.game.config.width*25/40, self.game.config.height-self.game.config.width/5, 'PWaterIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+        PWaterIIButton.setInteractive().on('pointerdown',() => displayHint("PWaterII", self));
+
+        const PEarthIIButton = this.add.image(self.game.config.width*30/40, self.game.config.height-self.game.config.width/5, 'PEarthIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+        PEarthIIButton.setInteractive().on('pointerdown',() => displayHint("PEarthII", self));
+
+        const PSkyIIButton = this.add.image(self.game.config.width*35/40, self.game.config.height-self.game.config.width/5, 'PSkyIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+        PSkyIIButton.setInteractive().on('pointerdown',() => displayHint("PSkyII", self));
+
+        const WWaterIIButton = this.add.image(self.game.config.width*25/40, self.game.config.height-self.game.config.width/12, 'WWaterIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+        WWaterIIButton.setInteractive().on('pointerdown',() => displayHint("WWaterII", self));
+
+        const WEarthIIButton = this.add.image(self.game.config.width*30/40, self.game.config.height-self.game.config.width/12, 'WEarthIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+        WEarthIIButton.setInteractive().on('pointerdown',() => displayHint("WEarthII", self));
+
+        const WSkyIIButton = this.add.image(self.game.config.width*35/40, self.game.config.height-self.game.config.width/12, 'WSkyIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+        WSkyIIButton.setInteractive().on('pointerdown',() => displayHint("WSkyII", self));
+    }
     this.socket.emit('charsQueue', {q: playerCharsQueue, r: this.player.roomId});
 
     activateQueuedSpells(this, true);//Activate player's queued spells
@@ -1822,46 +1822,67 @@ function identifyProjectile(string){
     
     var type = "";
     //console.log(name);
-    switch(string){
-        case 'MaMa2':
-            type = "PWater";
-            break;
-        case 'Sa':
-            type = "PEarth";
-            break;
-        case 'Ba':
-            type = "PSky";
-            break;
-        case 'AA2A3':
-            type = "WWater";
-            break;
-        case 'EIEI2':
-            type = "WEarth";
-            break;
-        case 'OU':
-            type = "WSky";
-            break;
-        case 'MaWaTaTa2':
-            type = "PWaterII";
-            break;
-        case 'SaKaKa2Ka3Ma':
-            type = "PEarthII";
-            break;
-        case 'BaLaLa2Ha':
-            type = "PSkyII";
-            break;
-        case 'AA2A3YaYa2DaDa2':
-            type = "WWaterII";
-            break;
-        case 'EIEI2PaPa2NaNa2':
-            type = "WEarthII";
-            break;
-        case 'OGaGa2NgaNga2':
-            type = "WSkyII";
-            break;
+    if(round == 1){
+        switch(string){
+            case 'MaMa2':
+                type = "PWater";
+                break;
+            case 'Sa':
+                type = "PEarth";
+                break;
+            case 'Ba':
+                type = "PSky";
+                break;
+            case 'AA2A3':
+                type = "WWater";
+                break;
+            case 'EIEI2':
+                type = "WEarth";
+                break;
+            case 'OU':
+                type = "WSky";
+                break;
+        }
+    }else if(round >= 2){
+        switch(string){
+            case 'MaMa2':
+                type = "PWater";
+                break;
+            case 'Sa':
+                type = "PEarth";
+                break;
+            case 'Ba':
+                type = "PSky";
+                break;
+            case 'AA2A3':
+                type = "WWater";
+                break;
+            case 'EIEI2':
+                type = "WEarth";
+                break;
+            case 'OU':
+                type = "WSky";
+                break;
+            case 'MaWaTaTa2':
+                type = "PWaterII";
+                break;
+            case 'SaKaKa2Ka3Ma':
+                type = "PEarthII";
+                break;
+            case 'BaLaLa2Ha':
+                type = "PSkyII";
+                break;
+            case 'AA2A3YaYa2DaDa2':
+                type = "WWaterII";
+                break;
+            case 'EIEI2PaPa2NaNa2':
+                type = "WEarthII";
+                break;
+            case 'OGaGa2NgaNga2':
+                type = "WSkyII";
+                break;
+        }
     }
-    console.log(string);
-    console.log(type);
 
     // chars = "";
     //const pointer = self.input.activePointer;
@@ -1893,20 +1914,20 @@ function activatePlayerSpell(self, i, playerCharsQueue){
     setTimeout(function() {
         if(playerCharsQueue[i]){
             var type = identifyProjectile(playerCharsQueue[i]);
+            console.log(type);
             if(type[0] == 'P'){
                 self.player.setProjectile(type);
+                if(self.game.config.gamePhase == 1){
+                    if(self.player.getProjectile()){
+                        self.myProjectiles.add(addProjectile(self, self.player.getProjectile(), laneToCoord(self, 1), self.player.healthBar.y - self.game.config.width/6)); 
+                    }
+                }
             }else if(type){
                 self.player.setWard(type);
-                if(self.myWard.type){
-                    self.myWard.destroy();
+                if(self.myWard.getChildren()[0]){
+                    self.myWard.getChildren()[0].destroy();
                 }
-                self.myWard = addWard(self, self.player.getWard(), laneToCoord(self, 0), self.player.healthBar.y - self.game.config.width/6);
-            }
-    
-            if(self.game.config.gamePhase == 1){
-                if(self.player.getProjectile()){
-                    self.myProjectiles.add(addProjectile(self, self.player.getProjectile(), laneToCoord(self, 1), self.player.healthBar.y - self.game.config.width/6)); 
-                }
+                self.myWard.add(addWard(self, self.player.getWard(), laneToCoord(self, 0), self.player.healthBar.y - self.game.config.width/6));
             }
         }
     },i * 1500)
@@ -1919,6 +1940,12 @@ function activateOpponentSpell(self, i, otherCharsQueue){
             var type = identifyProjectile(otherCharsQueue[i]);
             if(type[0] == 'P'){
                 self.otherPlayer.setProjectile(type);
+                if(self.game.config.gamePhase == 1){            
+                    if(self.otherPlayer.getProjectile()){
+                        self.otherProjectiles.add(addProjectile(self, self.otherPlayer.getProjectile(), laneToCoord(self, 0), self.otherPlayer.healthBar.y + self.game.config.width/6));
+                        self.otherProjectiles.children.each(entity => entity.flipY = true)
+                    }
+                }
             }else if(type){
                 if(self.otherWard.getChildren()[0]){
                     self.otherWard.getChildren()[0].destroy();
@@ -1926,13 +1953,6 @@ function activateOpponentSpell(self, i, otherCharsQueue){
                 self.otherPlayer.setWard(type);
                 self.otherWard.add(addWard(self, self.otherPlayer.getWard(), laneToCoord(self, 1), self.otherPlayer.healthBar.y + self.game.config.width/6));
                 self.otherWard.children.each(entity => entity.flipY = true);
-            }
-    
-            if(self.game.config.gamePhase == 1){            
-                if(self.otherPlayer.getProjectile()){
-                    self.otherProjectiles.add(addProjectile(self, self.otherPlayer.getProjectile(), laneToCoord(self, 0), self.otherPlayer.healthBar.y + self.game.config.width/6));
-                    self.otherProjectiles.children.each(entity => entity.flipY = true)
-                }
             }
         }
     },i * 1500)
