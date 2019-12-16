@@ -1379,11 +1379,7 @@ function create() {
         });
     });
 
-    //Other player's spells
-    this.socket.on('otherCharsQueue', function(otherQ){
-        console.log("Opponent Queue received");
-        otherCharsQueue = otherQ;
-    });
+
 
     //Player input
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -1473,6 +1469,13 @@ function create() {
     //Timer
     self.timedEvent = this.time.addEvent({ delay: 20000, callback: endRound, callbackScope: this, loop: true });
     self.timerBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width*19/48,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.width/30).setTint(0x0000ff);
+
+    //Opponent's spells
+    this.socket.on('otherCharsQueue', function(otherQ){
+        otherCharsQueue = otherQ;
+        console.log(otherCharsQueue);
+        activateQueuedSpells(self, false);//Activate opponent's queued spells
+    }, this);
 
     //Hints UI
     const PWaterButton = this.add.image(self.game.config.width/10, self.game.config.height-self.game.config.width/5, 'PWaterbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
@@ -1599,9 +1602,11 @@ function projectileWardCollision(projectile, ward){//collision for projectiles
 }
 
 function endRound(){
-    this.socket.emit('charsQueue', {q: playerCharsQueue, r: this.player.roomId});
-    activateQueuedSpells(this);
     round = round + 1;
+
+    this.socket.emit('charsQueue', {q: playerCharsQueue, r: this.player.roomId});
+
+    activateQueuedSpells(this, true);//Activate player's queued spells
 }
 
 function clearHint(self){//Clear hint
@@ -1836,7 +1841,6 @@ function identifyProjectile(string){
         case 'OU':
             type = "WSky";
             break;
-
         case 'MaWaTaTa2':
             type = "PWaterII";
             break;
@@ -1866,19 +1870,26 @@ function identifyProjectile(string){
     return type;
 }
 
-function activateQueuedSpells(self){
+function activateQueuedSpells(self, isPlayersSpells){
 
     var i = 0
-    while(playerCharsQueue[i] || otherCharsQueue[i]){
-        activateSpell(self, i, playerCharsQueue, otherCharsQueue);
-        i = i + 1;
-    }
 
-    playerCharsQueue = [];
-    otherCharsQueue = [];
+    if(isPlayersSpells){
+        while(playerCharsQueue[i]){
+            activatePlayerSpell(self, i, playerCharsQueue);
+            i = i + 1;
+        }
+        playerCharsQueue = [];
+    }else{
+        while(otherCharsQueue[i]){
+            activateOpponentSpell(self, i, otherCharsQueue);
+            i = i + 1;
+        }
+        otherCharsQueue=[];
+    }
 }
 
-function activateSpell(self, i, playerCharsQueue, otherCharsQueue){
+function activatePlayerSpell(self, i, playerCharsQueue){
     setTimeout(function() {
         if(playerCharsQueue[i]){
             var type = identifyProjectile(playerCharsQueue[i]);
@@ -1898,8 +1909,13 @@ function activateSpell(self, i, playerCharsQueue, otherCharsQueue){
                 }
             }
         }
-    
+    },i * 1500)
+}
+
+function activateOpponentSpell(self, i, otherCharsQueue){
+    setTimeout(function() {    
         if(otherCharsQueue[i]){
+            console.log("Opponent Queue " + i);
             var type = identifyProjectile(otherCharsQueue[i]);
             if(type[0] == 'P'){
                 self.otherPlayer.setProjectile(type);
