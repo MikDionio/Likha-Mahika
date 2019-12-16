@@ -35,8 +35,8 @@ app.get('/', function (req, res) {
 });
 
 // main routes
-app.use('/thesis/public', routes);
-app.use('/thesis/public', passport.authenticate('jwt', { session : false }), secureRoutes);
+app.use('/', routes);
+app.use('/', passport.authenticate('jwt', { session : false }), secureRoutes);
 
 // catch all other routes
 app.use((req, res, next) => {
@@ -138,6 +138,11 @@ io.on('connection', function(socket){
       //console.log(projectileData.roomId);
       socket.broadcast.to(inputData.roomId).emit('playerClicked',inputData);
   });
+
+  socket.on('charsQueue', function(data){
+    console.log("Queue recieved in " + data.r);
+    socket.broadcast.to(data.r).emit('otherCharsQueue', data.q);
+  })
 
   socket.on('log', function(logData){
       console.log("logging");

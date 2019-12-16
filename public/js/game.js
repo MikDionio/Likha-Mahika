@@ -1247,12 +1247,18 @@ var config = {
 
 var game = new Phaser.Game(config);
 var emitter = new Phaser.Events.EventEmitter();
+var graphics;
+var hsv;
+
 var otherPlayer;
 var player;
 var log;
 var f;
 // var gamePhase = 0;//0 for finding opponent, 1 for game playing, 2 for match end
 var chars="";
+var playerCharsQueue = [];
+var otherCharsQueue = [];
+var round = 1;
 
 function preload() {
     // this.load.image('fire','assets/star_full.png');
@@ -1373,6 +1379,12 @@ function create() {
         });
     });
 
+    //Other player's spells
+    this.socket.on('otherCharsQueue', function(otherQ){
+        console.log("Opponent Queue received");
+        otherCharsQueue = otherQ;
+    });
+
     //Player input
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -1458,7 +1470,9 @@ function create() {
         }
     }, this)
 
-    timedEvent = this.time.addEvent({ delay: 1500, callback: fireProjectiles, callbackScope: this, loop: true });
+    //Timer
+    self.timedEvent = this.time.addEvent({ delay: 20000, callback: endRound, callbackScope: this, loop: true });
+    self.timerBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width*19/48,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.width/30).setTint(0x0000ff);
 
     //Hints UI
     const PWaterButton = this.add.image(self.game.config.width/10, self.game.config.height-self.game.config.width/5, 'PWaterbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
@@ -1503,6 +1517,9 @@ function update() {
     var gameEnd = false;
 
     if(self.game.config.gamePhase == 1){
+
+        self.timerBar.displayWidth = self.game.config.width*(1 - self.timedEvent.getProgress());
+
         this.myProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by me
             projectileObject.setVelocityY(-projectileObject.speed);
             //projectileObject.body.debugBodyColor = projectileObject.body.touching.none ? 0x0099ff : 0xff9900;
@@ -1581,18 +1598,10 @@ function projectileWardCollision(projectile, ward){//collision for projectiles
     }
 }
 
-function fireProjectiles(){
-    if(this.game.config.gamePhase == 1){
-        if(this.player.getProjectile()){
-            this.myProjectiles.add(addProjectile(this, this.player.getProjectile(), laneToCoord(this, 1), this.player.healthBar.y - this.game.config.width/6)); 
-        }
-    
-        if(this.otherPlayer.getProjectile()){
-            this.otherProjectiles.add(addProjectile(this, this.otherPlayer.getProjectile(), laneToCoord(this, 0), this.otherPlayer.healthBar.y + this.game.config.width/6));
-            this.otherProjectiles.children.each(entity => entity.flipY = true)
-        }
-    }
-    
+function endRound(){
+    this.socket.emit('charsQueue', {q: playerCharsQueue, r: this.player.roomId});
+    activateQueuedSpells(this);
+    round = round + 1;
 }
 
 function clearHint(self){//Clear hint
@@ -1682,30 +1691,17 @@ function addPlayer(self, playerInfo){
             clearHint(self);
             gest.clear();
             if(self.game.config.gamePhase == 1){
-                
-                var type = identifyProjectile();
     
                 //Logging
                 f.setEndTime(Date.now());
                 f.setFigName(chars);
-                console.log(f.figName);
-                chars="";
                 f.setUsedHint(self.usedHint);
                 self.log.figures.push(f);
 
                 self.usedHint = false;
-                console.log(self.log);
-                if(type[0] == 'P'){
-                    self.player.setProjectile(type);
-                    self.socket.emit('playerChangeProjectile', {projectile_type: self.player.getProjectile(), roomId: self.player.roomId});
-                }else if(type){
-                    self.player.setWard(type);
-                    if(self.myWard.type){
-                        self.myWard.destroy();
-                    }
-                    self.myWard = addWard(self, self.player.getWard(), laneToCoord(self, 0), self.player.healthBar.y - self.game.config.width/6);
-                    self.socket.emit('playerChangeWard',{ward_type: self.player.getWard(), roomId: self.player.roomId});
-                }
+
+                playerCharsQueue.push(chars);
+                chars="";
             }
     
             if(self.game.config.gamePhase == 2){//Tap to return to home page when game ends
@@ -1816,12 +1812,12 @@ function errorString(fig, points, score, timeStart, timeEnd){
     console.log("Wrong stroke");//soon this will have proper error feedback
 }
 
-function identifyProjectile(){
+function identifyProjectile(string){
     // var self = this;
     
     var type = "";
     //console.log(name);
-    switch(chars){
+    switch(string){
         case 'MaMa2':
             type = "PWater";
             break;
@@ -1837,7 +1833,7 @@ function identifyProjectile(){
         case 'EIEI2':
             type = "WEarth";
             break;
-        case 'O':
+        case 'OU':
             type = "WSky";
             break;
 
@@ -1860,7 +1856,7 @@ function identifyProjectile(){
             type = "WSkyII";
             break;
     }
-    console.log(chars);
+    console.log(string);
     console.log(type);
 
     // chars = "";
@@ -1868,6 +1864,62 @@ function identifyProjectile(){
     //Emit projectile event
     //emitter.emit('throw_projectile', type);
     return type;
+}
+
+function activateQueuedSpells(self){
+
+    var i = 0
+    while(playerCharsQueue[i] || otherCharsQueue[i]){
+        activateSpell(self, i, playerCharsQueue, otherCharsQueue);
+        i = i + 1;
+    }
+
+    playerCharsQueue = [];
+    otherCharsQueue = [];
+}
+
+function activateSpell(self, i, playerCharsQueue, otherCharsQueue){
+    setTimeout(function() {
+        if(playerCharsQueue[i]){
+            var type = identifyProjectile(playerCharsQueue[i]);
+            if(type[0] == 'P'){
+                self.player.setProjectile(type);
+            }else if(type){
+                self.player.setWard(type);
+                if(self.myWard.type){
+                    self.myWard.destroy();
+                }
+                self.myWard = addWard(self, self.player.getWard(), laneToCoord(self, 0), self.player.healthBar.y - self.game.config.width/6);
+            }
+    
+            if(self.game.config.gamePhase == 1){
+                if(self.player.getProjectile()){
+                    self.myProjectiles.add(addProjectile(self, self.player.getProjectile(), laneToCoord(self, 1), self.player.healthBar.y - self.game.config.width/6)); 
+                }
+            }
+        }
+    
+        if(otherCharsQueue[i]){
+            var type = identifyProjectile(otherCharsQueue[i]);
+            if(type[0] == 'P'){
+                self.otherPlayer.setProjectile(type);
+            }else if(type){
+                if(self.otherWard.getChildren()[0]){
+                    self.otherWard.getChildren()[0].destroy();
+                }
+                self.otherPlayer.setWard(type);
+                self.otherWard.add(addWard(self, self.otherPlayer.getWard(), laneToCoord(self, 1), self.otherPlayer.healthBar.y + self.game.config.width/6));
+                self.otherWard.children.each(entity => entity.flipY = true);
+            }
+    
+            if(self.game.config.gamePhase == 1){            
+                if(self.otherPlayer.getProjectile()){
+                    self.otherProjectiles.add(addProjectile(self, self.otherPlayer.getProjectile(), laneToCoord(self, 0), self.otherPlayer.healthBar.y + self.game.config.width/6));
+                    self.otherProjectiles.children.each(entity => entity.flipY = true)
+                }
+            }
+        }
+    },i * 1500)
 }
 
 function laneToCoord(self, lane){
