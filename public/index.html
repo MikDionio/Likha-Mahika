@@ -68,6 +68,9 @@
     <a href="signup.html">Don't have an account? Sign up here.</a>
   </form>
   <script>
+    if(self.location.port != "8081"){
+      self.location.assign('//' + self.location.hostname+ ':8081');
+    }
     function signIn() {
       var data = {
         username: document.forms[0].elements[0].value,
