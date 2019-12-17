@@ -1262,6 +1262,8 @@ var round = 1;
 var totalHintsPage = 1;
 var currHintsPage = 1;
 
+var receivedOtherCharsQueue = false;
+
 function preload() {
     //Projectiles and Wards
     this.load.image('PWater','assets/PWater.png');
@@ -1480,10 +1482,9 @@ function create() {
     self.timerBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width*19/48,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.width/30).setTint(0x0000ff);
 
     //Opponent's spells
-    this.socket.on('otherCharsQueue', function(otherQ){
+    this.socket.on('otherCharsQueue', function(otherQ){//received spells early
+        receivedOtherCharsQueue = true;
         otherCharsQueue = otherQ;
-        console.log(otherCharsQueue);
-        activateQueuedSpells(self, false);//Activate opponent's queued spells
     }, this);
 
     //Hints UI
@@ -1584,19 +1585,47 @@ function projectileWardCollision(projectile, ward){//collision for projectiles
     }
 }
 
+function waitForOpponentQueue(self){
+    timeout = 30000;
+    return new Promise((resolve, reject) => {
+        var timer;
+        
+        self.socket.emit('charsQueue', {q: playerCharsQueue, r: self.player.roomId});
+
+        function responseHandler(q){
+            resolve(q);
+            clearTimeout(timer);
+        }
+        
+        if(receivedOtherCharsQueue){
+            responseHandler(otherCharsQueue);
+        }else{
+            self.socket.once('otherCharsQueue', responseHandler);
+
+            timer = setTimeout(() => {
+                reject(new Error("timeout waiting for opponent queue"));
+                self.socket.removeListener('msg', responseHandler);
+            }, timeout);
+        }
+    });
+}
+
 function endRound(){
-    round = round + 1;
+    waitForOpponentQueue(this).then(q => {
+        round = round + 1;
 
-    if(round == 2){//Display 2nd level hints
-        totalHintsPage = 2;
-        changeHintsPage(2, this);
-    }else if(round == 3){
-        totalHintsPage = 3;
-        changeHintsPage(3, this);
-    }
-    this.socket.emit('charsQueue', {q: playerCharsQueue, r: this.player.roomId});
+        if(round == 3){//Display 2nd level hints
+            totalHintsPage = 2;
+            changeHintsPage(2, this);
+        }else if(round == 5){
+            totalHintsPage = 3;
+            changeHintsPage(3, this);
+        }
 
-    activateQueuedSpells(this, true);//Activate player's queued spells
+        otherCharsQueue = q;
+        activateQueuedSpells(this);//Activate queued spells
+        receivedOtherCharsQueue = false;
+    }, this);
 }
 
 function clearHintsButtons(){
@@ -1622,9 +1651,13 @@ function clearHintsButtons(){
     WSkyIIIButton.destroy();
 }
 
-function changeHintsPage(page, self){
+function changeHintsPage(page, self){//functions for the arrows
     // console.log(page);
-    if(page <= 1){
+    if(totalHintsPage == 1){
+        page = 1;
+        self.leftArrowButton.setAlpha(0.5);
+        self.rightArrowButton.setAlpha(0.5);
+    }else if(page <= 1){
         page = 1;
         self.rightArrowButton.setAlpha(1.0);
         self.leftArrowButton.setAlpha(0.5);
@@ -1709,6 +1742,7 @@ function hintsPage(page, self){
 }
 
 function clearHint(self){//Clear hint
+    console.log("Clear hint");
     if(self.hintImage1){
         self.hintImage1.destroy();
     }
@@ -1720,19 +1754,19 @@ function clearHint(self){//Clear hint
     if(self.hintImage3){
         self.hintImage3.destroy();
     }
-    self.activeHint = "";//set active hint to blank
+    // self.activeHint = "";//set active hint to blank
 }
 
 function displayHint(hint, self){//display hint based on button
     clearHint(self);
     self.usedHint = true;
-    if(hint == self.activeHint){//if user presses button again, do nothing (this just clears the hint)
-        
+
+    if(hint == self.activeHint){//if user presses button again, clear the hint
+        self.activeHint = "";
     }else{//else display new hint
         switch(hint){
             case 'PWater':
                 self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
-                console.log(self.hintImage2.width + " , " + self.hintImage2.height);
                 break;
             case 'WWater':
                 self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
@@ -1988,7 +2022,7 @@ function identifyProjectile(string){
                 type = "WSky";
                 break;
         }
-    }else if(round >= 2){
+    }else if(round > 3){
         switch(string){
             case 'MaMa2':
                 type = "PWater";
@@ -2027,6 +2061,63 @@ function identifyProjectile(string){
                 type = "WSkyII";
                 break;
         }
+    }else{
+        switch(string){
+            case 'MaMa2':
+                type = "PWater";
+                break;
+            case 'Sa':
+                type = "PEarth";
+                break;
+            case 'Ba':
+                type = "PSky";
+                break;
+            case 'AA2A3':
+                type = "WWater";
+                break;
+            case 'EIEI2':
+                type = "WEarth";
+                break;
+            case 'OU':
+                type = "WSky";
+                break;
+            case 'MaWa':
+                type = "PWaterII";
+                break;
+            case 'SaKaKa2Ka3':
+                type = "PEarthII";
+                break;
+            case 'BaLaLa2':
+                type = "PSkyII";
+                break;
+            case 'AA2A3YaYa2':
+                type = "WWaterII";
+                break;
+            case 'EIEI2PaPa2':
+                type = "WEarthII";
+                break;
+            case 'OGaGa2':
+                type = "WSkyII";
+                break;
+            case 'MaWaTaTa2':
+                type = "PWaterIII";
+                break;
+            case 'SaKaKa2Ka3Ma':
+                type = "PEarthIII";
+                break;
+            case 'BaLaLa2Ha':
+                type = "PSkyIII";
+                break;
+            case 'AA2A3YaYa2DaDa2':
+                type = "WWaterIII";
+                break;
+            case 'EIEI2PaPa2NaNa2':
+                type = "WEarthIII";
+                break;
+            case 'OGaGa2NgaNga2':
+                type = "WSkyIII";
+                break;
+        }
     }
 
     // chars = "";
@@ -2036,23 +2127,17 @@ function identifyProjectile(string){
     return type;
 }
 
-function activateQueuedSpells(self, isPlayersSpells){
+function activateQueuedSpells(self){
 
     var i = 0
 
-    if(isPlayersSpells){
-        while(playerCharsQueue[i]){
-            activatePlayerSpell(self, i, playerCharsQueue);
-            i = i + 1;
-        }
-        playerCharsQueue = [];
-    }else{
-        while(otherCharsQueue[i]){
-            activateOpponentSpell(self, i, otherCharsQueue);
-            i = i + 1;
-        }
-        otherCharsQueue=[];
+    while(playerCharsQueue[i] || otherCharsQueue[i]){
+        activatePlayerSpell(self, i, playerCharsQueue);
+        activateOpponentSpell(self,i, otherCharsQueue);
+        i = i + 1;
     }
+    playerCharsQueue = [];
+    otherCharsQueue=[];
 }
 
 function activatePlayerSpell(self, i, playerCharsQueue){
