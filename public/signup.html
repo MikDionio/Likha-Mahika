@@ -19,7 +19,7 @@
     <label for="password" class="sr-only">Password</label>
     <input type="password" id="password" class="form-control" placeholder="Password" required>
     <a class="btn btn-lg btn-primary btn-block" onClick="signUp()">Sign up</a>
-    <a href="/index.html">Already have an account? Login here.</a>
+    <a href="index.html">Already have an account? Login here.</a>
   </form>
   <script>
     function signUp() {
@@ -30,7 +30,7 @@
       };
       $.ajax({
         type: 'POST',
-        url: '/thesis/public/signup',
+        url: 'signup',
         data,
         success: function (data) {
           window.alert('user created successfully');

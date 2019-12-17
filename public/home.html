@@ -24,7 +24,7 @@
 
     $.ajax({
     type: 'GET',
-    url: '/thesis/public/current',
+    url: 'current',
     success: function (response) {
         loggedUser = response;
         document.getElementById("username").innerHTML = "Hello " + loggedUser + "!";
