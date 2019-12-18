@@ -35,8 +35,8 @@ app.get('/', function (req, res) {
 });
 
 // main routes
-app.use('/', routes);
-app.use('/', passport.authenticate('jwt', { session : false }), secureRoutes);
+app.use('', routes);
+app.use('', passport.authenticate('jwt', { session : false }), secureRoutes);
 
 // catch all other routes
 app.use((req, res, next) => {
@@ -55,6 +55,19 @@ app.listen(process.env.PORT || 3000, () => {
   console.log(`Server started on port ${process.env.PORT || 3000}`);
 });
 
+var route, routes2 = [];
+
+app._router.stack.forEach(function(middleware){
+    if(middleware.route){ // routes registered directly on the app
+        routes2.push(middleware.route);
+    } else if(middleware.name === 'router'){ // router middleware 
+        middleware.handle.stack.forEach(function(handler){
+            route = handler.route;
+            route && routes2.push(route);
+        });
+    }
+});
+console.log(routes2)
 // setup mongo connection
 const uri = process.env.MONGO_CONNECTION_URL;
 mongoose.connect(uri, { useNewUrlParser : true, useCreateIndex: true, useUnifiedTopology: true });
