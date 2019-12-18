@@ -2,7 +2,7 @@
 
 //Gestures
 var gest = new gestures({
-	debug: true,
+	debug: false,
 	draw: true,
 	drawColor: "#000000",
 	drawWidth: 5,
