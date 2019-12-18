@@ -1263,6 +1263,7 @@ var totalHintsPage = 1;
 var currHintsPage = 1;
 
 var receivedOtherCharsQueue = false;
+var spellCounter = 0;
 
 function preload() {
     //Projectiles and Wards
@@ -1390,8 +1391,6 @@ function create() {
         });
     });
 
-
-
     //Player input
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -1482,7 +1481,7 @@ function create() {
     self.timerBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width*19/48,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.width/30).setTint(0x0000ff);
 
     //Opponent's spells
-    this.socket.on('otherCharsQueue', function(otherQ){//received spells early
+    this.socket.on('otherCharsQueue', function(otherQ){//if received spells early, indicate
         receivedOtherCharsQueue = true;
         otherCharsQueue = otherQ;
     }, this);
@@ -1495,8 +1494,24 @@ function create() {
 
     this.rightArrowButton = this.add.image(self.game.config.width*8.5/10, self.game.config.height-self.game.config.width/6, 'hint_rightArrow').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10).setAlpha(0.5);
     this.rightArrowButton.setInteractive().on('pointerdown', ()=>changeHintsPage(currHintsPage + 1, this))
-    //Level 1 hints
+    
+    //Show Level 1 hints at start of game
     changeHintsPage(1, this);
+
+    //Tap to return to homepage when game ends
+    this.input.on('pointerdown', function(){
+        if(self.game.config.gamePhase == 2){//Tap to return to home page when game ends
+            self.player.displayName.setText("Back to home");
+            if(self.location.hostname=="localhost"){
+                self.location.assign('//' + self.location.hostname+ ':8081' + '/home.html');
+            }
+            else{
+                self.location.assign('//' + self.location.hostname+ ':8081' + 'thesis/public/home.html');
+            }
+        }
+    });
+
+    updateSpellCount(this, 0);
 }
 
 function update() {
@@ -1586,7 +1601,9 @@ function projectileWardCollision(projectile, ward){//collision for projectiles
 }
 
 function waitForOpponentQueue(self){
-    timeout = 30000;
+    spellCounter = 0;
+    updateSpellCount(self, spellCounter);
+    timeout = 5000;
     return new Promise((resolve, reject) => {
         var timer;
         
@@ -1597,9 +1614,9 @@ function waitForOpponentQueue(self){
             clearTimeout(timer);
         }
         
-        if(receivedOtherCharsQueue){
+        if(receivedOtherCharsQueue){//if received opponent spells early, resolve
             responseHandler(otherCharsQueue);
-        }else{
+        }else{//else wait for opponent's spells
             self.socket.once('otherCharsQueue', responseHandler);
 
             timer = setTimeout(() => {
@@ -1611,21 +1628,24 @@ function waitForOpponentQueue(self){
 }
 
 function endRound(){
-    waitForOpponentQueue(this).then(q => {
-        round = round + 1;
+    round = round + 1;
 
-        if(round == 3){//Display 2nd level hints
-            totalHintsPage = 2;
-            changeHintsPage(2, this);
-        }else if(round == 5){
-            totalHintsPage = 3;
-            changeHintsPage(3, this);
-        }
+    if(round == 3){//Display 2nd level hints
+        totalHintsPage = 2;
+        changeHintsPage(2, this);
+    }else if(round == 5){
+        totalHintsPage = 3;
+        changeHintsPage(3, this);
+    }
+    waitForOpponentQueue(this).then(q => {
 
         otherCharsQueue = q;
         activateQueuedSpells(this);//Activate queued spells
         receivedOtherCharsQueue = false;
-    }, this);
+    }, reason => {
+        console.log(reason);
+        activateQueuedSpells(this);
+    });
 }
 
 function clearHintsButtons(){
@@ -1670,7 +1690,6 @@ function changeHintsPage(page, self){//functions for the arrows
         self.rightArrowButton.setAlpha(1.0);
     }
 
-    
     currHintsPage = page;
     console.log(currHintsPage);
     hintsPage(page, self);
@@ -1845,6 +1864,15 @@ function displayHint(hint, self){//display hint based on button
     
 }
 
+function updateSpellCount(self, count){
+    if(self.displaySpellCount){
+        self.displaySpellCount.setText("Spells: " + count + "/5")
+    }else{
+        self.displaySpellCount = self.add.text(0, self.game.config.height*7/10, "Spells: " + count + "/5", { fontSize: '20px', fill: '#fff' });
+    }
+    
+}
+
 function addPlayer(self, playerInfo){
     if(!self.player){
         self.player = new Player(playerInfo.playerName, playerInfo.playerId,playerInfo.roomId);//temp values
@@ -1853,27 +1881,27 @@ function addPlayer(self, playerInfo){
         self.player.healthBar.setInteractive().on('pointerdown', function(pointer){//Tapping on healthbar lets you shoot.
             clearHint(self);
             gest.clear();
-            if(self.game.config.gamePhase == 1){
-    
-                //Logging
-                f.setEndTime(Date.now());
-                f.setFigName(chars);
-                f.setUsedHint(self.usedHint);
-                self.log.figures.push(f);
+            if(self.game.config.gamePhase == 1 && spellCounter <= 5){
+                if(chars != ""){
+                    //Logging
+                    f.setEndTime(Date.now());
+                    f.setFigName(chars);
+                    f.setUsedHint(self.usedHint);
+                    self.log.figures.push(f);
 
-                self.usedHint = false;
+                    self.usedHint = false;
 
-                playerCharsQueue.push(chars);
-                chars="";
-            }
-    
-            if(self.game.config.gamePhase == 2){//Tap to return to home page when game ends
-                self.player.displayName.setText("Back to home");
-                if(self.location.hostname=="localhost"){
-                    self.location.assign('//' + self.location.hostname+ ':8081' + '/home.html');
-                }
-                else{
-                    self.location.assign('//' + self.location.hostname+ ':8081' + 'thesis/public/home.html');
+                    if(identifyProjectile(chars) != ""){
+                        playerCharsQueue.push(chars);
+                        spellCounter++;
+                        updateSpellCount(self, spellCounter);
+                    }else{
+                        console.log("not a character");
+                    }
+
+                    chars="";
+                }else{
+                    console.log("no character");
                 }
             }
         });
@@ -1984,16 +2012,18 @@ function updateCurrentStrokes(fig, points, score, timeStart, timeEnd){
 }
 
 function errorString(fig, points, score, timeStart, timeEnd){
-    if(chars == ""){
-        f = new Figure(timeStart);
-        // f.strokes.push(points);
-        f.scores.push(score);
-    }else{
-        // f.strokes.push(points);
-        f.scores.push(score);
-    }
-    chars += fig;
+    // if(chars == ""){
+    //     f = new Figure(timeStart);
+    //     // f.strokes.push(points);
+    //     f.scores.push(score);
+    // }else{
+    //     // f.strokes.push(points);
+    //     f.scores.push(score);
+    // }
+    // chars += fig;
     console.log("Wrong stroke");//soon this will have proper error feedback
+    chars = "";
+    gest.clear();
 }
 
 function identifyProjectile(string){
