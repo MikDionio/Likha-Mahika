@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+ 
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Login Page</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="css/main.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/192spaceShips_001.png" sizes="192x192" />
+  <link rel="icon" href="assets/512spaceShips_001.png" sizes="512x512" />
+  <meta name="viewport" content="width=device-width; 
+  initial-scale=0.8; maximum-scale=2; user-scalable=0;"/>
+</head>
+ 
+<body class="">
+  <div style="font-size:0; position:relative">
+    <img id="page" src="assets/tutorial1.png"/>
+    <a class="btn btn-danger" onClick="prev()" style="position: absolute;
+    left: 0px;
+    height: 100%;
+    width:20%;
+    background: transparent;
+    border: none !important;
+    font-size:0;
+    outline:none;">easter</a>
+    <a class="btn btn-danger" onClick="next()" style="position: absolute;
+    right: 0px;
+    height: 100%;
+    width:20%;
+    background: transparent;
+    border: none !important;
+    font-size:0;
+    outline:none;">easter</a>
+  </div>
+</body>
+<script>
+  var page = 1;
+  function prev(){
+    if(page==1){
+      self.location.replace('home.html');
+    }
+    page--;
+    document.getElementById('page').src = "assets/tutorial" + page + ".png";
+    
+  }
+  function next(){
+    if(page==3){
+      self.location.replace('home.html');
+    }
+    page++;
+    document.getElementById('page').src = "assets/tutorial" + page + ".png";
+  }
+</script>
+</html>
