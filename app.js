@@ -152,10 +152,10 @@ io.on('connection', function(socket){
       socket.broadcast.to(inputData.roomId).emit('playerClicked',inputData);
   });
 
-  socket.on('charsQueue', function(data){
-    console.log("Queue recieved in " + data.r);
-    socket.broadcast.to(data.r).emit('otherCharsQueue', data.q);
-  })
+  // socket.on('charsQueue', function(data){
+  //   console.log("Queue recieved in " + data.r);
+  //   socket.broadcast.to(data.r).emit('otherCharsQueue', data.q);
+  // });
 
   socket.on('log', function(logData){
       console.log("logging");

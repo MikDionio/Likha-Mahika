@@ -1263,7 +1263,9 @@ var totalHintsPage = 1;
 var currHintsPage = 1;
 
 var receivedOtherCharsQueue = false;
-var spellCounter = 0;
+var playerSpellCounter = 0;
+var opponentSpellCounter = 0;
+var spellsPerRound = 3;
 
 function preload() {
     //Projectiles and Wards
@@ -1416,19 +1418,19 @@ function create() {
         this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
     }, this);
 
-    this.input.keyboard.on('keydown_W', function(event){//Water
-        self.player.setProjectile("PWater");
-        this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
-    }, this);
+    // this.input.keyboard.on('keydown_W', function(event){//Water
+    //     self.player.setProjectile("PWater");
+    //     this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
+    // }, this);
 
-    this.input.keyboard.on('keydown_A', function(event){//Water Ward
-        self.player.setWard("WWater");
-        if(self.myWard.type){
-            self.myWard.destroy();
-        }
-        this.myWard.add(addWard(self, self.player.getWard(), laneToCoord(this, 0), this.player.healthBar.y - this.game.config.width/6));
-        this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
-    }, this);
+    // this.input.keyboard.on('keydown_A', function(event){//Water Ward
+    //     self.player.setWard("WWater");
+    //     if(self.myWard.type){
+    //         self.myWard.destroy();
+    //     }
+    //     this.myWard.add(addWard(self, self.player.getWard(), laneToCoord(this, 0), this.player.healthBar.y - this.game.config.width/6));
+    //     this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
+    // }, this);
 
     // this.input.keyboard.on('keydown_A', function(event){//Lightning
     //     const pointer = self.input.activePointer;
@@ -1449,16 +1451,20 @@ function create() {
     // }, this);
 
     this.socket.on('playerClicked',function(inputData){
-        self.otherPlayer.setProjectile(inputData.projectile_type);
-        if(self.otherPlayer.getWard() != inputData.ward_type){
-            self.otherPlayer.setWard(inputData.ward_type);
-            if(self.otherWard.getChildren()[0]){
-                self.otherWard.getChildren()[0].destroy();
-            }
-            self.otherWard.add(addWard(self, self.otherPlayer.getWard(), laneToCoord(self, 1), self.otherPlayer.healthBar.y + self.game.config.width/6));
-            self.otherWard.children.each(entity => entity.flipY = true)
+        // self.otherPlayer.setProjectile(inputData.projectile_type);
+        // if(self.otherPlayer.getWard() != inputData.ward_type){
+        //     self.otherPlayer.setWard(inputData.ward_type);
+        //     if(self.otherWard.getChildren()[0]){
+        //         self.otherWard.getChildren()[0].destroy();
+        //     }
+        //     self.otherWard.add(addWard(self, self.otherPlayer.getWard(), laneToCoord(self, 1), self.otherPlayer.healthBar.y + self.game.config.width/6));
+        //     self.otherWard.children.each(entity => entity.flipY = true)
+        // }
+        updateOtherCharsQueue(self, inputData.input);
+
+        if(opponentSpellCounter == spellsPerRound && playerSpellCounter == spellsPerRound){
+            endRound(self);
         }
-        
     }, this);
 
     this.socket.on('otherPlayerChangeProjectile', function(projectileData){//change projectile only
@@ -1477,14 +1483,14 @@ function create() {
     }, this)
 
     //Timer
-    self.timedEvent = this.time.addEvent({ delay: 20000, callback: endRound, callbackScope: this, loop: true });
-    self.timerBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width*19/48,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.width/30).setTint(0x0000ff);
+    // self.timedEvent = this.time.addEvent({ delay: 20000, callback: endRound, callbackScope: this, loop: true });
+    // self.timerBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width*19/48,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.width/30).setTint(0x0000ff);
 
     //Opponent's spells
-    this.socket.on('otherCharsQueue', function(otherQ){//if received spells early, indicate
-        receivedOtherCharsQueue = true;
-        otherCharsQueue = otherQ;
-    }, this);
+    // this.socket.on('otherCharsQueue', function(otherQ){//if received spells early, indicate
+    //     receivedOtherCharsQueue = true;
+    //     otherCharsQueue = otherQ;
+    // }, this);
 
     //Hints UI
 
@@ -1511,7 +1517,8 @@ function create() {
         }
     });
 
-    updateSpellCount(this, 0);
+    updatePlayerSpellCount(this, 0);
+    updateOpponentSpellCount(this, 0);
 }
 
 function update() {
@@ -1520,7 +1527,7 @@ function update() {
 
     if(self.game.config.gamePhase == 1){
 
-        self.timerBar.displayWidth = self.game.config.width*(1 - self.timedEvent.getProgress());
+        // self.timerBar.displayWidth = self.game.config.width*(1 - self.timedEvent.getProgress());
 
         this.myProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by me
             projectileObject.setVelocityY(-projectileObject.speed);
@@ -1600,52 +1607,60 @@ function projectileWardCollision(projectile, ward){//collision for projectiles
     }
 }
 
-function waitForOpponentQueue(self){
-    spellCounter = 0;
-    updateSpellCount(self, spellCounter);
-    timeout = 5000;
-    return new Promise((resolve, reject) => {
-        var timer;
+// function waitForOpponentQueue(self){
+//     playerSpellCounter = 0;
+//     updatePlayerSpellCount(self, playerSpellCounter);
+//     timeout = 5000;
+//     return new Promise((resolve, reject) => {
+//         var timer;
         
-        self.socket.emit('charsQueue', {q: playerCharsQueue, r: self.player.roomId});
+//         self.socket.emit('charsQueue', {q: playerCharsQueue, r: self.player.roomId});
 
-        function responseHandler(q){
-            resolve(q);
-            clearTimeout(timer);
-        }
+//         function responseHandler(q){
+//             resolve(q);
+//             clearTimeout(timer);
+//         }
         
-        if(receivedOtherCharsQueue){//if received opponent spells early, resolve
-            responseHandler(otherCharsQueue);
-        }else{//else wait for opponent's spells
-            self.socket.once('otherCharsQueue', responseHandler);
+//         if(receivedOtherCharsQueue){//if received opponent spells early, resolve
+//             responseHandler(otherCharsQueue);
+//         }else{//else wait for opponent's spells
+//             self.socket.once('otherCharsQueue', responseHandler);
 
-            timer = setTimeout(() => {
-                reject(new Error("timeout waiting for opponent queue"));
-                self.socket.removeListener('msg', responseHandler);
-            }, timeout);
-        }
-    });
+//             timer = setTimeout(() => {
+//                 reject(new Error("timeout waiting for opponent queue"));
+//                 self.socket.removeListener('msg', responseHandler);
+//             }, timeout);
+//         }
+//     });
+// }
+
+function updateOtherCharsQueue(self, chars){
+    otherCharsQueue.push(chars);
+    opponentSpellCounter = opponentSpellCounter + 1;
+    updateOpponentSpellCount(self, opponentSpellCounter);
 }
 
-function endRound(){
+function endRound(self){
     round = round + 1;
 
     if(round == 3){//Display 2nd level hints
         totalHintsPage = 2;
-        changeHintsPage(2, this);
+        changeHintsPage(2, self);
     }else if(round == 5){
         totalHintsPage = 3;
-        changeHintsPage(3, this);
+        changeHintsPage(3, self);
     }
-    waitForOpponentQueue(this).then(q => {
 
-        otherCharsQueue = q;
-        activateQueuedSpells(this);//Activate queued spells
-        receivedOtherCharsQueue = false;
-    }, reason => {
-        console.log(reason);
-        activateQueuedSpells(this);
-    });
+    activateQueuedSpells(self);
+    // waitForOpponentQueue(this).then(q => {
+
+    //     otherCharsQueue = q;
+    //     activateQueuedSpells(this);//Activate queued spells
+    //     receivedOtherCharsQueue = false;
+    // }, reason => {
+    //     console.log(reason);
+    //     activateQueuedSpells(this);
+    // });
 }
 
 function clearHintsButtons(){
@@ -1864,13 +1879,21 @@ function displayHint(hint, self){//display hint based on button
     
 }
 
-function updateSpellCount(self, count){
-    if(self.displaySpellCount){
-        self.displaySpellCount.setText("Spells: " + count + "/5")
+function updatePlayerSpellCount(self, count){
+    if(self.displayPlayerSpellCount){
+        self.displayPlayerSpellCount.setText("Spells: " + count + "/" + spellsPerRound)
     }else{
-        self.displaySpellCount = self.add.text(0, self.game.config.height*7/10, "Spells: " + count + "/5", { fontSize: '20px', fill: '#fff' });
+        self.displayPlayerSpellCount = self.add.text(0, self.game.config.height*7/10, "Spells: " + count + "/" + spellsPerRound, { fontSize: '20px', fill: '#fff' });
     }
     
+}
+
+function updateOpponentSpellCount(self, count){
+    if(self.displayOpponentSpellCount){
+        self.displayOpponentSpellCount.setText("Spells: " + count + "/" + spellsPerRound)
+    }else{
+        self.displayOpponentSpellCount = self.add.text(0, self.game.config.height*1/10, "Spells: " + count + "/" + spellsPerRound, { fontSize: '20px', fill: '#fff' });
+    }
 }
 
 function addPlayer(self, playerInfo){
@@ -1881,7 +1904,7 @@ function addPlayer(self, playerInfo){
         self.player.healthBar.setInteractive().on('pointerdown', function(pointer){//Tapping on healthbar lets you shoot.
             clearHint(self);
             gest.clear();
-            if(self.game.config.gamePhase == 1 && spellCounter <= 5){
+            if(self.game.config.gamePhase == 1 && playerSpellCounter <= spellsPerRound){
                 if(chars != ""){
                     //Logging
                     f.setEndTime(Date.now());
@@ -1893,8 +1916,13 @@ function addPlayer(self, playerInfo){
 
                     if(identifyProjectile(chars) != ""){
                         playerCharsQueue.push(chars);
-                        spellCounter++;
-                        updateSpellCount(self, spellCounter);
+                        self.socket.emit('playerInput',{roomId: self.player.roomId, input: chars});
+                        playerSpellCounter++;
+                        updatePlayerSpellCount(self, playerSpellCounter);
+
+                        if(opponentSpellCounter == spellsPerRound && playerSpellCounter == spellsPerRound){
+                            endRound(self);
+                        }
                     }else{
                         console.log("not a character");
                     }
