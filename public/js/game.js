@@ -2081,13 +2081,13 @@ function identifyProjectile(string){
             case 'BaLaLa2Ha':
                 type = "PSkyII";
                 break;
-            case 'AA2A3YaYa2DaDa2':
+            case 'AA2A3YaYa2':
                 type = "WWaterII";
                 break;
-            case 'EIEI2PaPa2NaNa2':
+            case 'EIEI2PaPa2':
                 type = "WEarthII";
                 break;
-            case 'OGaGa2NgaNga2':
+            case 'OGaGa2':
                 type = "WSkyII";
                 break;
         }
