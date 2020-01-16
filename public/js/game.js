@@ -1282,6 +1282,10 @@ function preload() {
     this.load.image('PEarthII','assets/PEarthII.png');
     this.load.image('WEarthII','assets/WEarthII.png');
 
+    //Blanks
+    this.load.image('P','assets/P.png');
+    this.load.image('W','assets/W.png');
+
     //UI Elements
     this.load.image('health_bar','assets/bar.png');
     this.load.image('bg','assets/bgII.png');
@@ -1517,8 +1521,8 @@ function create() {
         }
     });
 
-    updatePlayerSpellCount(this, 0);
-    updateOpponentSpellCount(this, 0);
+    // updatePlayerSpellCount(this, 0);
+    // updateOpponentSpellCount(this, 0);
 }
 
 function update() {
@@ -1637,7 +1641,7 @@ function projectileWardCollision(projectile, ward){//collision for projectiles
 function updateOtherCharsQueue(self, chars){
     otherCharsQueue.push(chars);
     opponentSpellCounter = opponentSpellCounter + 1;
-    updateOpponentSpellCount(self, opponentSpellCounter);
+    updateOpponentSpellCount(self, opponentSpellCounter, chars);
 }
 
 function endRound(self){
@@ -1879,21 +1883,40 @@ function displayHint(hint, self){//display hint based on button
     
 }
 
-function updatePlayerSpellCount(self, count){
+function updatePlayerSpellCount(self, count, chars){
+    // if(self.displayPlayerSpellCount){
+    //     self.displayPlayerSpellCount.setText("Spells: " + count + "/" + spellsPerRound)
+    // }else{
+    //     self.displayPlayerSpellCount = self.add.text(0, self.game.config.height*7/10, "Spells: " + count + "/" + spellsPerRound, { fontSize: '20px', fill: '#fff' });
+    // }
+
+    type = identifyProjectile(chars);
+
     if(self.displayPlayerSpellCount){
-        self.displayPlayerSpellCount.setText("Spells: " + count + "/" + spellsPerRound)
+        self.displayPlayerSpellCount.push(self.add.image(self.game.config.width/4 - (count-1)*self.game.config.width/12, self.game.config.height*7/10, type).setDisplaySize(self.game.config.width/24, self.game.config.width/12));
     }else{
-        self.displayPlayerSpellCount = self.add.text(0, self.game.config.height*7/10, "Spells: " + count + "/" + spellsPerRound, { fontSize: '20px', fill: '#fff' });
+        self.displayPlayerSpellCount = [self.add.image(self.game.config.width/4 - (count-1)*self.game.config.width/12, self.game.config.height*7/10, type).setDisplaySize(self.game.config.width/24, self.game.config.width/12)];
     }
-    
+
 }
 
-function updateOpponentSpellCount(self, count){
+function updateOpponentSpellCount(self, count, chars){
+    // if(self.displayOpponentSpellCount){
+    //     self.displayOpponentSpellCount.setText("Spells: " + count + "/" + spellsPerRound)
+    // }else{
+    //     self.displayOpponentSpellCount = self.add.text(0, self.game.config.height*1/10, "Spells: " + count + "/" + spellsPerRound, { fontSize: '20px', fill: '#fff' });
+    // }
+
+    type = identifyProjectile(chars);
+
     if(self.displayOpponentSpellCount){
-        self.displayOpponentSpellCount.setText("Spells: " + count + "/" + spellsPerRound)
+        self.displayOpponentSpellCount.push(self.add.image(self.game.config.width*3/4 + (count - 1)*self.game.config.width/12, self.game.config.height/10, type[0]).setDisplaySize(self.game.config.width/24, self.game.config.width/12));
     }else{
-        self.displayOpponentSpellCount = self.add.text(0, self.game.config.height*1/10, "Spells: " + count + "/" + spellsPerRound, { fontSize: '20px', fill: '#fff' });
+        self.displayOpponentSpellCount = [self.add.image(self.game.config.width*3/4 + (count - 1)*self.game.config.width/12, self.game.config.height/10, type[0]).setDisplaySize(self.game.config.width/24, self.game.config.width/12)];
     }
+    console.log(count);
+    var img = self.displayOpponentSpellCount[count-1];
+    img.flipY = true
 }
 
 function addPlayer(self, playerInfo){
@@ -1918,7 +1941,7 @@ function addPlayer(self, playerInfo){
                         playerCharsQueue.push(chars);
                         self.socket.emit('playerInput',{roomId: self.player.roomId, input: chars});
                         playerSpellCounter++;
-                        updatePlayerSpellCount(self, playerSpellCounter);
+                        updatePlayerSpellCount(self, playerSpellCounter, chars);
 
                         if(opponentSpellCounter == spellsPerRound && playerSpellCounter == spellsPerRound){
                             endRound(self);
@@ -2217,6 +2240,8 @@ function activatePlayerSpell(self, i, playerCharsQueue){
                 }
                 self.myWard.add(addWard(self, self.player.getWard(), laneToCoord(self, 0), self.player.healthBar.y - self.game.config.width/5));
             }
+            self.displayPlayerSpellCount[i].destroy();
+            self.displayPlayerSpellCount[i] = null;
         }
     },i * 1500)
 }
@@ -2242,6 +2267,8 @@ function activateOpponentSpell(self, i, otherCharsQueue){
                 self.otherWard.add(addWard(self, self.otherPlayer.getWard(), laneToCoord(self, 1), self.otherPlayer.healthBar.y + self.game.config.width/5));
                 self.otherWard.children.each(entity => entity.flipY = true);
             }
+            self.displayOpponentSpellCount[i].destroy();
+            self.displayOpponentSpellCount[i] = null;
         }
     },i * 1500)
 }
