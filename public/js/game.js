@@ -1267,6 +1267,14 @@ var playerSpellCounter = 0;
 var opponentSpellCounter = 0;
 var spellsPerRound = 3;
 
+//global audio var
+var wProjectile 
+var eProjectile;
+var sProjectile;
+var wShield;
+var eShield;
+var sShield;
+
 function preload() {
     //Projectiles and Wards
     this.load.image('PWater','assets/PWater.png');
@@ -1343,6 +1351,15 @@ function preload() {
     this.load.image('WWaterIIIbtn', 'assets/WWaterIII_btn.png');
     this.load.image('WEarthIIIbtn', 'assets/WEarthIII_btn.png');
     this.load.image('WSkyIIIbtn','assets/WSkyIII_btn.png');
+
+    //audio
+    this.load.audio('Wprojectile','assets/audio/Wprojectile.mp3');
+    this.load.audio('Eprojectile','assets/audio/Eprojectile.mp3');
+    this.load.audio('Sprojectile','assets/audio/Sprojectile.mp3');
+    this.load.audio('Wshield','assets/audio/Wshield.mp3');
+    this.load.audio('Eshield','assets/audio/Eshield.mp3');
+    this.load.audio('Sshield','assets/audio/Sshield.mp3');
+
 }
    
 function create() {
@@ -1375,6 +1392,14 @@ function create() {
     //Projectile Ward collision
     this.physics.add.overlap(this.otherProjectiles.getChildren(), this.myWard.getChildren(), projectileWardCollision, null, this);
     this.physics.add.overlap(this.myProjectiles.getChildren(), this.otherWard.getChildren(), projectileWardCollision, null, this);
+
+    //Audio
+    wProjectile = this.sound.add("Wprojectile");
+    eProjectile = this.sound.add("Eprojectile");
+    sProjectile = this.sound.add("Sprojectile");
+    wShield = this.sound.add("Wshield");
+    eShield = this.sound.add("Eshield");
+    sShield = this.sound.add("Sshield");
 
     this.socket.on('currentPlayers', function(player) {
         console.log(player.playerId + " === " + self.socket.id);
@@ -2207,7 +2232,28 @@ function identifyProjectile(string){
     //emitter.emit('throw_projectile', type);
     return type;
 }
-
+function playAudio(type){
+    switch(type){
+        case 'PWater'||'PWaterII'||'PWaterIII':
+            wProjectile.play();
+            break;
+        case 'PEarth'||'PEarthII'||'PEarthIII':
+            eProjectile.play();
+            break;
+        case 'PSky'||'PSkyII'||'PSkyIII':
+            sProjectile.play();
+            break;
+        case 'WWater'||'WWaterII'||'WWaterIII':
+            wShield.play();
+            break;
+        case 'WEarth'||'WEarthII'||'WEarthIII':
+            eShield.play();
+            break;
+        case 'WSky'||'WSkyII'||'WSkyIII':
+            sShield.play();
+            break;
+    }
+}
 function activateQueuedSpells(self){
 
     var i = 0
@@ -2242,6 +2288,7 @@ function activatePlayerSpell(self, i, playerCharsQueue){
             }
             self.displayPlayerSpellCount[i].destroy();
             self.displayPlayerSpellCount[i] = null;
+            playAudio(type);
         }
     },i * 1500)
 }
@@ -2269,6 +2316,7 @@ function activateOpponentSpell(self, i, otherCharsQueue){
             }
             self.displayOpponentSpellCount[i].destroy();
             self.displayOpponentSpellCount[i] = null;
+            playAudio(type);
         }
     },i * 1500)
 }
