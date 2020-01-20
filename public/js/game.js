@@ -1805,7 +1805,6 @@ function hintsPage(page, self){
 }
 
 function clearHint(self){//Clear hint
-    console.log("Clear hint");
     if(self.hintImage1){
         self.hintImage1.destroy();
     }
@@ -1951,6 +1950,7 @@ function addPlayer(self, playerInfo){
         self.player.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width/3,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.player.health/10),self.game.config.width/10);
         self.player.healthBar.setInteractive().on('pointerdown', function(pointer){//Tapping on healthbar lets you shoot.
             clearHint(self);
+            self.activeHint = "";
             gest.clear();
             if(self.game.config.gamePhase == 1 && playerSpellCounter <= spellsPerRound){
                 if(chars != ""){
