@@ -1690,6 +1690,9 @@ function endRound(self){
     //     console.log(reason);
     //     activateQueuedSpells(this);
     // });
+
+    playerSpellCounter = 0;
+    opponentSpellCounter = 0;
 }
 
 function clearHintsButtons(){
@@ -1952,14 +1955,13 @@ function addPlayer(self, playerInfo){
             clearHint(self);
             self.activeHint = "";
             gest.clear();
-            if(self.game.config.gamePhase == 1 && playerSpellCounter <= spellsPerRound){
+            if(self.game.config.gamePhase == 1 && playerSpellCounter < spellsPerRound){
                 if(chars != ""){
                     //Logging
                     f.setEndTime(Date.now());
                     f.setFigName(chars);
                     f.setUsedHint(self.usedHint);
                     self.log.figures.push(f);
-
                     self.usedHint = false;
 
                     if(identifyProjectile(chars) != ""){
