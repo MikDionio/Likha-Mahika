@@ -1695,6 +1695,76 @@ function endRound(self){
     opponentSpellCounter = 0;
 }
 
+function activateQueuedSpells(self){
+
+    var i = 0
+
+    while(playerCharsQueue[i] || otherCharsQueue[i]){
+        activatePlayerSpell(self, i, playerCharsQueue);
+        activateOpponentSpell(self,i, otherCharsQueue);
+        i = i + 1;
+    }
+    playerCharsQueue = [];
+    otherCharsQueue=[];
+
+    // self.displayPlayerSpellCount = [];
+    // self.displayOpponentSpellCount = [];
+}
+
+function activatePlayerSpell(self, i, playerCharsQueue){
+    setTimeout(function() {
+        if(playerCharsQueue[i]){
+            var type = identifyProjectile(playerCharsQueue[i]);
+            console.log(type);
+            if(type[0] == 'P'){
+                self.player.setProjectile(type);
+                if(self.game.config.gamePhase == 1){
+                    if(self.player.getProjectile()){
+                        self.myProjectiles.add(addProjectile(self, self.player.getProjectile(), laneToCoord(self, 1), self.player.healthBar.y - self.game.config.width/6)); 
+                    }
+                }
+            }else if(type){
+                self.player.setWard(type);
+                if(self.myWard.getChildren()[0]){
+                    self.myWard.getChildren()[0].destroy();
+                }
+                self.myWard.add(addWard(self, self.player.getWard(), laneToCoord(self, 0), self.player.healthBar.y - self.game.config.width/5));
+            }
+            self.displayPlayerSpellCount[i].destroy();
+            // self.displayPlayerSpellCount[i] = null;
+            playAudio(type);
+        }
+    },i * 1500)
+}
+
+function activateOpponentSpell(self, i, otherCharsQueue){
+    setTimeout(function() {    
+        if(otherCharsQueue[i]){
+            console.log("Opponent Queue " + i);
+            var type = identifyProjectile(otherCharsQueue[i]);
+            if(type[0] == 'P'){
+                self.otherPlayer.setProjectile(type);
+                if(self.game.config.gamePhase == 1){            
+                    if(self.otherPlayer.getProjectile()){
+                        self.otherProjectiles.add(addProjectile(self, self.otherPlayer.getProjectile(), laneToCoord(self, 0), self.otherPlayer.healthBar.y + self.game.config.width/6));
+                        self.otherProjectiles.children.each(entity => entity.flipY = true)
+                    }
+                }
+            }else if(type){
+                if(self.otherWard.getChildren()[0]){
+                    self.otherWard.getChildren()[0].destroy();
+                }
+                self.otherPlayer.setWard(type);
+                self.otherWard.add(addWard(self, self.otherPlayer.getWard(), laneToCoord(self, 1), self.otherPlayer.healthBar.y + self.game.config.width/5));
+                self.otherWard.children.each(entity => entity.flipY = true);
+            }
+            self.displayOpponentSpellCount[i].destroy();
+            // self.displayOpponentSpellCount[i] = null;
+            playAudio(type);
+        }
+    },i * 1500)
+}
+
 function clearHintsButtons(){
     PWaterButton.destroy();
     PEarthButton.destroy();
@@ -1920,7 +1990,7 @@ function updatePlayerSpellCount(self, count, chars){
     type = identifyProjectile(chars);
 
     if(self.displayPlayerSpellCount){
-        self.displayPlayerSpellCount.push(self.add.image(self.game.config.width/4 - (count-1)*self.game.config.width/12, self.game.config.height*7/10, type).setDisplaySize(self.game.config.width/24, self.game.config.width/12));
+        self.displayPlayerSpellCount[count-1] = self.add.image(self.game.config.width/4 - (count-1)*self.game.config.width/12, self.game.config.height*7/10, type).setDisplaySize(self.game.config.width/24, self.game.config.width/12);
     }else{
         self.displayPlayerSpellCount = [self.add.image(self.game.config.width/4 - (count-1)*self.game.config.width/12, self.game.config.height*7/10, type).setDisplaySize(self.game.config.width/24, self.game.config.width/12)];
     }
@@ -1937,7 +2007,7 @@ function updateOpponentSpellCount(self, count, chars){
     type = identifyProjectile(chars);
 
     if(self.displayOpponentSpellCount){
-        self.displayOpponentSpellCount.push(self.add.image(self.game.config.width*3/4 + (count - 1)*self.game.config.width/12, self.game.config.height/10, type[0]).setDisplaySize(self.game.config.width/24, self.game.config.width/12));
+        self.displayOpponentSpellCount[count-1] = self.add.image(self.game.config.width*3/4 + (count - 1)*self.game.config.width/12, self.game.config.height/10, type[0]).setDisplaySize(self.game.config.width/24, self.game.config.width/12);
     }else{
         self.displayOpponentSpellCount = [self.add.image(self.game.config.width*3/4 + (count - 1)*self.game.config.width/12, self.game.config.height/10, type[0]).setDisplaySize(self.game.config.width/24, self.game.config.width/12)];
     }
@@ -2255,72 +2325,6 @@ function playAudio(type){
             sShield.play();
             break;
     }
-}
-function activateQueuedSpells(self){
-
-    var i = 0
-
-    while(playerCharsQueue[i] || otherCharsQueue[i]){
-        activatePlayerSpell(self, i, playerCharsQueue);
-        activateOpponentSpell(self,i, otherCharsQueue);
-        i = i + 1;
-    }
-    playerCharsQueue = [];
-    otherCharsQueue=[];
-}
-
-function activatePlayerSpell(self, i, playerCharsQueue){
-    setTimeout(function() {
-        if(playerCharsQueue[i]){
-            var type = identifyProjectile(playerCharsQueue[i]);
-            console.log(type);
-            if(type[0] == 'P'){
-                self.player.setProjectile(type);
-                if(self.game.config.gamePhase == 1){
-                    if(self.player.getProjectile()){
-                        self.myProjectiles.add(addProjectile(self, self.player.getProjectile(), laneToCoord(self, 1), self.player.healthBar.y - self.game.config.width/6)); 
-                    }
-                }
-            }else if(type){
-                self.player.setWard(type);
-                if(self.myWard.getChildren()[0]){
-                    self.myWard.getChildren()[0].destroy();
-                }
-                self.myWard.add(addWard(self, self.player.getWard(), laneToCoord(self, 0), self.player.healthBar.y - self.game.config.width/5));
-            }
-            self.displayPlayerSpellCount[i].destroy();
-            self.displayPlayerSpellCount[i] = null;
-            playAudio(type);
-        }
-    },i * 1500)
-}
-
-function activateOpponentSpell(self, i, otherCharsQueue){
-    setTimeout(function() {    
-        if(otherCharsQueue[i]){
-            console.log("Opponent Queue " + i);
-            var type = identifyProjectile(otherCharsQueue[i]);
-            if(type[0] == 'P'){
-                self.otherPlayer.setProjectile(type);
-                if(self.game.config.gamePhase == 1){            
-                    if(self.otherPlayer.getProjectile()){
-                        self.otherProjectiles.add(addProjectile(self, self.otherPlayer.getProjectile(), laneToCoord(self, 0), self.otherPlayer.healthBar.y + self.game.config.width/6));
-                        self.otherProjectiles.children.each(entity => entity.flipY = true)
-                    }
-                }
-            }else if(type){
-                if(self.otherWard.getChildren()[0]){
-                    self.otherWard.getChildren()[0].destroy();
-                }
-                self.otherPlayer.setWard(type);
-                self.otherWard.add(addWard(self, self.otherPlayer.getWard(), laneToCoord(self, 1), self.otherPlayer.healthBar.y + self.game.config.width/5));
-                self.otherWard.children.each(entity => entity.flipY = true);
-            }
-            self.displayOpponentSpellCount[i].destroy();
-            self.displayOpponentSpellCount[i] = null;
-            playAudio(type);
-        }
-    },i * 1500)
 }
 
 function laneToCoord(self, lane){
