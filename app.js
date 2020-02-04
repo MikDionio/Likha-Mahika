@@ -87,12 +87,12 @@ mongoose.connection.on('connected', function () {
 // });
 
 io.on('connection', function(socket){
-
+  
   socket.on('connectPlayer', function(playerData){//when a new player connects
     if(roomCount == 0){//if no rooms, make new room
       console.log("No rooms");
       socket.join('room'+roomCount);
-      newPlayer(socket, roomCount, playerData.name);
+      newPlayer(socket, 'room' + roomCount, playerData.name);
       console.log(socket.id + ' has joined session ' + roomCount);
       roomCount++;
     }else{
@@ -101,7 +101,7 @@ io.on('connection', function(socket){
             if(io.sockets.adapter.rooms['room'+i]){//If room exists
                 if(io.sockets.adapter.rooms['room'+i].length < 2){//check if it waiting user
                     socket.join('room'+i);
-                    newPlayer(socket, i, playerData.name);
+                    newPlayer(socket, 'room' + i, playerData.name);
                     console.log(socket.id + ' has joined session ' + i);
                     foundRoom = true;
                     break;
@@ -112,14 +112,14 @@ io.on('connection', function(socket){
             for(i = 0; i < roomCount; i++){
                 if(!io.sockets.adapter.rooms['room'+i]){//If room does not exist, fill in gap
                     socket.join('room'+i);
-                    newPlayer(socket, i, playerData.name);
+                    newPlayer(socket, 'room' + i, playerData.name);
                     console.log(socket.id + ' has joined session ' + i);
                     break;
                     // console.log("Room " + i + " does not exist");
                 }else if(i == roomCount - 1){
                     console.log("New Room");
                     socket.join('room'+roomCount);
-                    newPlayer(socket, roomCount, playerData.name);
+                    newPlayer(socket, 'room'+roomCount, playerData.name);
                     console.log(socket.id + ' has joined session ' + roomCount);
                     roomCount++;
                     break;
@@ -129,6 +129,12 @@ io.on('connection', function(socket){
     }
   });
   // roomCount = roomCount % 128;
+
+  socket.on('connectPrivateRoom', function(playerData){
+    socket.join(playerData.roomName);
+    newPlayer(socket, playerData.roomName, playerData.name);
+    console.log(socket.id + ' has joined ' + playerData.roomName);
+  });
 
   socket.on('disconnect', function() {
       console.log('user disconnected');
@@ -171,21 +177,20 @@ server.listen(8081, function() {
   console.log(`Listening on ${server.address().port}`);
 });
 
-function newPlayer(socket, roomNo, name){//Create new player
+function newPlayer(socket, roomName, name){//Create new player
   //create a new player and add it to our players object
-  room = 'room' + roomNo;
   players[socket.id] = {
       playerName: name,
       playerId: socket.id,
-      roomId: room,
+      roomId: roomName,
   };
 
   console.log("Player " + players[socket.id].playerName + " broadcasting to " + players[socket.id].roomId);
-  io.in(room).emit('currentPlayers', players[socket.id]);//send to room a new player's data
+  io.in(roomName).emit('currentPlayers', players[socket.id]);//send to room a new player's data
 
-  io.of('/').in(room).clients((error, clients) => {//get list of clients in a room
+  io.of('/').in(roomName).clients((error, clients) => {//get list of clients in a room
       if(clients[0]){//if room is occupied
-          io.in(room).emit('currentPlayers', players[clients[0]]);//retransmit data of player already in the room
+          io.in(roomName).emit('currentPlayers', players[clients[0]]);//retransmit data of player already in the room
       }
   })
 }

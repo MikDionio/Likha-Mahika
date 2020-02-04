@@ -16,8 +16,11 @@
 <body class="text-center">
   <form class="form-signin">
     <h1 class="h3 mb-3 font-weight-normal" id="username"></h1>
-    <a class="btn btn-lg btn-danger btn-block text-white" onClick="startGame()">Start Game</a>
     <a class="btn btn-lg btn-success btn-block text-white" href="tutorial.html">Instructions</a>
+    <a class="btn btn-lg btn-danger btn-block text-white" onClick="startGame()">Join Random Game</a>
+    <br />
+    <input type="text" name="room" placeholder="Private Room Name">
+    <a class="btn btn-lg btn-danger btn-block text-white" onClick="privateGame()">Create/Join Private Game</a>
   </form>
 
 </body>
@@ -37,12 +40,16 @@
     });
     function startGame(){
       if(self.location.hostname=="localhost"){
-        self.location.assign('//' + self.location.hostname+ ':8081' + '/game.html'+'?username='+loggedUser);
+        self.location.assign('//' + self.location.hostname+ ':8081' + '/game.html'+'?username='+loggedUser + '&private=' +false);
       }
       else{
-        self.location.assign('//' + self.location.hostname+ ':8081' + '/game.html'+'?username='+loggedUser);
+        self.location.assign('//' + self.location.hostname+ ':8081' + '/game.html'+'?username='+loggedUser + '&private=' +false);
       }
       
+    }
+    function privateGame(){
+      var roomName = document.getElementsByName("room")[0].value;
+      self.location.assign('//' + self.location.hostname + ':8081' + '/game.html' + '?username='+loggedUser + '&roomName=' + roomName);
     }
 </script>
 </html>

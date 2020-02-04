@@ -1254,6 +1254,10 @@ var otherPlayer;
 var player;
 var log;
 var f;
+
+var isPrivateGame;
+var privateRoomName;
+
 // var gamePhase = 0;//0 for finding opponent, 1 for game playing, 2 for match end
 var chars="";
 var playerCharsQueue = [];
@@ -1364,10 +1368,20 @@ function preload() {
    
 function create() {
     var self = this;
-    var username=document.location.search.replace(/^.*?\=/,'');
+    // var username=document.location.search.replace(/^.*?\=/,'');
+    const urlParams = new URLSearchParams(window.location.search);
+    var username = urlParams.get('username');
+    isPrivateGame = urlParams.has('roomName');
+    privateRoomName = urlParams.get('roomName');
+
     this.socket = io();
 
-    this.socket.emit('connectPlayer', {name: username});//connect player to the server
+    if(isPrivateGame){
+        this.socket.emit('connectPrivateRoom',{name: username, roomName: privateRoomName});//create or join a private room
+    }else{
+        this.socket.emit('connectPlayer', {name: username});//connect player random players
+    }
+    
 
     this.otherPlayers = this.physics.add.group();
 
@@ -1378,9 +1392,14 @@ function create() {
     //Background
     this.background = this.add.image(self.game.config.width/2,self.game.config.height/2,'bg').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.height);
     // this.letter = this.add.image(self.game.config.width/2,self.game.config.height/2,'letter').setOrigin(0.5,0.5)
-    //Loading gif
-    this.loading = this.add.image(self.game.config.width/2, self.game.config.height/2,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75);
-    
+
+    //Loading message
+    if(isPrivateGame){
+        this.loading = this.add.text(self.game.config.width/2, self.game.config.height/2,'Waiting in private game \'' + privateRoomName + '\'', { fontSize: '32px', fill: '#000', align: 'center', wordWrap: { width: 300 }}).setOrigin(0.5, 0.5);
+    }else{
+        this.loading = this.add.image(self.game.config.width/2, self.game.config.height/2,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75);
+    }
+
     //Projectiles
     this.myProjectiles = this.physics.add.group();//Projectiles sent by me on the field
     this.otherProjectiles = this.physics.add.group();//Projectiles sent by opponent on the field
@@ -1598,11 +1617,15 @@ function update() {
     //Game Phases
     if(!self.otherPlayer){//if still waiting for opponent
         if(!this.loading){
-            this.loading = this.add.image(self.game.config.width/2, self.game.config.height/2,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75); //Add loading gif if needed
+            if(isPrivateGame){//add loading message if needed
+                this.loading = this.add.text(self.game.config.width/2, self.game.config.height/2,'Waiting in private game \'' + privateRoomName + '\'', { fontSize: '32px', fill: '#000', align: 'center', wordWrap: { width: 300 }}).setOrigin(0.5, 0.5);
+            }else{
+                this.loading = this.add.image(self.game.config.width/2, self.game.config.height/2,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75);
+            }
         }
         self.game.config.gamePhase = 0;
     }else if(self.otherPlayer && self.game.config.gamePhase == 0){//if there is opponent
-        if(this.loading){//remove loading gif
+        if(this.loading){//remove loading message
             this.loading.destroy();
             self.log.setStartTime(Date.now());//log start time
             console.log(self.log);
@@ -2019,7 +2042,7 @@ function updateOpponentSpellCount(self, count, chars){
 function addPlayer(self, playerInfo){
     if(!self.player){
         self.player = new Player(playerInfo.playerName, playerInfo.playerId,playerInfo.roomId);//temp values
-        console.log("Player: " + self.player.playerName);
+        console.log("Player: " + self.player.playerName + ", RoomName: " + playerInfo.roomId);
         self.player.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width/3,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.player.health/10),self.game.config.width/10);
         self.player.healthBar.setInteractive().on('pointerdown', function(pointer){//Tapping on healthbar lets you shoot.
             clearHint(self);
