@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href="css/main.css" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="assets/192spaceShips_001.png" sizes="192x192" />
   <link rel="icon" href="assets/512spaceShips_001.png" sizes="512x512" />
@@ -18,11 +21,37 @@
     <h1 class="h3 mb-3 font-weight-normal" id="username"></h1>
     <a class="btn btn-lg btn-success btn-block text-white" href="tutorial.html">Instructions</a>
     <a class="btn btn-lg btn-danger btn-block text-white" onClick="startGame()">Join Random Game</a>
-    <br />
-    <input type="text" name="room" placeholder="Private Room Name">
-    <a class="btn btn-lg btn-danger btn-block text-white" onClick="privateGame()">Create/Join Private Game</a>
+    <!-- <a class="btn btn-lg btn-danger btn-block text-white" onClick="privateGame()">Create/Join Private Game</a> -->
+      <!-- Button trigger modal -->
+    <a type="button" class="btn btn-lg btn-danger btn-block text-white" data-toggle="modal" data-target="#createPrivateGameModal" onClick="createOrJoin('New private game room name', 'Create Private Game')">
+      Create Private Game
+    </a>
+    <a type="button" class="btn btn-lg btn-danger btn-block text-white" data-toggle="modal" data-target="#createPrivateGameModal" onClick="createOrJoin('Existing private game room name', 'Join Private Game')">
+      Join Private Game
+    </a>
   </form>
 
+<!-- Modals -->
+<!-- Private Game -->
+<div class="modal fade" id="createPrivateGameModal" tabindex="-1" role="dialog" aria-labelledby="createPrivateGame" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="privateGameModalTitle">Create or Join a Private Game</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control" name="room" id="roomInput" placeholder="private game name">
+      </To>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onClick="privateGame()">Create Private Game</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 <script>
 
@@ -49,7 +78,15 @@
     }
     function privateGame(){
       var roomName = document.getElementsByName("room")[0].value;
-      self.location.assign('//' + self.location.hostname + ':8081' + '/game.html' + '?username='+loggedUser + '&roomName=' + roomName);
+      if(roomName === ""){
+        alert("Please specify a room name");
+      }else{
+        self.location.assign('//' + self.location.hostname + ':8081' + '/game.html' + '?username='+loggedUser + '&roomName=' + roomName);
+      }
+    }
+    function createOrJoin(placeHolderText, modalTitle){
+      document.getElementById("roomInput").placeholder=placeHolderText;
+      document.getElementById("privateGameModalTitle").innerHTML = modalTitle;
     }
 </script>
 </html>
