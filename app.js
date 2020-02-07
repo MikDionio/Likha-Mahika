@@ -137,12 +137,14 @@ io.on('connection', function(socket){
   });
 
   socket.on('disconnect', function() {
-      console.log('user disconnected');
-      //remove this player from our players object
-      delete players[socket.id];
+      console.log('user ' + players[socket.id].playerName +  ' disconnected from ' + players[socket.id].roomId);
+      
+      socket.broadcast.to(players[socket.id].roomId).emit('opponentDisconnect');
 
-      //emit a message to all players to remove this player
-      io.emit('disconnect',socket.id);
+      // //remove this player from our players object
+      delete players[socket.id];
+      // //emit a message to all players to remove this player
+      // io.emit('disconnect',socket.id);
   });
 
   socket.on('playerChangeProjectile', function(projectileData){

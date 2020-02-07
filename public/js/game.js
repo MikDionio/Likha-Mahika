@@ -1433,12 +1433,16 @@ function create() {
     //     addOtherPlayer(self, playerInfo);
     // });
 
-    this.socket.on('disconnect', function(playerId){
-        self.otherPlayers.getChildren().forEach(function (otherPlayer){
-            if(playerId === otherPlayer.playerId){
-                otherPlayer.destroy();
-            }
-        });
+    // this.socket.on('disconnect', function(playerId){
+    //     self.otherPlayers.getChildren().forEach(function (otherPlayer){
+    //         if(playerId === otherPlayer.playerId){
+    //             otherPlayer.destroy();
+    //         }
+    //     });
+    // });
+
+    this.socket.on('opponentDisconnect', function(){
+        endGame(self, true);
     });
 
     //Player input
@@ -2214,6 +2218,10 @@ function identifyProjectile(string){
                 type = "PSky";
                 break;
             case 'AA2A3':
+            case 'AA3A2':
+            case 'AA3A3':
+            case 'AA3A3':
+            case 'AA2A2':
                 type = "WWater";
                 break;
             case 'EIEI2':
@@ -2235,6 +2243,10 @@ function identifyProjectile(string){
                 type = "PSky";
                 break;
             case 'AA2A3':
+            case 'AA3A2':
+            case 'AA3A3':
+            case 'AA3A3':
+            case 'AA2A2':
                 type = "WWater";
                 break;
             case 'EIEI2':
@@ -2253,6 +2265,9 @@ function identifyProjectile(string){
                 type = "PSkyII";
                 break;
             case 'AA2A3YaYa2':
+            case 'AA3A2YaYa2':
+            case 'AA3A3YaYa2':
+            case 'AA2A2YaYa2':
                 type = "WWaterII";
                 break;
             case 'EIEI2PaPa2':
@@ -2274,6 +2289,10 @@ function identifyProjectile(string){
                 type = "PSky";
                 break;
             case 'AA2A3':
+            case 'AA3A2':
+            case 'AA3A3':
+            case 'AA3A3':
+            case 'AA2A2':
                 type = "WWater";
                 break;
             case 'EIEI2':
@@ -2292,6 +2311,9 @@ function identifyProjectile(string){
                 type = "PSkyII";
                 break;
             case 'AA2A3YaYa2':
+            case 'AA3A2YaYa2':
+            case 'AA3A3YaYa2':
+            case 'AA2A2YaYa2':
                 type = "WWaterII";
                 break;
             case 'EIEI2PaPa2':
@@ -2310,6 +2332,9 @@ function identifyProjectile(string){
                 type = "PSkyIII";
                 break;
             case 'AA2A3YaYa2DaDa2':
+            case 'AA3A2YaYa2DaDa2':
+            case 'AA3A3YaYa2DaDa2':
+            case 'AA2A2YaYa2DaDa2':
                 type = "WWaterIII";
                 break;
             case 'EIEI2PaPa2NaNa2':
@@ -2377,5 +2402,5 @@ function endGame(self, winner){
     fileName = self.log.playerName + "_" + d.toDateString() + "_" + d.getHours() + "_" + d.getMinutes();
     console.log(fileName);
     self.socket.emit('log',{logName: fileName,logInfo: json});
-    self.socket.disconnect()
+    self.socket.disconnect();
 }
