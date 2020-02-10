@@ -1554,7 +1554,8 @@ function create() {
     this.rightArrowButton.setInteractive().on('pointerdown', ()=>changeHintsPage(currHintsPage + 1, this))
     
     //Show Level 1 hints at start of game
-    changeHintsPage(1, this);
+    // changeHintsPage(1, this);
+    endRound(self);
 
     //Tap to return to homepage when game ends
     this.input.on('pointerdown', function(){
@@ -1699,12 +1700,15 @@ function updateOtherCharsQueue(self, chars){
 function endRound(self){
     round = round + 1;
 
-    if(round == 3){//Display 2nd level hints
-        totalHintsPage = 2;
-        changeHintsPage(2, self);
-    }else if(round == 5){
+    if(round >= 5){//Display 3rd level hints
         totalHintsPage = 3;
         changeHintsPage(3, self);
+    }else if(round >= 3){//Display 2nd level hints
+        totalHintsPage = 2;
+        changeHintsPage(2, self);
+    }else{//Display 1st level hints
+        totalHintsPage = 1;
+        changeHintsPage(1, self);
     }
 
     activateQueuedSpells(self);
