@@ -444,7 +444,7 @@ gest.addGesture("Ka", [
      {x: 345.7598571777344, y: 329.0967102050781},
 ], updateCurrentStrokes)
 
-gest.addGesture("Ka2", [
+gest.addGesture("Ka3", [
     {x: 241.6153106689453, y: 302.71343994140625},
  {x: 241.979225183589, y: 305.9886665742707},
  {x: 242.3431396982327, y: 309.2638932071352},
@@ -480,7 +480,7 @@ gest.addGesture("Ka2", [
  {x: 238.83811950683594, y: 406.85797119140625},
 ], updateCurrentStrokes)
 
-gest.addGesture("Ka3", [
+gest.addGesture("Ka2", [
     {x: 127.75062561035156, y: 388.8062438964844},
      {x: 121.29892044453815, y: 400.8123291554617},
      {x: 115.92596970528105, y: 410.92379392393826},
@@ -1143,7 +1143,7 @@ class Projectile{
         if(this.type == "stone"){
             this.speed = 0;
         }else{
-            this.speed = 200;
+            this.speed = 300;
         }
 
         this.image = imageReference;
@@ -1262,7 +1262,7 @@ var privateRoomName;
 var chars="";
 var playerCharsQueue = [];
 var otherCharsQueue = [];
-var round = 1;
+var round = 6;
 var totalHintsPage = 1;
 var currHintsPage = 1;
 
@@ -2076,6 +2076,8 @@ function addPlayer(self, playerInfo){
                         }
                     }else{
                         console.log("not a character");
+                        self.errorMessage =  self.add.text(self.game.config.width/2, self.game.config.height/2,'Incorrect spell!', { fontSize: '32px', fill: '#000', align: 'center', wordWrap: { width: 300 }}).setOrigin(0.5, 0.5);
+                        self.time.delayedCall(1000, function(){self.errorMessage.destroy();},self,this);
                     }
 
                     chars="";
@@ -2105,7 +2107,7 @@ function addOtherPlayer(self, playerInfo) {
 function addProjectile(self, projectileType, posx, posy){
     const p = self.physics.add.image(posx,posy,projectileType).setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/12, self.game.config.width/6);
     p.type = projectileType;
-    p.speed = 200;
+    p.speed = 300;
 
     switch(projectileType){
         case 'PWaterIII':
@@ -2201,6 +2203,7 @@ function errorString(fig, points, score, timeStart, timeEnd){
     // }
     // chars += fig;
     console.log("Wrong stroke");//soon this will have proper error feedback
+
     chars = "";
     gest.clear();
 }
@@ -2268,10 +2271,10 @@ function identifyProjectile(string){
             case 'BaLaLa2Ha':
                 type = "PSkyII";
                 break;
-            case 'AA2A3YaYa2':
-            case 'AA3A2YaYa2':
-            case 'AA3A3YaYa2':
-            case 'AA2A2YaYa2':
+            case 'AA2A3Ya':
+            case 'AA3A2Ya':
+            case 'AA3A3Ya':
+            case 'AA2A2Ya':
                 type = "WWaterII";
                 break;
             case 'EIEI2PaPa2':
@@ -2314,10 +2317,10 @@ function identifyProjectile(string){
             case 'BaLaLa2':
                 type = "PSkyII";
                 break;
-            case 'AA2A3YaYa2':
-            case 'AA3A2YaYa2':
-            case 'AA3A3YaYa2':
-            case 'AA2A2YaYa2':
+            case 'AA2A3Ya':
+            case 'AA3A2Ya':
+            case 'AA3A3Ya':
+            case 'AA2A2Ya':
                 type = "WWaterII";
                 break;
             case 'EIEI2PaPa2':
