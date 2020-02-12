@@ -1534,9 +1534,9 @@ function create() {
         }
     }, this)
 
-    //Timer
-    // self.timedEvent = this.time.addEvent({ delay: 20000, callback: endRound, callbackScope: this, loop: true });
-    // self.timerBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width*19/48,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.width/30).setTint(0x0000ff);
+    // Timer
+    self.timedEvent = this.time.addEvent({ delay: 30000, callback: endRound, args: [self], callbackScope: this, loop: true });
+    self.timerBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width*19/48,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.width/30).setTint(0x0000ff);
 
     //Opponent's spells
     // this.socket.on('otherCharsQueue', function(otherQ){//if received spells early, indicate
@@ -1580,7 +1580,7 @@ function update() {
 
     if(self.game.config.gamePhase == 1){
 
-        // self.timerBar.displayWidth = self.game.config.width*(1 - self.timedEvent.getProgress());
+        self.timerBar.displayWidth = self.game.config.width*(1 - self.timedEvent.getProgress());
 
         this.myProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by me
             projectileObject.setVelocityY(-projectileObject.speed);
