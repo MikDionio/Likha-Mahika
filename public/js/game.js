@@ -1285,14 +1285,20 @@ function preload() {
     this.load.image('WWater','assets/WWater.png');
     this.load.image('PWaterII','assets/PWaterII.png');
     this.load.image('WWaterII','assets/WWaterII.png');
+    this.load.image('PWaterIII','assets/PWaterIII.png');
+    this.load.image('WWaterIII','assets/WWaterIII.png');
     this.load.image('PSky','assets/PSky.png');
     this.load.image('WSky','assets/WSky.png');
     this.load.image('PSkyII','assets/PSkyII.png');
     this.load.image('WSkyII','assets/WSkyII.png');
+    this.load.image('PSkyIII','assets/PSkyIII.png');
+    this.load.image('WSkyIII','assets/WSkyIII.png');
     this.load.image('PEarth','assets/PEarth.png');
     this.load.image('WEarth','assets/WEarth.png');
     this.load.image('PEarthII','assets/PEarthII.png');
     this.load.image('WEarthII','assets/WEarthII.png');
+    this.load.image('PEarthIII','assets/PEarthIII.png');
+    this.load.image('WEarthIII','assets/WEarthIII.png');
 
     //Blanks
     this.load.image('P','assets/P.png');
@@ -1560,15 +1566,15 @@ function create() {
     //Tap to return to homepage when game ends
     this.input.on('pointerdown', function(){
         if(self.game.config.gamePhase == 2){//Tap to return to home page when game ends
-            self.player.displayName.setText("Back to home");
-            if(self.location.hostname=="localhost"){
+            console.log(self);
+            if(self.location.hostname == "localhost"){
                 self.location.assign('//' + self.location.hostname+ ':8081' + '/home.html');
             }
             else{
                 self.location.assign('//' + self.location.hostname+ ':8081' + 'thesis/public/home.html');
             }
         }
-    });
+    }, this);
 
     // updatePlayerSpellCount(this, 0);
     // updateOpponentSpellCount(this, 0);
@@ -1951,59 +1957,61 @@ function displayHint(hint, self){//display hint based on button
                 break;
     
             case 'PWaterII':
-                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage2 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'wa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                // self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'wa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
                 break;
             case 'WWaterII':
-                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage2 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'ya_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                // self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'ya_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
                 break;
             case 'PEarthII':
-                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'sa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage2 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'ka_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                // self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'sa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'ka_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
                 break;
             case 'WEarthII':
-                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ei_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage2 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'pa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                // self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ei_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'pa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
                 break;
             case 'PSkyII':
-                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ba_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage2 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'la_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                // self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ba_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'la_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
                 break;
             case 'WSkyII':
-                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ou_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage2 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'ga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                // self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ou_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'ga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
                 break;
 
             case 'PWaterIII':
-                self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'wa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'ta_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                // self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                // self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'wa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                // self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'ta_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(266, 186);
+                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'ta_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(266, 186);
                 break;
             case 'WWaterIII':
-                self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ya_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'da_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
+                // self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ya_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'da_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
                 break;
             case 'PEarthIII':
-                self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'sa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ka_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'sa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
+                // self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ka_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
                 break;
             case 'WEarthIII':
-                self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'ei_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'pa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'na_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ei_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
+                // self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'pa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'na_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
                 break;
             case 'PSkyIII':
-                self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'ba_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'la_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'ha_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ba_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
+                // self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'la_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'ha_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
                 break;
             case 'WSkyIII':
-                self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'ou_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'nga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage1 = self.add.image(self.game.config.width*3/16, self.game.config.height/2, 'ou_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
+                // self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
+                self.hintImage3 = self.add.image(self.game.config.width*11/16, self.game.config.height/2, 'nga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
                 break;
         }
         self.activeHint = hint;//keep track of currently active hint
@@ -2087,7 +2095,7 @@ function addPlayer(self, playerInfo){
             }
         });
         self.player.healthBar.setTint(0x00ff00);
-        self.player.displayName = self.add.text(self.game.config.width/2, self.game.config.height-self.game.config.width/3, self.player.playerName + "(" + self.player.health  + "/10)", { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
+        self.player.displayName = self.add.text(self.game.config.width/2, self.game.config.height-self.game.config.width/3, self.player.playerName + "(" + self.player.health  + "/10)", { fontSize: '32px', fill: '#000', align: 'center', wordWrap: { width: 300 }}).setOrigin(0.5, 0.5);
         self.log = new Log(playerInfo.playerName);
     }
     
@@ -2212,145 +2220,229 @@ function identifyProjectile(string){
     // var self = this;
     
     var type = "";
+    switch(string){
+        case 'MaMa2':
+            type = "PWater";
+            break;
+        case 'Sa':
+            type = "PEarth";
+            break;
+        case 'Ba':
+            type = "PSky";
+            break;
+        case 'AA2A3':
+        case 'AA3A2':
+        case 'AA3A3':
+        case 'AA3A3':
+        case 'AA2A2':
+            type = "WWater";
+            break;
+        case 'EIEI2':
+            type = "WEarth";
+            break;
+        case 'OU':
+            type = "WSky";
+            break;
+        // case 'MaMa2Wa':
+        case 'Wa':
+            type = "PWaterII";
+            break;
+        // case 'SaKaKa2Ka3':
+        case 'KaKa2Ka3':
+        case 'LaKa2Ka3':
+            type = "PEarthII";
+            break;
+        // case 'BaLaLa2':
+        case 'LaLa2':
+        case 'KaLa2':
+            type = "PSkyII";
+            break;
+        // case 'AA2A3Ya':
+        // case 'AA3A2Ya':
+        // case 'AA3A3Ya':
+        // case 'AA2A2Ya':
+        case 'Ya':
+            type = "WWaterII";
+            break;
+        // case 'EIEI2PaPa2':
+        case 'PaPa2':
+            type = "WEarthII";
+            break;
+        // case 'OGaGa2':
+        case 'GaGa2':
+            type = "WSkyII";
+            break;
+        // case 'MaMa2WaTaTa2':
+        case 'MaMa2TaTa2':
+            type = "PWaterIII";
+            break;
+        // case 'SaKaKa2Ka3MaMa2':
+        case 'SaMaMa2':
+            type = "PEarthIII";
+            break;
+        // case 'BaLaLa2Ha':
+        case 'BaHa':
+            type = "PSkyIII";
+            break;
+        // case 'AA2A3YaYa2DaDa2':
+        // case 'AA3A2YaYa2DaDa2':
+        // case 'AA3A3YaYa2DaDa2':
+        // case 'AA2A2YaYa2DaDa2':
+        case 'AA2A3DaDa2':
+        case 'AA3A2DaDa2':
+        case 'AA3A3DaDa2':
+        case 'AA2A2DaDa2':
+            type = "WWaterIII";
+            break;
+        // case 'EIEI2PaPa2NaNa2':
+        case 'EIEI2NaNa2':
+            type = "WEarthIII";
+            break;
+        // case 'OGaGa2NgaNga2':
+        case 'ONgaNga2':
+            type = "WSkyIII";
+            break;
     //console.log(name);
-    if(round == 1){
-        switch(string){
-            case 'MaMa2':
-                type = "PWater";
-                break;
-            case 'Sa':
-                type = "PEarth";
-                break;
-            case 'Ba':
-                type = "PSky";
-                break;
-            case 'AA2A3':
-            case 'AA3A2':
-            case 'AA3A3':
-            case 'AA3A3':
-            case 'AA2A2':
-                type = "WWater";
-                break;
-            case 'EIEI2':
-                type = "WEarth";
-                break;
-            case 'OU':
-                type = "WSky";
-                break;
-        }
-    }else if(round > 3){
-        switch(string){
-            case 'MaMa2':
-                type = "PWater";
-                break;
-            case 'Sa':
-                type = "PEarth";
-                break;
-            case 'Ba':
-                type = "PSky";
-                break;
-            case 'AA2A3':
-            case 'AA3A2':
-            case 'AA3A3':
-            case 'AA3A3':
-            case 'AA2A2':
-                type = "WWater";
-                break;
-            case 'EIEI2':
-                type = "WEarth";
-                break;
-            case 'OU':
-                type = "WSky";
-                break;
-            case 'MaWaTaTa2':
-                type = "PWaterII";
-                break;
-            case 'SaKaKa2Ka3Ma':
-                type = "PEarthII";
-                break;
-            case 'BaLaLa2Ha':
-                type = "PSkyII";
-                break;
-            case 'AA2A3Ya':
-            case 'AA3A2Ya':
-            case 'AA3A3Ya':
-            case 'AA2A2Ya':
-                type = "WWaterII";
-                break;
-            case 'EIEI2PaPa2':
-                type = "WEarthII";
-                break;
-            case 'OGaGa2':
-                type = "WSkyII";
-                break;
-        }
-    }else{
-        switch(string){
-            case 'MaMa2':
-                type = "PWater";
-                break;
-            case 'Sa':
-                type = "PEarth";
-                break;
-            case 'Ba':
-                type = "PSky";
-                break;
-            case 'AA2A3':
-            case 'AA3A2':
-            case 'AA3A3':
-            case 'AA3A3':
-            case 'AA2A2':
-                type = "WWater";
-                break;
-            case 'EIEI2':
-                type = "WEarth";
-                break;
-            case 'OU':
-                type = "WSky";
-                break;
-            case 'MaWa':
-                type = "PWaterII";
-                break;
-            case 'SaKaKa2Ka3':
-                type = "PEarthII";
-                break;
-            case 'BaLaLa2':
-                type = "PSkyII";
-                break;
-            case 'AA2A3Ya':
-            case 'AA3A2Ya':
-            case 'AA3A3Ya':
-            case 'AA2A2Ya':
-                type = "WWaterII";
-                break;
-            case 'EIEI2PaPa2':
-                type = "WEarthII";
-                break;
-            case 'OGaGa2':
-                type = "WSkyII";
-                break;
-            case 'MaWaTaTa2':
-                type = "PWaterIII";
-                break;
-            case 'SaKaKa2Ka3Ma':
-                type = "PEarthIII";
-                break;
-            case 'BaLaLa2Ha':
-                type = "PSkyIII";
-                break;
-            case 'AA2A3YaYa2DaDa2':
-            case 'AA3A2YaYa2DaDa2':
-            case 'AA3A3YaYa2DaDa2':
-            case 'AA2A2YaYa2DaDa2':
-                type = "WWaterIII";
-                break;
-            case 'EIEI2PaPa2NaNa2':
-                type = "WEarthIII";
-                break;
-            case 'OGaGa2NgaNga2':
-                type = "WSkyIII";
-                break;
-        }
+    // if(round == 1){
+    //     switch(string){
+    //         case 'MaMa2':
+    //             type = "PWater";
+    //             break;
+    //         case 'Sa':
+    //             type = "PEarth";
+    //             break;
+    //         case 'Ba':
+    //             type = "PSky";
+    //             break;
+    //         case 'AA2A3':
+    //         case 'AA3A2':
+    //         case 'AA3A3':
+    //         case 'AA3A3':
+    //         case 'AA2A2':
+    //             type = "WWater";
+    //             break;
+    //         case 'EIEI2':
+    //             type = "WEarth";
+    //             break;
+    //         case 'OU':
+    //             type = "WSky";
+    //             break;
+    //     }
+    // }else if(round > 3){
+    //     switch(string){
+    //         case 'MaMa2':
+    //             type = "PWater";
+    //             break;
+    //         case 'Sa':
+    //             type = "PEarth";
+    //             break;
+    //         case 'Ba':
+    //             type = "PSky";
+    //             break;
+    //         case 'AA2A3':
+    //         case 'AA3A2':
+    //         case 'AA3A3':
+    //         case 'AA3A3':
+    //         case 'AA2A2':
+    //             type = "WWater";
+    //             break;
+    //         case 'EIEI2':
+    //             type = "WEarth";
+    //             break;
+    //         case 'OU':
+    //             type = "WSky";
+    //             break;
+    //         // case 'MaWaTaTa2':
+    //         case 'TaTa2':
+    //             type = "PWaterII";
+    //             break;
+    //         case 'SaKaKa2Ka3Ma':
+    //             type = "PEarthII";
+    //             break;
+    //         case 'BaLaLa2Ha':
+    //             type = "PSkyII";
+    //             break;
+    //         // case 'AA2A3Ya':
+    //         // case 'AA3A2Ya':
+    //         // case 'AA3A3Ya':
+    //         // case 'AA2A2Ya':
+    //         case 'Ya':
+    //             type = "WWaterII";
+    //             break;
+    //         case 'EIEI2PaPa2':
+    //             type = "WEarthII";
+    //             break;
+    //         case 'OGaGa2':
+    //             type = "WSkyII";
+    //             break;
+    //     }
+    // }else{
+    //     switch(string){
+    //         case 'MaMa2':
+    //             type = "PWater";
+    //             break;
+    //         case 'Sa':
+    //             type = "PEarth";
+    //             break;
+    //         case 'Ba':
+    //             type = "PSky";
+    //             break;
+    //         case 'AA2A3':
+    //         case 'AA3A2':
+    //         case 'AA3A3':
+    //         case 'AA3A3':
+    //         case 'AA2A2':
+    //             type = "WWater";
+    //             break;
+    //         case 'EIEI2':
+    //             type = "WEarth";
+    //             break;
+    //         case 'OU':
+    //             type = "WSky";
+    //             break;
+    //         case 'MaWa':
+    //             type = "PWaterII";
+    //             break;
+    //         case 'SaKaKa2Ka3':
+    //             type = "PEarthII";
+    //             break;
+    //         case 'BaLaLa2':
+    //             type = "PSkyII";
+    //             break;
+    //         case 'AA2A3Ya':
+    //         case 'AA3A2Ya':
+    //         case 'AA3A3Ya':
+    //         case 'AA2A2Ya':
+    //             type = "WWaterII";
+    //             break;
+    //         case 'EIEI2PaPa2':
+    //             type = "WEarthII";
+    //             break;
+    //         case 'OGaGa2':
+    //             type = "WSkyII";
+    //             break;
+    //         case 'MaWaTaTa2':
+    //             type = "PWaterIII";
+    //             break;
+    //         case 'SaKaKa2Ka3Ma':
+    //             type = "PEarthIII";
+    //             break;
+    //         case 'BaLaLa2Ha':
+    //             type = "PSkyIII";
+    //             break;
+    //         case 'AA2A3YaYa2DaDa2':
+    //         case 'AA3A2YaYa2DaDa2':
+    //         case 'AA3A3YaYa2DaDa2':
+    //         case 'AA2A2YaYa2DaDa2':
+    //             type = "WWaterIII";
+    //             break;
+    //         case 'EIEI2PaPa2NaNa2':
+    //             type = "WEarthIII";
+    //             break;
+    //         case 'OGaGa2NgaNga2':
+    //             type = "WSkyIII";
+    //             break;
+    //     }
     }
 
     // chars = "";
@@ -2400,6 +2492,8 @@ function endGame(self, winner){
         self.log.setWinLose(false);
     }
     self.log.setEndTime(Date.now());
+    self.game.config.gamePhase = 2;
+    self.player.displayName.setText("Back to home");
     console.log(self.log);
     json = JSON.stringify(self.log);
     // var fs = require('fs');
