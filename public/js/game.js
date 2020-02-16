@@ -1262,7 +1262,7 @@ var privateRoomName;
 var chars="";
 var playerCharsQueue = [];
 var otherCharsQueue = [];
-var round = 6;
+var round = 1;
 var totalHintsPage = 1;
 var currHintsPage = 1;
 
