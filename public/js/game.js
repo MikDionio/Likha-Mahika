@@ -1311,6 +1311,7 @@ function preload() {
     this.load.image('finding', 'assets/finding.png');
     this.load.image('win','assets/win.png');
     this.load.image('lose','assets/lose.png');
+    this.load.image('button','assets/button.png');
 
     //Hints
     this.load.image('a_hint', 'assets/a.png');
@@ -1397,6 +1398,7 @@ function create() {
     
     //Background
     this.background = this.add.image(self.game.config.width/2,self.game.config.height/2,'bg').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.height);
+    this.button = this.add.image(self.game.config.width/2,self.game.config.height*9/10,'button').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*3/10, self.game.config.width*3/10);
     // this.letter = this.add.image(self.game.config.width/2,self.game.config.height/2,'letter').setOrigin(0.5,0.5)
 
     //Loading message
@@ -1553,10 +1555,10 @@ function create() {
     //Hints UI
 
     //Arrow buttons
-    this.leftArrowButton = this.add.image(self.game.config.width/10, self.game.config.height-self.game.config.width/6, 'hint_leftArrow').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10).setAlpha(0.5);
+    this.leftArrowButton = this.add.image(self.game.config.width/12, self.game.config.height-self.game.config.width/7, 'hint_leftArrow').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10).setAlpha(0.5);
     this.leftArrowButton.setInteractive().on('pointerdown', ()=>changeHintsPage(currHintsPage - 1, this));
 
-    this.rightArrowButton = this.add.image(self.game.config.width*8.5/10, self.game.config.height-self.game.config.width/6, 'hint_rightArrow').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10).setAlpha(0.5);
+    this.rightArrowButton = this.add.image(self.game.config.width*11/12, self.game.config.height-self.game.config.width/7, 'hint_rightArrow').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10).setAlpha(0.5);
     this.rightArrowButton.setInteractive().on('pointerdown', ()=>changeHintsPage(currHintsPage + 1, this))
     
     //Show Level 1 hints at start of game
@@ -1854,62 +1856,62 @@ function hintsPage(page, self){
     // clearHintsButtons();
     switch(page){
         case 1:
-            const PWaterButton = self.add.image(self.game.config.width*3/8, self.game.config.height-self.game.config.width/5, 'PWaterbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const PWaterButton = self.add.image(self.game.config.width*6/9, self.game.config.height-self.game.config.width/5, 'PWaterbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             PWaterButton.setInteractive().on('pointerdown',() => displayHint("PWater", self));
 
-            const PEarthButton = self.add.image(self.game.config.width/2, self.game.config.height-self.game.config.width/5, 'PEarthbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const PEarthButton = self.add.image(self.game.config.width*7/9, self.game.config.height-self.game.config.width/5, 'PEarthbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             PEarthButton.setInteractive().on('pointerdown',() => displayHint("PEarth", self));
 
-            const PSkyButton = self.add.image(self.game.config.width*5/8, self.game.config.height-self.game.config.width/5, 'PSkybtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const PSkyButton = self.add.image(self.game.config.width*7/9, self.game.config.height-self.game.config.width/12, 'PSkybtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             PSkyButton.setInteractive().on('pointerdown',() => displayHint("PSky", self));
 
-            const WWaterButton = self.add.image(self.game.config.width*3/8, self.game.config.height-self.game.config.width/12, 'WWaterbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const WWaterButton = self.add.image(self.game.config.width*2/9, self.game.config.height-self.game.config.width/5, 'WWaterbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             WWaterButton.setInteractive().on('pointerdown',() => displayHint("WWater", self));
 
-            const WEarthButton = self.add.image(self.game.config.width/2, self.game.config.height-self.game.config.width/12, 'WEarthbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const WEarthButton = self.add.image(self.game.config.width*2/9, self.game.config.height-self.game.config.width/12, 'WEarthbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             WEarthButton.setInteractive().on('pointerdown',() => displayHint("WEarth", self));
 
-            const WSkyButton = self.add.image(self.game.config.width*5/8, self.game.config.height-self.game.config.width/12, 'WSkybtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const WSkyButton = self.add.image(self.game.config.width*3/9, self.game.config.height-self.game.config.width/12, 'WSkybtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             WSkyButton.setInteractive().on('pointerdown',() => displayHint("WSky", self));
 
             break;
         case 2:
-            const PWaterIIButton = self.add.image(self.game.config.width*3/8, self.game.config.height-self.game.config.width/5, 'PWaterIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const PWaterIIButton = self.add.image(self.game.config.width*6/9, self.game.config.height-self.game.config.width/5, 'PWaterIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             PWaterIIButton.setInteractive().on('pointerdown',() => displayHint("PWaterII", self));
     
-            const PEarthIIButton = self.add.image(self.game.config.width/2, self.game.config.height-self.game.config.width/5, 'PEarthIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const PEarthIIButton = self.add.image(self.game.config.width*7/9, self.game.config.height-self.game.config.width/5, 'PEarthIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             PEarthIIButton.setInteractive().on('pointerdown',() => displayHint("PEarthII", self));
     
-            const PSkyIIButton = self.add.image(self.game.config.width*5/8, self.game.config.height-self.game.config.width/5, 'PSkyIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const PSkyIIButton = self.add.image(self.game.config.width*7/9, self.game.config.height-self.game.config.width/12, 'PSkyIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             PSkyIIButton.setInteractive().on('pointerdown',() => displayHint("PSkyII", self));
     
-            const WWaterIIButton = self.add.image(self.game.config.width*3/8, self.game.config.height-self.game.config.width/12, 'WWaterIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const WWaterIIButton = self.add.image(self.game.config.width*2/9, self.game.config.height-self.game.config.width/5, 'WWaterIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             WWaterIIButton.setInteractive().on('pointerdown',() => displayHint("WWaterII", self));
     
-            const WEarthIIButton = self.add.image(self.game.config.width/2, self.game.config.height-self.game.config.width/12, 'WEarthIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const WEarthIIButton = self.add.image(self.game.config.width*2/9, self.game.config.height-self.game.config.width/12, 'WEarthIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             WEarthIIButton.setInteractive().on('pointerdown',() => displayHint("WEarthII", self));
     
-            const WSkyIIButton = self.add.image(self.game.config.width*5/8, self.game.config.height-self.game.config.width/12, 'WSkyIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const WSkyIIButton = self.add.image(self.game.config.width*3/9, self.game.config.height-self.game.config.width/12, 'WSkyIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             WSkyIIButton.setInteractive().on('pointerdown',() => displayHint("WSkyII", self));
 
             break;
         case 3:
-            const PWaterIIIButton = self.add.image(self.game.config.width*3/8, self.game.config.height-self.game.config.width/5, 'PWaterIIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const PWaterIIIButton = self.add.image(self.game.config.width*6/9, self.game.config.height-self.game.config.width/5, 'PWaterIIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             PWaterIIIButton.setInteractive().on('pointerdown',() => displayHint("PWaterIII", self));
     
-            const PEarthIIIButton = self.add.image(self.game.config.width/2, self.game.config.height-self.game.config.width/5, 'PEarthIIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const PEarthIIIButton = self.add.image(self.game.config.width*7/9, self.game.config.height-self.game.config.width/5, 'PEarthIIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             PEarthIIIButton.setInteractive().on('pointerdown',() => displayHint("PEarthIII", self));
     
-            const PSkyIIIButton = self.add.image(self.game.config.width*5/8, self.game.config.height-self.game.config.width/5, 'PSkyIIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const PSkyIIIButton = self.add.image(self.game.config.width*7/9, self.game.config.height-self.game.config.width/12, 'PSkyIIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             PSkyIIIButton.setInteractive().on('pointerdown',() => displayHint("PSkyIII", self));
     
-            const WWaterIIIButton = self.add.image(self.game.config.width*3/8, self.game.config.height-self.game.config.width/12, 'WWaterIIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const WWaterIIIButton = self.add.image(self.game.config.width*2/9, self.game.config.height-self.game.config.width/5, 'WWaterIIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             WWaterIIIButton.setInteractive().on('pointerdown',() => displayHint("WWaterIII", self));
     
-            const WEarthIIIButton = self.add.image(self.game.config.width/2, self.game.config.height-self.game.config.width/12, 'WEarthIIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const WEarthIIIButton = self.add.image(self.game.config.width*2/9, self.game.config.height-self.game.config.width/12, 'WEarthIIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             WEarthIIIButton.setInteractive().on('pointerdown',() => displayHint("WEarthIII", self));
     
-            const WSkyIIIButton = self.add.image(self.game.config.width*5/8, self.game.config.height-self.game.config.width/12, 'WSkyIIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
+            const WSkyIIIButton = self.add.image(self.game.config.width*3/9, self.game.config.height-self.game.config.width/12, 'WSkyIIIbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
             WSkyIIIButton.setInteractive().on('pointerdown',() => displayHint("WSkyIII", self));
             break;
     }
