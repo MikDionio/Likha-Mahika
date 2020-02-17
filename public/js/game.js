@@ -1567,12 +1567,13 @@ function create() {
     this.input.on('pointerdown', function(){
         if(self.game.config.gamePhase == 2){//Tap to return to home page when game ends
             console.log(self);
-            if(self.location.hostname == "localhost"){
-                self.location.assign('//' + self.location.hostname+ ':8081' + '/home.html');
-            }
-            else{
-                self.location.assign('//' + self.location.hostname+ ':8081' + 'thesis/public/home.html');
-            }
+            window.location.replace("/home.html")
+            // if(self.location.hostname == "localhost"){
+            //     self.location.assign('//' + self.location.hostname+ ':8081' + '/home.html');
+            // }
+            // else{
+            //     self.location.assign('//' + self.location.hostname+ ':8081' + 'thesis/public/home.html');
+            // }
         }
     }, this);
 
@@ -2261,6 +2262,7 @@ function identifyProjectile(string){
         // case 'AA3A2Ya':
         // case 'AA3A3Ya':
         // case 'AA2A2Ya':
+        case 'Pa':
         case 'Ya':
             type = "WWaterII";
             break;
@@ -2273,7 +2275,7 @@ function identifyProjectile(string){
             type = "WSkyII";
             break;
         // case 'MaMa2WaTaTa2':
-        case 'MaMa2TaTa2':
+        case 'MaMa2Ta2Ta':
             type = "PWaterIII";
             break;
         // case 'SaKaKa2Ka3MaMa2':
@@ -2295,11 +2297,13 @@ function identifyProjectile(string){
             type = "WWaterIII";
             break;
         // case 'EIEI2PaPa2NaNa2':
+        case 'EIEI2NaKa3':
         case 'EIEI2NaNa2':
             type = "WEarthIII";
             break;
         // case 'OGaGa2NgaNga2':
-        case 'ONgaNga2':
+        case 'Nga2NgaNga2':
+        case 'OUNgaNga2':
             type = "WSkyIII";
             break;
     //console.log(name);

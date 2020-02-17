@@ -16,19 +16,29 @@
   <link rel="icon" href="assets/512spaceShips_001.png" sizes="512x512" />
 </head>
  
-<body class="text-center">
+<body class="justify-content-center">
   <form class="form-signin">
-    <h1 class="h3 mb-3 font-weight-normal" id="username"></h1>
+    <h1 class="h3 mb-3 font-weight-normal text-center" id="username"></h1>
     <a class="btn btn-lg btn-success btn-block text-white" href="tutorial.html">Instructions</a>
     <a class="btn btn-lg btn-danger btn-block text-white" onClick="startGame()">Join Random Game</a>
     <!-- <a class="btn btn-lg btn-danger btn-block text-white" onClick="privateGame()">Create/Join Private Game</a> -->
       <!-- Button trigger modal -->
-    <a type="button" class="btn btn-lg btn-danger btn-block text-white" data-toggle="modal" data-target="#createPrivateGameModal" onClick="createOrJoin('New private game room name', 'Create Private Game')">
+    <!-- <a type="button" class="btn btn-lg btn-danger btn-block text-white" data-toggle="modal" data-target="#createPrivateGameModal" onClick="createOrJoin('New private game room name', 'Create Private Game')">
       Create Private Game
     </a>
     <a type="button" class="btn btn-lg btn-danger btn-block text-white" data-toggle="modal" data-target="#createPrivateGameModal" onClick="createOrJoin('Existing private game room name', 'Join Private Game')">
       Join Private Game
-    </a>
+    </a> -->
+    <div class="card text-center mt-2">
+      <div class="card-body">
+        <h3>Private Lobby</h3>
+          <div class="input-group mb-1">
+            <input type="text" class="form-control" name="room" id="roomInput" placeholder="New/Existing Game Name">
+          </div>
+          
+        <button type="button" class="btn btn-primary btn-lg col mt-2" onClick="privateGame()">Create/Join Private Game</button>
+       </div>  
+    </div>
   </form>
 
 <!-- Modals -->
