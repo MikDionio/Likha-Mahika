@@ -1374,7 +1374,10 @@ function preload() {
 }
    
 function create() {
+    window.self = this;
     var self = this;
+    console.log(this);
+    console.log(game);
     // var username=document.location.search.replace(/^.*?\=/,'');
     const urlParams = new URLSearchParams(window.location.search);
     var username = urlParams.get('username');
@@ -1399,6 +1402,41 @@ function create() {
     //Background
     this.background = this.add.image(self.game.config.width/2,self.game.config.height/2,'bg').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.height);
     this.button = this.add.image(self.game.config.width/2,self.game.config.height*9/10,'button').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*3/10, self.game.config.width*3/10);
+
+    this.button.setInteractive().on('pointerdown', function(pointer){//Tapping on button lets you submit spells.
+        clearHint(self);
+        self.activeHint = "";
+        gest.clear();
+        if(self.game.config.gamePhase == 1 && playerSpellCounter < spellsPerRound){
+            if(chars != ""){
+                //Logging
+                f.setEndTime(Date.now());
+                f.setFigName(chars);
+                f.setUsedHint(self.usedHint);
+                self.log.figures.push(f);
+                self.usedHint = false;
+
+                if(identifyProjectile(chars) != ""){
+                    playerCharsQueue.push(chars);
+                    self.socket.emit('playerInput',{roomId: self.player.roomId, input: chars});
+                    playerSpellCounter++;
+                    updatePlayerSpellCount(self, playerSpellCounter, chars);
+
+                    if(opponentSpellCounter == spellsPerRound && playerSpellCounter == spellsPerRound){
+                        endRound(self);
+                    }
+                }else{
+                    console.log("not a character");
+                    self.errorMessage =  self.add.text(self.game.config.width/2, self.game.config.height/2,'Incorrect spell!', { fontSize: '32px', fill: '#000', align: 'center', wordWrap: { width: 300 }}).setOrigin(0.5, 0.5);
+                    self.time.delayedCall(1000, function(){self.errorMessage.destroy();},self,this);
+                }
+
+                chars="";
+            }else{
+                console.log("no character");
+            }
+        }
+    });
     // this.letter = this.add.image(self.game.config.width/2,self.game.config.height/2,'letter').setOrigin(0.5,0.5)
 
     //Loading message
@@ -1581,6 +1619,7 @@ function create() {
 
     // updatePlayerSpellCount(this, 0);
     // updateOpponentSpellCount(this, 0);
+    
 }
 
 function update() {
@@ -2063,40 +2102,6 @@ function addPlayer(self, playerInfo){
         self.player = new Player(playerInfo.playerName, playerInfo.playerId,playerInfo.roomId);//temp values
         console.log("Player: " + self.player.playerName + ", RoomName: " + playerInfo.roomId);
         self.player.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width/3,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.player.health/10),self.game.config.width/10);
-        self.player.healthBar.setInteractive().on('pointerdown', function(pointer){//Tapping on healthbar lets you shoot.
-            clearHint(self);
-            self.activeHint = "";
-            gest.clear();
-            if(self.game.config.gamePhase == 1 && playerSpellCounter < spellsPerRound){
-                if(chars != ""){
-                    //Logging
-                    f.setEndTime(Date.now());
-                    f.setFigName(chars);
-                    f.setUsedHint(self.usedHint);
-                    self.log.figures.push(f);
-                    self.usedHint = false;
-
-                    if(identifyProjectile(chars) != ""){
-                        playerCharsQueue.push(chars);
-                        self.socket.emit('playerInput',{roomId: self.player.roomId, input: chars});
-                        playerSpellCounter++;
-                        updatePlayerSpellCount(self, playerSpellCounter, chars);
-
-                        if(opponentSpellCounter == spellsPerRound && playerSpellCounter == spellsPerRound){
-                            endRound(self);
-                        }
-                    }else{
-                        console.log("not a character");
-                        self.errorMessage =  self.add.text(self.game.config.width/2, self.game.config.height/2,'Incorrect spell!', { fontSize: '32px', fill: '#000', align: 'center', wordWrap: { width: 300 }}).setOrigin(0.5, 0.5);
-                        self.time.delayedCall(1000, function(){self.errorMessage.destroy();},self,this);
-                    }
-
-                    chars="";
-                }else{
-                    console.log("no character");
-                }
-            }
-        });
         self.player.healthBar.setTint(0x00ff00);
         self.player.displayName = self.add.text(self.game.config.width/2, self.game.config.height-self.game.config.width/3, self.player.playerName + "(" + self.player.health  + "/10)", { fontSize: '32px', fill: '#000', align: 'center', wordWrap: { width: 300 }}).setOrigin(0.5, 0.5);
         self.log = new Log(playerInfo.playerName);
@@ -2203,7 +2208,7 @@ function updateCurrentStrokes(fig, points, score, timeStart, timeEnd){
     console.log(chars);
 }
 
-function errorString(fig, points, score, timeStart, timeEnd){
+function errorString(){
     // if(chars == ""){
     //     f = new Figure(timeStart);
     //     // f.strokes.push(points);
@@ -2213,10 +2218,17 @@ function errorString(fig, points, score, timeStart, timeEnd){
     //     f.scores.push(score);
     // }
     // chars += fig;
-    console.log("Wrong stroke");//soon this will have proper error feedback
+    console.log("Wrong stroke");
+
+    window.self.errorText = window.self.add.text(self.game.config.width/2, self.game.config.height/2,'Wrong stroke!', { fontSize: '32px', fill: '#000', align: 'center',wordWrap: { width: 300 }}).setOrigin(0.5, 0.5).setColor("red");
+    window.self.errorTextTimer = window.self.time.delayedCall(1000, clearErrorString, [], this);
 
     chars = "";
     gest.clear();
+}
+
+function clearErrorString(){
+    window.self.errorText.destroy();
 }
 
 function identifyProjectile(string){
