@@ -1209,6 +1209,7 @@ class Figure{
         this.scores = [];
         this.figName = "";
         this.usedHint = false;
+        this.errorsMade = 0;
     }
 
     setEndTime(t){
@@ -1221,6 +1222,10 @@ class Figure{
 
     setUsedHint(didUseHint){
         this.usedHint = didUseHint;
+    }
+
+    incrementErrors(){
+        this.errorsMade = this.errorsMade + 1;
     }
 }
 
@@ -1254,6 +1259,7 @@ var otherPlayer;
 var player;
 var log;
 var f;
+var errors = 0;
 
 var isPrivateGame;
 var privateRoomName;
@@ -1415,6 +1421,7 @@ function create() {
                 f.setUsedHint(self.usedHint);
                 self.log.figures.push(f);
                 self.usedHint = false;
+                f = "";
 
                 if(identifyProjectile(chars) != ""){
                     playerCharsQueue.push(chars);
@@ -1813,7 +1820,7 @@ function activatePlayerSpell(self, i, playerCharsQueue){
             // self.displayPlayerSpellCount[i] = null;
             playAudio(type);
         }
-    },i * 1500)
+    },i * 2000)
 }
 
 function activateOpponentSpell(self, i, otherCharsQueue){
@@ -1841,7 +1848,7 @@ function activateOpponentSpell(self, i, otherCharsQueue){
             // self.displayOpponentSpellCount[i] = null;
             playAudio(type);
         }
-    },i * 1500)
+    },i * 2000)
 }
 
 function clearHintsButtons(){
@@ -2164,31 +2171,31 @@ function addWard(self, wardType, posx, posy){
             break;
         case 'WSkyIII':
             w.resistance = 3;
-            w.weaknesses = ["PSkyIII", "PSkyII", "PSky"];
+            w.weaknesses = ["PEarthIII", "PEarthII", "PEarth"];
             break;
         case 'WWaterII': 
             w.resistance = 2;
-            w.weaknesses = ["PSkyII", "PSky"];
+            w.weaknesses = ["PEarthIII","PSkyIII","PSkyII", "PSky"];
             break;
         case 'WEarthII': 
             w.resistance = 2;
-            w.weaknesses = ["PWaterII", "PWater"];
+            w.weaknesses = ["PSkyIII","PWaterIII","PWaterII", "PWater"];
             break;
         case 'WSkyII': 
             w.resistance = 2;
-            w.weaknesses = ["PEarthII", "PEarth"];
+            w.weaknesses = ["PWaterIII","PEarthIII","PEarthII", "PEarth"];
             break;
         case 'WWater':
             w.resistance = 1;
-            w.weaknesses = ["PSkyII", "PEarthII", "PSky"];
+            w.weaknesses = ["PEarthIII", "PSkyIII","PSkyII", "PEarthII", "PSky"];
             break;
         case 'WEarth':
             w.resistance = 1;
-            w.weaknesses = ["PWaterII", "PSkyII", "PWater"];
+            w.weaknesses = ["PWaterIII","PSkyIII","PWaterII", "PSkyII", "PWater"];
             break;
         case 'WSky':
             w.resistance = 1;
-            w.weaknesses = ["PEarthII", "PWaterII", "PEarth"];
+            w.weaknesses = ["PEarthIII","PWaterIII","PEarthII", "PWaterII", "PEarth"];
             break;
     }
     return w;
@@ -2199,6 +2206,8 @@ function updateCurrentStrokes(fig, points, score, timeStart, timeEnd){
         f = new Figure(timeStart);
         // f.strokes.push(points);
         f.scores.push(score);
+        f.errorsMade = errors;
+        errors = 0;
     }else{
         // f.strokes.push(points);
         f.scores.push(score);
@@ -2222,6 +2231,15 @@ function errorString(){
 
     window.self.errorText = window.self.add.text(self.game.config.width/2, self.game.config.height/2,'Wrong stroke!', { fontSize: '32px', fill: '#000', align: 'center',wordWrap: { width: 300 }}).setOrigin(0.5, 0.5).setColor("red");
     window.self.errorTextTimer = window.self.time.delayedCall(1000, clearErrorString, [], this);
+    if(f){
+        f.incrementErrors();
+        console.log(f);
+    }else{
+        errors = errors + 1;
+        console.log(errors);
+    }
+
+    console.log(f);
 
     chars = "";
     gest.clear();
