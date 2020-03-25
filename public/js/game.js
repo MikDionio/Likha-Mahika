@@ -1398,12 +1398,7 @@ function create() {
         this.socket.emit('connectPlayer', {name: username});//connect player random players
     }
     
-
     this.otherPlayers = this.physics.add.group();
-
-    console.log(self.game.config.width);
-    console.log(self.game.config.height);
-    console.log(localStorage);
     
     //Background
     this.background = this.add.image(self.game.config.width/2,self.game.config.height/2,'bg').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.height);
@@ -1444,7 +1439,6 @@ function create() {
             }
         }
     });
-    // this.letter = this.add.image(self.game.config.width/2,self.game.config.height/2,'letter').setOrigin(0.5,0.5)
 
     //Loading message
     if(isPrivateGame){
@@ -1482,18 +1476,6 @@ function create() {
         }
     });
 
-    // this.socket.on('newPlayer',function(playerInfo){//when other player is found
-    //     addOtherPlayer(self, playerInfo);
-    // });
-
-    // this.socket.on('disconnect', function(playerId){
-    //     self.otherPlayers.getChildren().forEach(function (otherPlayer){
-    //         if(playerId === otherPlayer.playerId){
-    //             otherPlayer.destroy();
-    //         }
-    //     });
-    // });
-
     this.socket.on('opponentDisconnect', function(){
         endGame(self, true);
     });
@@ -1501,70 +1483,7 @@ function create() {
     //Player input
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    //Throw Projectile (For debugging)
-    this.input.keyboard.on('keydown_Q', function(event){//Sky
-        // const pointer = self.input.activePointer;
-        // this.socket.emit('playerInput', {type: "fire", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
-        // self.myProjectiles.add(addProjectile(self, "fire",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
-        self.player.setProjectile("PSky");
-        this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
-        // console.log(self.player.getProjectile());
-    }, this);
-
-    this.input.keyboard.on('keydown_E', function(event){//Sky Ward
-        // const pointer = self.input.activePointer;
-        // self.myProjectiles.add(addProjectile(self, "nature",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
-        // this.socket.emit('playerInput', {type: "nature", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
-        self.player.setWard("WSky");
-        if(self.myWard.type){
-            self.myWard.destroy();
-        }
-        this.myWard.add(addWard(self, self.player.getWard(), laneToCoord(this, 0), this.player.healthBar.y - this.game.config.width/6));
-        this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
-    }, this);
-
-    // this.input.keyboard.on('keydown_W', function(event){//Water
-    //     self.player.setProjectile("PWater");
-    //     this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
-    // }, this);
-
-    // this.input.keyboard.on('keydown_A', function(event){//Water Ward
-    //     self.player.setWard("WWater");
-    //     if(self.myWard.type){
-    //         self.myWard.destroy();
-    //     }
-    //     this.myWard.add(addWard(self, self.player.getWard(), laneToCoord(this, 0), this.player.healthBar.y - this.game.config.width/6));
-    //     this.socket.emit('playerInput', {projectile_type: self.player.getProjectile(), ward_type: self.player.getWard(), roomId: self.player.roomId});
-    // }, this);
-
-    // this.input.keyboard.on('keydown_A', function(event){//Lightning
-    //     const pointer = self.input.activePointer;
-    //     self.myProjectiles.add(addProjectile(self, "lightning",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
-    //     this.socket.emit('playerInput', {type: "lightning", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
-    // }, this);
-
-    // this.input.keyboard.on('keydown_D', function(event){//Wind
-    //     const pointer = self.input.activePointer;
-    //     self.myProjectiles.add(addProjectile(self, "wind",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
-    //     this.socket.emit('playerInput', {type: "wind", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
-    // }, this);
-
-    // this.input.keyboard.on('keydown_S', function(event){//Stone
-    //     const pointer = self.input.activePointer;
-    //     self.myProjectiles.add(addProjectile(self, "stone",laneToCoord(self, self.player.currLane), self.game.config.width - self.game.config.width/6));
-    //     this.socket.emit('playerInput', {type: "stone", lane: self.player.currLane, y: self.game.config.width - self.game.config.width/6, roomId: self.player.roomId});
-    // }, this);
-
     this.socket.on('playerClicked',function(inputData){
-        // self.otherPlayer.setProjectile(inputData.projectile_type);
-        // if(self.otherPlayer.getWard() != inputData.ward_type){
-        //     self.otherPlayer.setWard(inputData.ward_type);
-        //     if(self.otherWard.getChildren()[0]){
-        //         self.otherWard.getChildren()[0].destroy();
-        //     }
-        //     self.otherWard.add(addWard(self, self.otherPlayer.getWard(), laneToCoord(self, 1), self.otherPlayer.healthBar.y + self.game.config.width/6));
-        //     self.otherWard.children.each(entity => entity.flipY = true)
-        // }
         updateOtherCharsQueue(self, inputData.input);
 
         if(opponentSpellCounter == spellsPerRound && playerSpellCounter == spellsPerRound){
@@ -1591,12 +1510,6 @@ function create() {
     self.timedEvent = this.time.addEvent({ delay: 30000, callback: endRound, args: [self], callbackScope: this, loop: true });
     self.timerBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width*19/48,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.width/30).setTint(0x0000ff);
 
-    //Opponent's spells
-    // this.socket.on('otherCharsQueue', function(otherQ){//if received spells early, indicate
-    //     receivedOtherCharsQueue = true;
-    //     otherCharsQueue = otherQ;
-    // }, this);
-
     //Hints UI
 
     //Arrow buttons
@@ -1607,7 +1520,6 @@ function create() {
     this.rightArrowButton.setInteractive().on('pointerdown', ()=>changeHintsPage(currHintsPage + 1, this))
     
     //Show Level 1 hints at start of game
-    // changeHintsPage(1, this);
     endRound(self);
 
     //Tap to return to homepage when game ends
@@ -1615,18 +1527,8 @@ function create() {
         if(self.game.config.gamePhase == 2){//Tap to return to home page when game ends
             console.log(self);
             window.location.replace("/home.html")
-            // if(self.location.hostname == "localhost"){
-            //     self.location.assign('//' + self.location.hostname+ ':8081' + '/home.html');
-            // }
-            // else{
-            //     self.location.assign('//' + self.location.hostname+ ':8081' + 'thesis/public/home.html');
-            // }
         }
     }, this);
-
-    // updatePlayerSpellCount(this, 0);
-    // updateOpponentSpellCount(this, 0);
-    
 }
 
 function update() {
@@ -1639,7 +1541,6 @@ function update() {
 
         this.myProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by me
             projectileObject.setVelocityY(-projectileObject.speed);
-            //projectileObject.body.debugBodyColor = projectileObject.body.touching.none ? 0x0099ff : 0xff9900;
             if(projectileObject.y < (self.otherPlayer.healthBar.y)){
                 if(self.otherPlayer && self.player.getHealth() > 0){
                     self.otherPlayer.takeDamage(projectileObject.power);
@@ -1708,8 +1609,6 @@ function projectileWardCollision(projectile, ward){//collision for projectiles
 
     projectile.power = projectile.power - temp;
 
-    // console.log("Collide. Resistance: " + otherWard.resistance);
-
     if(projectile.power <= 0){
         projectile.destroy();
     }
@@ -1718,33 +1617,6 @@ function projectileWardCollision(projectile, ward){//collision for projectiles
         ward.destroy();
     }
 }
-
-// function waitForOpponentQueue(self){
-//     playerSpellCounter = 0;
-//     updatePlayerSpellCount(self, playerSpellCounter);
-//     timeout = 5000;
-//     return new Promise((resolve, reject) => {
-//         var timer;
-        
-//         self.socket.emit('charsQueue', {q: playerCharsQueue, r: self.player.roomId});
-
-//         function responseHandler(q){
-//             resolve(q);
-//             clearTimeout(timer);
-//         }
-        
-//         if(receivedOtherCharsQueue){//if received opponent spells early, resolve
-//             responseHandler(otherCharsQueue);
-//         }else{//else wait for opponent's spells
-//             self.socket.once('otherCharsQueue', responseHandler);
-
-//             timer = setTimeout(() => {
-//                 reject(new Error("timeout waiting for opponent queue"));
-//                 self.socket.removeListener('msg', responseHandler);
-//             }, timeout);
-//         }
-//     });
-// }
 
 function updateOtherCharsQueue(self, chars){
     otherCharsQueue.push(chars);
@@ -1767,15 +1639,6 @@ function endRound(self){
     }
 
     activateQueuedSpells(self);
-    // waitForOpponentQueue(this).then(q => {
-
-    //     otherCharsQueue = q;
-    //     activateQueuedSpells(this);//Activate queued spells
-    //     receivedOtherCharsQueue = false;
-    // }, reason => {
-    //     console.log(reason);
-    //     activateQueuedSpells(this);
-    // });
 
     playerSpellCounter = 0;
     opponentSpellCounter = 0;
@@ -1792,9 +1655,6 @@ function activateQueuedSpells(self){
     }
     playerCharsQueue = [];
     otherCharsQueue=[];
-
-    // self.displayPlayerSpellCount = [];
-    // self.displayOpponentSpellCount = [];
 }
 
 function activatePlayerSpell(self, i, playerCharsQueue){
@@ -1817,7 +1677,6 @@ function activatePlayerSpell(self, i, playerCharsQueue){
                 self.myWard.add(addWard(self, self.player.getWard(), laneToCoord(self, 0), self.player.healthBar.y - self.game.config.width/5));
             }
             self.displayPlayerSpellCount[i].destroy();
-            // self.displayPlayerSpellCount[i] = null;
             playAudio(type);
         }
     },i * 2000)
@@ -1845,7 +1704,6 @@ function activateOpponentSpell(self, i, otherCharsQueue){
                 self.otherWard.children.each(entity => entity.flipY = true);
             }
             self.displayOpponentSpellCount[i].destroy();
-            // self.displayOpponentSpellCount[i] = null;
             playAudio(type);
         }
     },i * 2000)
@@ -1875,7 +1733,6 @@ function clearHintsButtons(){
 }
 
 function changeHintsPage(page, self){//functions for the arrows
-    // console.log(page);
     if(totalHintsPage == 1){
         page = 1;
         self.leftArrowButton.setAlpha(0.5);
@@ -1899,7 +1756,6 @@ function changeHintsPage(page, self){//functions for the arrows
 }
 
 function hintsPage(page, self){
-    // clearHintsButtons();
     switch(page){
         case 1:
             const PWaterButton = self.add.image(self.game.config.width*6/9, self.game.config.height-self.game.config.width/5, 'PWaterbtn').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10);
@@ -1975,7 +1831,6 @@ function clearHint(self){//Clear hint
     if(self.hintImage3){
         self.hintImage3.destroy();
     }
-    // self.activeHint = "";//set active hint to blank
 }
 
 function displayHint(hint, self){//display hint based on button
@@ -2006,60 +1861,46 @@ function displayHint(hint, self){//display hint based on button
                 break;
     
             case 'PWaterII':
-                // self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
                 self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'wa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
                 break;
             case 'WWaterII':
-                // self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
                 self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'ya_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
                 break;
             case 'PEarthII':
-                // self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'sa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
                 self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'ka_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
                 break;
             case 'WEarthII':
-                // self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ei_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
                 self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'pa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
                 break;
             case 'PSkyII':
-                // self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ba_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
                 self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'la_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
                 break;
             case 'WSkyII':
-                // self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ou_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
                 self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'ga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
                 break;
 
             case 'PWaterIII':
-                // self.hintImage1 = self.add.image(self.game.config.width/6, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                // self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'wa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
-                // self.hintImage3 = self.add.image(self.game.config.width*8.3/10, self.game.config.height/2, 'ta_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
                 self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(266, 186);
                 self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'ta_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(266, 186);
                 break;
             case 'WWaterIII':
                 self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
-                // self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ya_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
                 self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'da_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
                 break;
             case 'PEarthIII':
                 self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'sa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
-                // self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ka_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
                 self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
                 break;
             case 'WEarthIII':
                 self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ei_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
-                // self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'pa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
                 self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'na_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
                 break;
             case 'PSkyIII':
                 self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ba_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
-                // self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'la_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
                 self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'ha_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
                 break;
             case 'WSkyIII':
                 self.hintImage1 = self.add.image(self.game.config.width*3/16, self.game.config.height/2, 'ou_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
-                // self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(200, 140);
                 self.hintImage3 = self.add.image(self.game.config.width*11/16, self.game.config.height/2, 'nga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
                 break;
         }
@@ -2069,12 +1910,6 @@ function displayHint(hint, self){//display hint based on button
 }
 
 function updatePlayerSpellCount(self, count, chars){
-    // if(self.displayPlayerSpellCount){
-    //     self.displayPlayerSpellCount.setText("Spells: " + count + "/" + spellsPerRound)
-    // }else{
-    //     self.displayPlayerSpellCount = self.add.text(0, self.game.config.height*7/10, "Spells: " + count + "/" + spellsPerRound, { fontSize: '20px', fill: '#fff' });
-    // }
-
     type = identifyProjectile(chars);
 
     if(self.displayPlayerSpellCount){
@@ -2086,12 +1921,6 @@ function updatePlayerSpellCount(self, count, chars){
 }
 
 function updateOpponentSpellCount(self, count, chars){
-    // if(self.displayOpponentSpellCount){
-    //     self.displayOpponentSpellCount.setText("Spells: " + count + "/" + spellsPerRound)
-    // }else{
-    //     self.displayOpponentSpellCount = self.add.text(0, self.game.config.height*1/10, "Spells: " + count + "/" + spellsPerRound, { fontSize: '20px', fill: '#fff' });
-    // }
-
     type = identifyProjectile(chars);
 
     if(self.displayOpponentSpellCount){
@@ -2218,15 +2047,6 @@ function updateCurrentStrokes(fig, points, score, timeStart, timeEnd){
 }
 
 function errorString(){
-    // if(chars == ""){
-    //     f = new Figure(timeStart);
-    //     // f.strokes.push(points);
-    //     f.scores.push(score);
-    // }else{
-    //     // f.strokes.push(points);
-    //     f.scores.push(score);
-    // }
-    // chars += fig;
     console.log("Wrong stroke");
 
     window.self.errorText = window.self.add.text(self.game.config.width/2, self.game.config.height/2,'Wrong stroke!', { fontSize: '32px', fill: '#000', align: 'center',wordWrap: { width: 300 }}).setOrigin(0.5, 0.5).setColor("red");
@@ -2250,7 +2070,6 @@ function clearErrorString(){
 }
 
 function identifyProjectile(string){
-    // var self = this;
     
     var type = "";
     switch(string){
@@ -2285,206 +2104,44 @@ function identifyProjectile(string){
         case 'LaKa2Ka3':
             type = "PEarthII";
             break;
-        // case 'BaLaLa2':
         case 'LaLa2':
         case 'KaLa2':
             type = "PSkyII";
             break;
-        // case 'AA2A3Ya':
-        // case 'AA3A2Ya':
-        // case 'AA3A3Ya':
-        // case 'AA2A2Ya':
         case 'Pa':
         case 'Ya':
             type = "WWaterII";
             break;
-        // case 'EIEI2PaPa2':
         case 'PaPa2':
             type = "WEarthII";
             break;
-        // case 'OGaGa2':
         case 'GaGa2':
             type = "WSkyII";
             break;
-        // case 'MaMa2WaTaTa2':
         case 'MaMa2Ta2Ta':
             type = "PWaterIII";
             break;
-        // case 'SaKaKa2Ka3MaMa2':
         case 'SaMaMa2':
             type = "PEarthIII";
             break;
-        // case 'BaLaLa2Ha':
         case 'BaHa':
             type = "PSkyIII";
             break;
-        // case 'AA2A3YaYa2DaDa2':
-        // case 'AA3A2YaYa2DaDa2':
-        // case 'AA3A3YaYa2DaDa2':
-        // case 'AA2A2YaYa2DaDa2':
         case 'AA2A3DaDa2':
         case 'AA3A2DaDa2':
         case 'AA3A3DaDa2':
         case 'AA2A2DaDa2':
             type = "WWaterIII";
             break;
-        // case 'EIEI2PaPa2NaNa2':
         case 'EIEI2NaKa3':
         case 'EIEI2NaNa2':
             type = "WEarthIII";
             break;
-        // case 'OGaGa2NgaNga2':
         case 'Nga2NgaNga2':
         case 'OUNgaNga2':
             type = "WSkyIII";
             break;
-    //console.log(name);
-    // if(round == 1){
-    //     switch(string){
-    //         case 'MaMa2':
-    //             type = "PWater";
-    //             break;
-    //         case 'Sa':
-    //             type = "PEarth";
-    //             break;
-    //         case 'Ba':
-    //             type = "PSky";
-    //             break;
-    //         case 'AA2A3':
-    //         case 'AA3A2':
-    //         case 'AA3A3':
-    //         case 'AA3A3':
-    //         case 'AA2A2':
-    //             type = "WWater";
-    //             break;
-    //         case 'EIEI2':
-    //             type = "WEarth";
-    //             break;
-    //         case 'OU':
-    //             type = "WSky";
-    //             break;
-    //     }
-    // }else if(round > 3){
-    //     switch(string){
-    //         case 'MaMa2':
-    //             type = "PWater";
-    //             break;
-    //         case 'Sa':
-    //             type = "PEarth";
-    //             break;
-    //         case 'Ba':
-    //             type = "PSky";
-    //             break;
-    //         case 'AA2A3':
-    //         case 'AA3A2':
-    //         case 'AA3A3':
-    //         case 'AA3A3':
-    //         case 'AA2A2':
-    //             type = "WWater";
-    //             break;
-    //         case 'EIEI2':
-    //             type = "WEarth";
-    //             break;
-    //         case 'OU':
-    //             type = "WSky";
-    //             break;
-    //         // case 'MaWaTaTa2':
-    //         case 'TaTa2':
-    //             type = "PWaterII";
-    //             break;
-    //         case 'SaKaKa2Ka3Ma':
-    //             type = "PEarthII";
-    //             break;
-    //         case 'BaLaLa2Ha':
-    //             type = "PSkyII";
-    //             break;
-    //         // case 'AA2A3Ya':
-    //         // case 'AA3A2Ya':
-    //         // case 'AA3A3Ya':
-    //         // case 'AA2A2Ya':
-    //         case 'Ya':
-    //             type = "WWaterII";
-    //             break;
-    //         case 'EIEI2PaPa2':
-    //             type = "WEarthII";
-    //             break;
-    //         case 'OGaGa2':
-    //             type = "WSkyII";
-    //             break;
-    //     }
-    // }else{
-    //     switch(string){
-    //         case 'MaMa2':
-    //             type = "PWater";
-    //             break;
-    //         case 'Sa':
-    //             type = "PEarth";
-    //             break;
-    //         case 'Ba':
-    //             type = "PSky";
-    //             break;
-    //         case 'AA2A3':
-    //         case 'AA3A2':
-    //         case 'AA3A3':
-    //         case 'AA3A3':
-    //         case 'AA2A2':
-    //             type = "WWater";
-    //             break;
-    //         case 'EIEI2':
-    //             type = "WEarth";
-    //             break;
-    //         case 'OU':
-    //             type = "WSky";
-    //             break;
-    //         case 'MaWa':
-    //             type = "PWaterII";
-    //             break;
-    //         case 'SaKaKa2Ka3':
-    //             type = "PEarthII";
-    //             break;
-    //         case 'BaLaLa2':
-    //             type = "PSkyII";
-    //             break;
-    //         case 'AA2A3Ya':
-    //         case 'AA3A2Ya':
-    //         case 'AA3A3Ya':
-    //         case 'AA2A2Ya':
-    //             type = "WWaterII";
-    //             break;
-    //         case 'EIEI2PaPa2':
-    //             type = "WEarthII";
-    //             break;
-    //         case 'OGaGa2':
-    //             type = "WSkyII";
-    //             break;
-    //         case 'MaWaTaTa2':
-    //             type = "PWaterIII";
-    //             break;
-    //         case 'SaKaKa2Ka3Ma':
-    //             type = "PEarthIII";
-    //             break;
-    //         case 'BaLaLa2Ha':
-    //             type = "PSkyIII";
-    //             break;
-    //         case 'AA2A3YaYa2DaDa2':
-    //         case 'AA3A2YaYa2DaDa2':
-    //         case 'AA3A3YaYa2DaDa2':
-    //         case 'AA2A2YaYa2DaDa2':
-    //             type = "WWaterIII";
-    //             break;
-    //         case 'EIEI2PaPa2NaNa2':
-    //             type = "WEarthIII";
-    //             break;
-    //         case 'OGaGa2NgaNga2':
-    //             type = "WSkyIII";
-    //             break;
-    //     }
     }
-
-    // chars = "";
-    //const pointer = self.input.activePointer;
-    //Emit projectile event
-    //emitter.emit('throw_projectile', type);
     return type;
 }
 function playAudio(type){
