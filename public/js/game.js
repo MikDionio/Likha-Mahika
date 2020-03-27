@@ -1255,7 +1255,7 @@ var emitter = new Phaser.Events.EventEmitter();
 var graphics;
 var hsv;
 
-var otherPlayer;
+var opponent;
 var player;
 var log;
 var f;
@@ -1384,7 +1384,6 @@ function create() {
     var self = this;
     console.log(this);
     console.log(game);
-    // var username=document.location.search.replace(/^.*?\=/,'');
     const urlParams = new URLSearchParams(window.location.search);
     var username = urlParams.get('username');
     isPrivateGame = urlParams.has('roomName');
@@ -1392,25 +1391,41 @@ function create() {
 
     this.socket = io();
 
+    //If player chooses private game, join the private room using the given room name, otherwise join a random room
+
     if(isPrivateGame){
-        this.socket.emit('connectPrivateRoom',{name: username, roomName: privateRoomName});//create or join a private room
+        this.socket.emit('connectPrivateRoom',{name: username, roomName: privateRoomName});
     }else{
-        this.socket.emit('connectPlayer', {name: username});//connect player random players
+        this.socket.emit('connectPlayer', {name: username});
     }
     
-    this.otherPlayers = this.physics.add.group();
-    
-    //Background
+    //Display background and spell button
+
     this.background = this.add.image(self.game.config.width/2,self.game.config.height/2,'bg').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.height);
     this.button = this.add.image(self.game.config.width/2,self.game.config.height*9/10,'button').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*3/10, self.game.config.width*3/10);
 
-    this.button.setInteractive().on('pointerdown', function(pointer){//Tapping on button lets you submit spells.
+    //Tapping on button lets you submit spells.
+
+    this.button.setInteractive().on('pointerdown', function(pointer){
+
+        //Clear game field of hints and strokes
+
         clearHint(self);
         self.activeHint = "";
         gest.clear();
+
+        //If the game has started and player still can cast spells, check the spell the player cast, else do nothing
+
         if(self.game.config.gamePhase == 1 && playerSpellCounter < spellsPerRound){
+
+            //If chars aray is not empty, verify characters
+            //Else display error message
+
             if(chars != ""){
-                //Logging
+
+                //Log end of character stroke, character name and if player used hints
+                //Push data to figures log, then clear figures log for next figure
+
                 f.setEndTime(Date.now());
                 f.setFigName(chars);
                 f.setUsedHint(self.usedHint);
@@ -1418,7 +1433,11 @@ function create() {
                 self.usedHint = false;
                 f = "";
 
-                if(identifyProjectile(chars) != ""){
+                //If chars correctly corresponds to a spell, load spell onto queue and send data to opponent's client
+                //Also check if player and opponent have the max no. of spells for the round and end the round if true
+                //Else display error message for 1 second
+
+                if(identifySpell(chars) != ""){
                     playerCharsQueue.push(chars);
                     self.socket.emit('playerInput',{roomId: self.player.roomId, input: chars});
                     playerSpellCounter++;
@@ -1427,37 +1446,41 @@ function create() {
                     if(opponentSpellCounter == spellsPerRound && playerSpellCounter == spellsPerRound){
                         endRound(self);
                     }
+
                 }else{
-                    console.log("not a character");
                     self.errorMessage =  self.add.text(self.game.config.width/2, self.game.config.height/2,'Incorrect spell!', { fontSize: '32px', fill: '#000', align: 'center', wordWrap: { width: 300 }}).setOrigin(0.5, 0.5);
                     self.time.delayedCall(1000, function(){self.errorMessage.destroy();},self,this);
                 }
 
+                //Clear chars
                 chars="";
+
             }else{
-                console.log("no character");
+                self.errorMessage =  self.add.text(self.game.config.width/2, self.game.config.height/2,'No character!', { fontSize: '32px', fill: '#000', align: 'center', wordWrap: { width: 300 }}).setOrigin(0.5, 0.5);
+                self.time.delayedCall(1000, function(){self.errorMessage.destroy();},self,this);
             }
         }
     });
 
-    //Loading message
+    //Display loading message if game has not started
+
     if(isPrivateGame){
         this.loading = this.add.text(self.game.config.width/2, self.game.config.height/2,'Waiting in private game \'' + privateRoomName + '\'', { fontSize: '32px', fill: '#000', align: 'center', wordWrap: { width: 300 }}).setOrigin(0.5, 0.5);
     }else{
         this.loading = this.add.image(self.game.config.width/2, self.game.config.height/2,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75);
     }
 
-    //Projectiles
-    this.myProjectiles = this.physics.add.group();//Projectiles sent by me on the field
-    this.otherProjectiles = this.physics.add.group();//Projectiles sent by opponent on the field
+    //Projectile groups
+    this.playerProjectiles = this.physics.add.group();
+    this.opponentProjectiles = this.physics.add.group();
 
-    //Wards
+    //Ward groups
     this.myWard = this.physics.add.group();
-    this.otherWard = this.physics.add.group();
+    this.opponentWard = this.physics.add.group();
 
     //Projectile Ward collision
-    this.physics.add.overlap(this.otherProjectiles.getChildren(), this.myWard.getChildren(), projectileWardCollision, null, this);
-    this.physics.add.overlap(this.myProjectiles.getChildren(), this.otherWard.getChildren(), projectileWardCollision, null, this);
+    this.physics.add.overlap(this.opponentProjectiles.getChildren(), this.myWard.getChildren(), projectileWardCollision, null, this);
+    this.physics.add.overlap(this.playerProjectiles.getChildren(), this.opponentWard.getChildren(), projectileWardCollision, null, this);
 
     //Audio
     wProjectile = this.sound.add("Wprojectile");
@@ -1467,15 +1490,18 @@ function create() {
     eShield = this.sound.add("Eshield");
     sShield = this.sound.add("Sshield");
 
+
+    //Receive player and opponent data upon entering a room
     this.socket.on('currentPlayers', function(player) {
         console.log(player.playerId + " === " + self.socket.id);
         if (player.playerId === self.socket.id) {
             addPlayer(self, player);
         } else {
-            addOtherPlayer(self, player);
+            addOpponent(self, player);
         }
     });
 
+    //End the game if opponent disconnects
     this.socket.on('opponentDisconnect', function(){
         endGame(self, true);
     });
@@ -1483,34 +1509,20 @@ function create() {
     //Player input
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.socket.on('playerClicked',function(inputData){
-        updateOtherCharsQueue(self, inputData.input);
+    //Receive input from opponent and display on UI
+    this.socket.on('opponentInput',function(inputData){
+        updateOpponentCharsQueue(self, inputData.input);
 
         if(opponentSpellCounter == spellsPerRound && playerSpellCounter == spellsPerRound){
             endRound(self);
         }
     }, this);
 
-    this.socket.on('otherPlayerChangeProjectile', function(projectileData){//change projectile only
-        self.otherPlayer.setProjectile(projectileData.projectile_type);
-    }, this);
-
-    this.socket.on('otherPlayerChangeWard', function(wardData){//change ward only
-        if(self.otherPlayer.getWard() != wardData.ward_type){
-            self.otherPlayer.setWard(wardData.ward_type);
-            if(self.otherWard.getChildren()[0]){
-                self.otherWard.getChildren()[0].destroy();
-            }
-            self.otherWard.add(addWard(self, self.otherPlayer.getWard(), laneToCoord(self, 1), self.otherPlayer.healthBar.y + self.game.config.width/6));
-            self.otherWard.children.each(entity => entity.flipY = true)
-        }
-    }, this)
-
-    // Timer
+    //Display Timer for each round
     self.timedEvent = this.time.addEvent({ delay: 30000, callback: endRound, args: [self], callbackScope: this, loop: true });
     self.timerBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width*19/48,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.width/30).setTint(0x0000ff);
 
-    //Hints UI
+    //Hints UI Elements
 
     //Arrow buttons
     this.leftArrowButton = this.add.image(self.game.config.width/12, self.game.config.height-self.game.config.width/7, 'hint_leftArrow').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/10, self.game.config.width/10).setAlpha(0.5);
@@ -1531,61 +1543,46 @@ function create() {
     }, this);
 }
 
+
+//Called once per frame
 function update() {
     var self = this;
     var gameEnd = false;
+
+    //If game is ongoing:
+    //update round timer,
+    //move projectiles for player and opponent,
+    //and deal damage if applicable
 
     if(self.game.config.gamePhase == 1){
 
         self.timerBar.displayWidth = self.game.config.width*(1 - self.timedEvent.getProgress());
 
-        this.myProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by me
-            projectileObject.setVelocityY(-projectileObject.speed);
-            if(projectileObject.y < (self.otherPlayer.healthBar.y)){
-                if(self.otherPlayer && self.player.getHealth() > 0){
-                    self.otherPlayer.takeDamage(projectileObject.power);
-                    self.otherPlayer.displayName.setText(self.otherPlayer.playerName + "(" + self.otherPlayer.health  + "/10)");
-                    self.otherPlayer.healthBar.displayWidth = self.game.config.width*(self.otherPlayer.getHealth()/10);
-    
-                    if(self.otherPlayer.getHealth() == 0){//if opponent health goes to zero
-                        endGame(self, 1);
-                        gameEnd = true;
-                    }
-                }
-                self.myProjectiles.remove(projectileObject);//stop tracking projectile
-                projectileObject.destroy();
-            }
+        this.playerProjectiles.getChildren().forEach(function(playerProjectile) {//Behaviour of projectiles sent by player
+            playerProjectile.setVelocityY(-playerProjectile.speed);
+            projectileDealDamage(self, playerProjectile, self.playerProjectiles, self.player, self.opponent);
         }, this);
     
-        this.otherProjectiles.getChildren().forEach(function(projectileObject) {//Behaviour of projectiles sent by opponent
-            projectileObject.setVelocityY(projectileObject.speed);
-            if(projectileObject.y > (self.player.healthBar.y)){
-                if(self.player && self.player.getHealth() > 0){
-                    self.player.takeDamage(projectileObject.power);
-                    self.player.displayName.setText(self.player.playerName + "(" + self.player.health  + "/10)");
-                    self.player.healthBar.displayWidth = self.game.config.width*(self.player.getHealth()/10);
-                    if(self.player.getHealth() == 0){//if player health goes to zero
-                        endGame(self, 0);
-                        gameEnd = true;
-                    }
-                }
-                self.otherProjectiles.remove(projectileObject);//stop tracking projectile
-                projectileObject.destroy();
-            }
+        this.opponentProjectiles.getChildren().forEach(function(opponentProjectile) {//Behaviour of projectiles sent by opponent
+            opponentProjectile.setVelocityY(opponentProjectile.speed);
+            projectileDealDamage(self, opponentProjectile, self.opponentProjectiles, self.opponent, self.player);
         }, this);
     }
 
-    //Game Phases
-    if(!self.otherPlayer){//if still waiting for opponent
+    //Keep track of game phase
+
+    //If still waiting for opponent, show loading message (game phase 0)
+    //If opponent found, remove message and start game (game phase 1)
+    if(!self.opponent){
         if(!this.loading){
-            if(isPrivateGame){//add loading message if needed
+            if(isPrivateGame){
                 this.loading = this.add.text(self.game.config.width/2, self.game.config.height/2,'Waiting in private game \'' + privateRoomName + '\'', { fontSize: '32px', fill: '#000', align: 'center', wordWrap: { width: 300 }}).setOrigin(0.5, 0.5);
             }else{
                 this.loading = this.add.image(self.game.config.width/2, self.game.config.height/2,'finding').setOrigin(0.5,0.5).setDisplaySize(300, 75);
             }
         }
         self.game.config.gamePhase = 0;
-    }else if(self.otherPlayer && self.game.config.gamePhase == 0){//if there is opponent
+    }else if(self.opponent && self.game.config.gamePhase == 0){
         if(this.loading){//remove loading message
             this.loading.destroy();
             self.log.setStartTime(Date.now());//log start time
@@ -1594,12 +1591,36 @@ function update() {
         self.game.config.gamePhase = 1;
     }
 
+
+    //If game has ended, game phase 2
     if(gameEnd && self.game.config.gamePhase == 1){
         self.game.config.gamePhase = 2;
     }
 }
 
-function projectileWardCollision(projectile, ward){//collision for projectiles
+//If projectile makes it behind health bar, deal some damage
+function projectileDealDamage(self, projectile, projectiles, caster, defender){
+    if(projectile.y < (defender.healthBar.y)){
+        if(defender && caster.getHealth() > 0){
+            defender.takeDamage(projectile.power);
+            defender.displayName.setText(defender.playerName + "(" + defender.health  + "/10)");
+            defender.healthBar.displayWidth = self.game.config.width*(defender.getHealth()/10);
+
+            //if someone's health goes to zero, end the game
+            if(defender.getHealth() == 0){
+                endGame(self, 1);
+                gameEnd = true;
+            }
+        }
+
+        //stop tracking the projectile
+        projectiles.remove(projectile);
+        projectile.destroy();
+    }
+}
+
+//Compute power and resistance levels when a projectile and ward collide
+function projectileWardCollision(projectile, ward){
         
     temp = ward.resistance;
     
@@ -1618,12 +1639,14 @@ function projectileWardCollision(projectile, ward){//collision for projectiles
     }
 }
 
-function updateOtherCharsQueue(self, chars){
+//Update UI when receiving input data of opponent
+function updateOpponentCharsQueue(self, chars){
     otherCharsQueue.push(chars);
     opponentSpellCounter = opponentSpellCounter + 1;
     updateOpponentSpellCount(self, opponentSpellCounter, chars);
 }
 
+//Determine what level of hints to make available once the round ends
 function endRound(self){
     round = round + 1;
 
@@ -1638,35 +1661,37 @@ function endRound(self){
         changeHintsPage(1, self);
     }
 
-    activateQueuedSpells(self);
+    activateQueuedSpells(self, 2000);
 
     playerSpellCounter = 0;
     opponentSpellCounter = 0;
 }
 
-function activateQueuedSpells(self){
+//Activate a spell in player's and opponent's queue every n milliseconds
+function activateQueuedSpells(self, n){
 
     var i = 0
 
     while(playerCharsQueue[i] || otherCharsQueue[i]){
-        activatePlayerSpell(self, i, playerCharsQueue);
-        activateOpponentSpell(self,i, otherCharsQueue);
+        activatePlayerSpell(self, i, playerCharsQueue, n);
+        activateOpponentSpell(self,i, otherCharsQueue, n);
         i = i + 1;
     }
     playerCharsQueue = [];
     otherCharsQueue=[];
 }
 
-function activatePlayerSpell(self, i, playerCharsQueue){
+//Activate a player's spell every interval
+function activatePlayerSpell(self, i, playerCharsQueue, interval){
     setTimeout(function() {
         if(playerCharsQueue[i]){
-            var type = identifyProjectile(playerCharsQueue[i]);
+            var type = identifySpell(playerCharsQueue[i]);
             console.log(type);
             if(type[0] == 'P'){
                 self.player.setProjectile(type);
                 if(self.game.config.gamePhase == 1){
                     if(self.player.getProjectile()){
-                        self.myProjectiles.add(addProjectile(self, self.player.getProjectile(), laneToCoord(self, 1), self.player.healthBar.y - self.game.config.width/6)); 
+                        self.playerProjectiles.add(addProjectile(self, self.player.getProjectile(), laneToCoord(self, 1), self.player.healthBar.y - self.game.config.width/6)); 
                     }
                 }
             }else if(type){
@@ -1679,60 +1704,39 @@ function activatePlayerSpell(self, i, playerCharsQueue){
             self.displayPlayerSpellCount[i].destroy();
             playAudio(type);
         }
-    },i * 2000)
+    },i * interval)
 }
 
-function activateOpponentSpell(self, i, otherCharsQueue){
+//Activate an opponent's spell every interval
+function activateOpponentSpell(self, i, otherCharsQueue, interval){
     setTimeout(function() {    
         if(otherCharsQueue[i]){
             console.log("Opponent Queue " + i);
-            var type = identifyProjectile(otherCharsQueue[i]);
+            var type = identifySpell(otherCharsQueue[i]);
             if(type[0] == 'P'){
-                self.otherPlayer.setProjectile(type);
+                self.opponent.setProjectile(type);
                 if(self.game.config.gamePhase == 1){            
-                    if(self.otherPlayer.getProjectile()){
-                        self.otherProjectiles.add(addProjectile(self, self.otherPlayer.getProjectile(), laneToCoord(self, 0), self.otherPlayer.healthBar.y + self.game.config.width/6));
-                        self.otherProjectiles.children.each(entity => entity.flipY = true)
+                    if(self.opponent.getProjectile()){
+                        self.opponentProjectiles.add(addProjectile(self, self.opponent.getProjectile(), laneToCoord(self, 0), self.opponent.healthBar.y + self.game.config.width/6));
+                        self.opponentProjectiles.children.each(entity => entity.flipY = true)
                     }
                 }
             }else if(type){
-                if(self.otherWard.getChildren()[0]){
-                    self.otherWard.getChildren()[0].destroy();
+                if(self.opponentWard.getChildren()[0]){
+                    self.opponentWard.getChildren()[0].destroy();
                 }
-                self.otherPlayer.setWard(type);
-                self.otherWard.add(addWard(self, self.otherPlayer.getWard(), laneToCoord(self, 1), self.otherPlayer.healthBar.y + self.game.config.width/5));
-                self.otherWard.children.each(entity => entity.flipY = true);
+                self.opponent.setWard(type);
+                self.opponentWard.add(addWard(self, self.opponent.getWard(), laneToCoord(self, 1), self.opponent.healthBar.y + self.game.config.width/5));
+                self.opponentWard.children.each(entity => entity.flipY = true);
             }
             self.displayOpponentSpellCount[i].destroy();
             playAudio(type);
         }
-    },i * 2000)
+    },i * interval)
 }
 
-function clearHintsButtons(){
-    PWaterButton.destroy();
-    PEarthButton.destroy();
-    PSkyButton.destroy();
-    WWaterButton.destroy();
-    WEarthButton.destroy();
-    WSkyButton.destroy();
-
-    PWaterIIButton.destroy();
-    PEarthIIButton.destroy();
-    PSkyIIButton.destroy();
-    WWaterIIButton.destroy();
-    WEarthIIButton.destroy();
-    WSkyIIButton.destroy();
-
-    PWaterIIIButton.destroy();
-    PEarthIIIButton.destroy();
-    PSkyIIIButton.destroy();
-    WWaterIIIButton.destroy();
-    WEarthIIIButton.destroy();
-    WSkyIIIButton.destroy();
-}
-
-function changeHintsPage(page, self){//functions for the arrows
+//Change hints page on arrow tap
+function changeHintsPage(page, self){
     if(totalHintsPage == 1){
         page = 1;
         self.leftArrowButton.setAlpha(0.5);
@@ -1755,6 +1759,7 @@ function changeHintsPage(page, self){//functions for the arrows
     hintsPage(page, self);
 }
 
+//Show correct hint buttons per page
 function hintsPage(page, self){
     switch(page){
         case 1:
@@ -1833,13 +1838,17 @@ function clearHint(self){//Clear hint
     }
 }
 
-function displayHint(hint, self){//display hint based on button
+//Display hint when player taps on button
+function displayHint(hint, self){
     clearHint(self);
     self.usedHint = true;
 
-    if(hint == self.activeHint){//if user presses button again, clear the hint
+    //if user presses button again, clear the hint
+    //else, display new hint
+
+    if(hint == self.activeHint){
         self.activeHint = "";
-    }else{//else display new hint
+    }else{
         switch(hint){
             case 'PWater':
                 self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
@@ -1909,8 +1918,9 @@ function displayHint(hint, self){//display hint based on button
     
 }
 
+//Update player spell count on UI
 function updatePlayerSpellCount(self, count, chars){
-    type = identifyProjectile(chars);
+    type = identifySpell(chars);
 
     if(self.displayPlayerSpellCount){
         self.displayPlayerSpellCount[count-1] = self.add.image(self.game.config.width/4 - (count-1)*self.game.config.width/12, self.game.config.height*7/10, type).setDisplaySize(self.game.config.width/24, self.game.config.width/12);
@@ -1920,8 +1930,9 @@ function updatePlayerSpellCount(self, count, chars){
 
 }
 
+//Update opponent spell count on UI
 function updateOpponentSpellCount(self, count, chars){
-    type = identifyProjectile(chars);
+    type = identifySpell(chars);
 
     if(self.displayOpponentSpellCount){
         self.displayOpponentSpellCount[count-1] = self.add.image(self.game.config.width*3/4 + (count - 1)*self.game.config.width/12, self.game.config.height/10, type[0]).setDisplaySize(self.game.config.width/24, self.game.config.width/12);
@@ -1933,6 +1944,7 @@ function updateOpponentSpellCount(self, count, chars){
     img.flipY = true
 }
 
+//Add new player to game
 function addPlayer(self, playerInfo){
     if(!self.player){
         self.player = new Player(playerInfo.playerName, playerInfo.playerId,playerInfo.roomId);//temp values
@@ -1945,17 +1957,19 @@ function addPlayer(self, playerInfo){
     
 }
 
-function addOtherPlayer(self, playerInfo) {
-    if(!self.otherPlayer){
-        self.otherPlayer = new Player(playerInfo.playerName,playerInfo.sessionId)
-        console.log("Opponent: " + self.otherPlayer.playerName);
-        self.otherPlayer.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.width/20,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.otherPlayer.health/10),self.game.config.width/10);
-        self.otherPlayer.healthBar.setTint(0xff00ff);
-        self.otherPlayer.displayName = self.add.text(self.game.config.width/2, self.game.config.width/20, self.otherPlayer.playerName + "(" + self.otherPlayer.health  + "/10)", { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
+//Add new opponent to game
+function addOpponent(self, playerInfo) {
+    if(!self.opponent){
+        self.opponent = new Player(playerInfo.playerName,playerInfo.sessionId)
+        console.log("Opponent: " + self.opponent.playerName);
+        self.opponent.healthBar = self.add.sprite(self.game.config.width/2,self.game.config.width/20,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width*(self.opponent.health/10),self.game.config.width/10);
+        self.opponent.healthBar.setTint(0xff00ff);
+        self.opponent.displayName = self.add.text(self.game.config.width/2, self.game.config.width/20, self.opponent.playerName + "(" + self.opponent.health  + "/10)", { fontSize: '32px', fill: '#000' }).setOrigin(0.5, 0.5);
         self.log.setOpponent(playerInfo.playerName);
     }
 }
 
+//Add projectile to game
 function addProjectile(self, projectileType, posx, posy){
     const p = self.physics.add.image(posx,posy,projectileType).setOrigin(0.5,0.5).setDisplaySize(self.game.config.width/12, self.game.config.width/6);
     p.type = projectileType;
@@ -1986,6 +2000,8 @@ function addProjectile(self, projectileType, posx, posy){
     return p;
 }
 
+
+//Add ward to game
 function addWard(self, wardType, posx, posy){
     const w = self.physics.add.image(posx, posy, wardType).setOrigin(0.5, 0.5).setDisplaySize(self.game.config.width/6, self.game.config.width/5);
     w.type = wardType;
@@ -2030,15 +2046,14 @@ function addWard(self, wardType, posx, posy){
     return w;
 }
 
+//Update chars based on stroke
 function updateCurrentStrokes(fig, points, score, timeStart, timeEnd){
     if(chars == ""){
         f = new Figure(timeStart);
-        // f.strokes.push(points);
         f.scores.push(score);
         f.errorsMade = errors;
         errors = 0;
     }else{
-        // f.strokes.push(points);
         f.scores.push(score);
     }
     console.log(f);
@@ -2046,6 +2061,7 @@ function updateCurrentStrokes(fig, points, score, timeStart, timeEnd){
     console.log(chars);
 }
 
+//Show error message if stroke is wrong
 function errorString(){
     console.log("Wrong stroke");
 
@@ -2065,11 +2081,13 @@ function errorString(){
     gest.clear();
 }
 
+//Clear error message
 function clearErrorString(){
     window.self.errorText.destroy();
 }
 
-function identifyProjectile(string){
+//Identify spell based on given string
+function identifySpell(string){
     
     var type = "";
     switch(string){
@@ -2144,6 +2162,8 @@ function identifyProjectile(string){
     }
     return type;
 }
+
+//Play audio based on spell
 function playAudio(type){
     switch(type){
         case 'PWater'||'PWaterII'||'PWaterIII':
@@ -2167,6 +2187,7 @@ function playAudio(type){
     }
 }
 
+//Convert lane to coordinates
 function laneToCoord(self, lane){
     switch(lane){
         case 0:
@@ -2176,7 +2197,12 @@ function laneToCoord(self, lane){
     }
 }
 
+
+//End the game
 function endGame(self, winner){
+
+    //If player wins, display win message
+    //Else display lose message
     if(winner){
         self.win = self.add.image(self.game.config.width/2, self.game.config.height/2,'win').setOrigin(0.5,0.5).setDisplaySize(200, 75);
         self.log.setWinLose(true);
@@ -2184,14 +2210,15 @@ function endGame(self, winner){
         self.lose = self.add.image(self.game.config.width/2, self.game.config.height/2,'lose').setOrigin(0.5,0.5).setDisplaySize(200, 75);
         self.log.setWinLose(false);
     }
+
+    //Finalize log and show game end message
+    //Save log to server and disconnect from server
+
     self.log.setEndTime(Date.now());
     self.game.config.gamePhase = 2;
     self.player.displayName.setText("Back to home");
     console.log(self.log);
     json = JSON.stringify(self.log);
-    // var fs = require('fs');
-    // fs.writeFile('log', json, 'utf8', callback);
-    // console.log(json);
     d = new Date(self.log.startTime)
     fileName = self.log.playerName + "_" + d.toDateString() + "_" + d.getHours() + "_" + d.getMinutes();
     console.log(fileName);

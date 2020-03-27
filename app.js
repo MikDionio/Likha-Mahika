@@ -79,63 +79,53 @@ mongoose.connection.on('connected', function () {
   console.log('connected to mongo');
 });
 
-
-// io.use(function(socket, next) {
-//   var handshakeData = socket.request;
-//   console.log("middleware:", handshakeData._query['username']);
-//   next();
-// });
-
+//Actions when a new player connects
 io.on('connection', function(socket){
   
-  socket.on('connectPlayer', function(playerData){//when a new player connects
-    if(roomCount == 0){//if no rooms, make new room
+  socket.on('connectPlayer', function(playerData){
+
+    //If no rooms, make first room
+    //Else, try to find a room with waiting user
+    //Else, make new room
+    if(roomCount == 0){
       console.log("No rooms");
-      socket.join('room'+roomCount);
-      newPlayer(socket, 'room' + roomCount, playerData.name);
-      console.log(socket.id + ' has joined session ' + roomCount);
+      joinRoom(socket, playerData, 'room' + roomCount);
       roomCount++;
     }else{
         var foundRoom = false;
-        for(i = 0; i < roomCount; i++){//Look for room with waiting user
-            if(io.sockets.adapter.rooms['room'+i]){//If room exists
-                if(io.sockets.adapter.rooms['room'+i].length < 2){//check if it waiting user
-                    socket.join('room'+i);
-                    newPlayer(socket, 'room' + i, playerData.name);
-                    console.log(socket.id + ' has joined session ' + i);
-                    foundRoom = true;
-                    break;
+        for(i = 0; i < roomCount; i++){
+            //If room exists and has 1 user waiting, join room
+            if(io.sockets.adapter.rooms['room' + i]){
+                if(io.sockets.adapter.rooms['room' + i].length < 2){
+                  joinRoom(socket, playerData, 'room' + i);
+                  foundRoom = true;
+                  break;
                 }
             }
         }
-        if(!foundRoom){//If no room with waiting user
+        //If not, make new room by filling in gap in room number 
+        //or adding to the number of rooms
+        if(!foundRoom){
             for(i = 0; i < roomCount; i++){
-                if(!io.sockets.adapter.rooms['room'+i]){//If room does not exist, fill in gap
-                    socket.join('room'+i);
-                    newPlayer(socket, 'room' + i, playerData.name);
-                    console.log(socket.id + ' has joined session ' + i);
-                    break;
-                    // console.log("Room " + i + " does not exist");
-                }else if(i == roomCount - 1){
-                    console.log("New Room");
-                    socket.join('room'+roomCount);
-                    newPlayer(socket, 'room'+roomCount, playerData.name);
-                    console.log(socket.id + ' has joined session ' + roomCount);
-                    roomCount++;
-                    break;
-                }
+              if(!io.sockets.adapter.rooms['room' + i]){
+                joinRoom(socket, playerData, 'room' + i);
+                break;
+              }else if(i == roomCount - 1){
+                joinRoom(socket, playerData, 'room' + roomCount);
+                roomCount++;
+                break;
+              }
             }
         }
     }
   });
-  // roomCount = roomCount % 128;
 
+  //Create private room as specified by user
   socket.on('connectPrivateRoom', function(playerData){
-    socket.join(playerData.roomName);
-    newPlayer(socket, playerData.roomName, playerData.name);
-    console.log(socket.id + ' has joined ' + playerData.roomName);
+    joinRoom(socket, playerData, playerData.roomName);
   });
 
+  //When user disconnects, notify server and opponent
   socket.on('disconnect', function() {
       console.log('user ' + players[socket.id].playerName +  ' disconnected from ' + players[socket.id].roomId);
       
@@ -143,28 +133,14 @@ io.on('connection', function(socket){
 
       // //remove this player from our players object
       delete players[socket.id];
-      // //emit a message to all players to remove this player
-      // io.emit('disconnect',socket.id);
   });
 
-  socket.on('playerChangeProjectile', function(projectileData){
-      socket.broadcast.to(projectileData.roomId).emit('otherPlayerChangeProjectile', projectileData);
-  });
-
-  socket.on('playerChangeWard', function(wardData){
-      socket.broadcast.to(wardData.roomId).emit('otherPlayerChangeWard', wardData);
-  });
-
+  //Take player input and send to opponent
   socket.on('playerInput', function(inputData){
-      //console.log(projectileData.roomId);
-      socket.broadcast.to(inputData.roomId).emit('playerClicked',inputData);
+      socket.broadcast.to(inputData.roomId).emit('opponentInput',inputData);
   });
 
-  // socket.on('charsQueue', function(data){
-  //   console.log("Queue recieved in " + data.r);
-  //   socket.broadcast.to(data.r).emit('otherCharsQueue', data.q);
-  // });
-
+  //Save logging data
   socket.on('log', function(logData){
       console.log("logging");
       var fs = require('fs');
@@ -175,12 +151,20 @@ io.on('connection', function(socket){
   });
 });
 
+//Listen on port
 server.listen(8081, function() {
   console.log(`Listening on ${server.address().port}`);
 });
 
-function newPlayer(socket, roomName, name){//Create new player
-  //create a new player and add it to our players object
+//Let player join specified room
+function joinRoom(socket, playerData, roomName){
+  socket.join(roomName);
+  newPlayer(socket, roomName, playerData.name);
+  console.log(socket.id + ' has joined room ' + roomName);
+}
+
+//Create a new player and add it to our players object
+function newPlayer(socket, roomName, name){
   players[socket.id] = {
       playerName: name,
       playerId: socket.id,
@@ -190,9 +174,12 @@ function newPlayer(socket, roomName, name){//Create new player
   console.log("Player " + players[socket.id].playerName + " broadcasting to " + players[socket.id].roomId);
   io.in(roomName).emit('currentPlayers', players[socket.id]);//send to room a new player's data
 
-  io.of('/').in(roomName).clients((error, clients) => {//get list of clients in a room
-      if(clients[0]){//if room is occupied
-          io.in(roomName).emit('currentPlayers', players[clients[0]]);//retransmit data of player already in the room
+  //Get list of clients in a room
+  //If room is occupied
+  //Retransmit data of player already in room
+  io.of('/').in(roomName).clients((error, clients) => {
+      if(clients[0]){
+          io.in(roomName).emit('currentPlayers', players[clients[0]]);
       }
   })
 }
