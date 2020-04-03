@@ -1101,7 +1101,6 @@ class Player{
         this.playerName = playerName
         this.playerID = playerID;
         this.roomId = roomId;
-        this.currLane = 0;
         this.health = 10;
         this.projectile_type = "";
         this.ward_type = "";
@@ -1136,44 +1135,8 @@ class Player{
     }
 }
 
-class Projectile{
-    constructor(projectileType, imageReference){
-        this.type = projectileType;
-        
-        if(this.type == "stone"){
-            this.speed = 0;
-        }else{
-            this.speed = 300;
-        }
-
-        this.image = imageReference;
-
-        this.resistance = 1;
-    }
-
-    getType(){
-        return this.type;
-    }
-
-    getSpeed(){
-        return this.speed;
-    }
-
-    setSpeed(s){
-        this.speed = s;
-    }
-
-    getResistance(){
-        return this.resistance;
-    }
-
-    setResistance(r){
-        this.resistance = r;
-    }
-
-}
-
-class Log{//Log for learning analytics
+//Log for learning analytics
+class Log{
     constructor(playerName){
         this.playerName = playerName;
         this.opponentName = "";
@@ -1278,7 +1241,7 @@ var opponentSpellCounter = 0;
 var spellsPerRound = 3;
 
 //global audio var
-var wProjectile 
+var wProjectile;
 var eProjectile;
 var sProjectile;
 var wShield;
