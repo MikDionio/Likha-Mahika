@@ -1,3 +1,4 @@
+//THIS PART IS FOR AUTH
 // reads in our .env file and makes those values available as environment variables
 require('dotenv').config();
 
@@ -9,9 +10,10 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 
-
 // create an instance of an express app
 const app = express();
+
+//
 const server = require('http').Server(app);
 const io = require('socket.io').listen(server);
 var players = {};
@@ -38,13 +40,13 @@ app.get('/', function (req, res) {
 app.use('', routes);
 app.use('', passport.authenticate('jwt', { session : false }), secureRoutes);
 
-// catch all other routes
+// catch all other routes that don't have a page (404)
 app.use((req, res, next) => {
   res.status(404);
   res.json({ message: '404 - Not Found' });
 });
 
-// handle errors
+// handle more complicated errors (500) 
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.json({ error : err });
@@ -55,19 +57,20 @@ app.listen(process.env.PORT || 3000, () => {
   console.log(`Server started on port ${process.env.PORT || 3000}`);
 });
 
-var route, routes2 = [];
+// For checking available routes
+//var route, routes2 = [];
+// app._router.stack.forEach(function(middleware){
+//     if(middleware.route){ // routes registered directly on the app
+//         routes2.push(middleware.route);
+//     } else if(middleware.name === 'router'){ // router middleware 
+//         middleware.handle.stack.forEach(function(handler){
+//             route = handler.route;
+//             route && routes2.push(route);
+//         });
+//     }
+// });
+// console.log(routes2)
 
-app._router.stack.forEach(function(middleware){
-    if(middleware.route){ // routes registered directly on the app
-        routes2.push(middleware.route);
-    } else if(middleware.name === 'router'){ // router middleware 
-        middleware.handle.stack.forEach(function(handler){
-            route = handler.route;
-            route && routes2.push(route);
-        });
-    }
-});
-console.log(routes2)
 // setup mongo connection
 const uri = process.env.MONGO_CONNECTION_URL;
 mongoose.connect(uri, { useNewUrlParser : true, useCreateIndex: true, useUnifiedTopology: true });
@@ -79,6 +82,7 @@ mongoose.connection.on('connected', function () {
   console.log('connected to mongo');
 });
 
+//THIS PART IS FOR THE SERVER
 //Actions when a new player connects
 io.on('connection', function(socket){
   

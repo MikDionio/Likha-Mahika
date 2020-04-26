@@ -21,6 +21,7 @@ const UserSchema = new Schema({
 //   }
 });
 
+//determines if the user has been taken before creating an new 
 UserSchema.plugin(uniqueValidator)
 UserSchema.pre('save', async function (next) {
   const user = this;
@@ -28,7 +29,8 @@ UserSchema.pre('save', async function (next) {
   this.password = hash;
   next();
 });
- 
+
+//check for the right password
 UserSchema.methods.isValidPassword = async function (password) {
   const user = this;
   const compare = await bcrypt.compare(password, user.password);
