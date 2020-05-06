@@ -1102,8 +1102,8 @@ class Player{
         this.playerID = playerID;
         this.roomId = roomId;
         this.health = 10;
-        this.projectile_type = "";
-        this.ward_type = "";
+        this.projectileType = "";
+        this.wardType = "";
     }
 
     getHealth(){
@@ -1119,47 +1119,19 @@ class Player{
     }
 
     getProjectile(){
-        return this.projectile_type;
+        return this.projectileType;
     }
 
     setProjectile(p){
-        this.projectile_type = p;
+        this.projectileType = p;
     }
 
     setWard(w){
-        this.ward_type = w;
+        this.wardType = w;
     }
 
     getWard(){
-        return this.ward_type;
-    }
-}
-
-//Log for learning analytics
-class Log{
-    constructor(playerName){
-        this.playerName = playerName;
-        this.opponentName = "";
-        this.startTime = "";
-        this.endTime = "";
-        this.winLose = "";
-        this.figures = [];
-    }
-
-    setOpponent(name){
-        this.opponentName = name;
-    }
-
-    setStartTime(t){
-        this.startTime = t;
-    }
-
-    setEndTime(t){
-        this.endTime = t;
-    }
-
-    setWinLose(didWin){
-        this.winLose = didWin;
+        return this.wardType;
     }
 }
 
@@ -1192,6 +1164,35 @@ class Figure{
     }
 }
 
+//Log for learning analytics
+class Log{
+    constructor(playerName){
+        this.playerName = playerName;
+        this.opponentName = "";
+        this.startTime = "";
+        this.endTime = "";
+        this.winLose = "";
+        this.figures = [];
+    }
+
+    setOpponent(name){
+        this.opponentName = name;
+    }
+
+    setStartTime(t){
+        this.startTime = t;
+    }
+
+    setEndTime(t){
+        this.endTime = t;
+    }
+
+    setWinLose(didWin){
+        this.winLose = didWin;
+    }
+}
+
+//Phaser config setup
 var config = {
     type: Phaser.AUTO,
     parent: 'phaser-example',
@@ -1212,11 +1213,9 @@ var config = {
     gamePhase: 0,
 };
 
-
+//Global Variables
 var game = new Phaser.Game(config);
 var emitter = new Phaser.Events.EventEmitter();
-var graphics;
-var hsv;
 
 var opponent;
 var player;
@@ -1227,7 +1226,6 @@ var errors = 0;
 var isPrivateGame;
 var privateRoomName;
 
-// var gamePhase = 0;//0 for finding opponent, 1 for game playing, 2 for match end
 var chars="";
 var playerCharsQueue = [];
 var otherCharsQueue = [];
@@ -1235,12 +1233,11 @@ var round = 1;
 var totalHintsPage = 1;
 var currHintsPage = 1;
 
-var receivedOtherCharsQueue = false;
 var playerSpellCounter = 0;
 var opponentSpellCounter = 0;
 var spellsPerRound = 3;
 
-//global audio var
+//global audio variables
 var wProjectile;
 var eProjectile;
 var sProjectile;
@@ -1248,6 +1245,7 @@ var wShield;
 var eShield;
 var sShield;
 
+//Load sprites to be used for the game
 function preload() {
     //Projectiles and Wards
     this.load.image('PWater','assets/PWater.png');
@@ -1561,7 +1559,7 @@ function update() {
     }
 }
 
-//If projectile makes it behind health bar, deal some damage
+//If projectile makes it behind health bar, deal some damage and update health bar
 function projectileDealDamage(self, projectile, projectiles, caster, defender){
     if(projectile.y < (defender.healthBar.y)){
         if(defender && caster.getHealth() > 0){
@@ -1644,7 +1642,8 @@ function activateQueuedSpells(self, n){
     otherCharsQueue=[];
 }
 
-//Activate a player's spell every interval
+//Identify ith character from player queue as spell
+//Activate spell every interval
 function activatePlayerSpell(self, i, playerCharsQueue, interval){
     setTimeout(function() {
         if(playerCharsQueue[i]){
@@ -1670,7 +1669,8 @@ function activatePlayerSpell(self, i, playerCharsQueue, interval){
     },i * interval)
 }
 
-//Activate an opponent's spell every interval
+//Identify ith character from opponent queue as spell
+//Activate spell every interval
 function activateOpponentSpell(self, i, otherCharsQueue, interval){
     setTimeout(function() {    
         if(otherCharsQueue[i]){
@@ -1907,7 +1907,7 @@ function updateOpponentSpellCount(self, count, chars){
     img.flipY = true
 }
 
-//Add new player to game
+//Initialize player
 function addPlayer(self, playerInfo){
     if(!self.player){
         self.player = new Player(playerInfo.playerName, playerInfo.playerId,playerInfo.roomId);//temp values
@@ -1920,7 +1920,7 @@ function addPlayer(self, playerInfo){
     
 }
 
-//Add new opponent to game
+//Initialize opponent to game
 function addOpponent(self, playerInfo) {
     if(!self.opponent){
         self.opponent = new Player(playerInfo.playerName,playerInfo.sessionId)
@@ -2010,7 +2010,7 @@ function addWard(self, wardType, posx, posy){
 }
 
 //Update chars based on stroke
-function updateCurrentStrokes(fig, points, score, timeStart, timeEnd){
+function updateCurrentStrokes(fig, score, timeStart){
     if(chars == ""){
         f = new Figure(timeStart);
         f.scores.push(score);
