@@ -1369,6 +1369,11 @@ function create() {
 
     this.button.setInteractive().on('pointerdown', function(pointer){
 
+        if(!self.scale.isFullscreen){//On first tap, turn the game full screen
+            self.scale.startFullscreen();
+            console.log(self.scale.isFullscreen)
+        }
+
         //Clear game field of hints and strokes
 
         clearHint(self);
@@ -1480,7 +1485,7 @@ function create() {
     }, this);
 
     //Display Timer for each round
-    self.timedEvent = this.time.addEvent({ delay: 30000, callback: endRound, args: [self], callbackScope: this, loop: true });
+    self.timer = this.time.addEvent({ delay: 30000, callback: endRound, args: [self], callbackScope: this, loop: true });
     self.timerBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width*19/48,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.width/30).setTint(0x0000ff);
 
     //Hints UI Elements
@@ -1495,8 +1500,9 @@ function create() {
     //Show Level 1 hints at start of game
     endRound(self);
 
-    //Tap to return to homepage when game ends
+
     this.input.on('pointerdown', function(){
+
         if(self.game.config.gamePhase == 2){//Tap to return to home page when game ends
             console.log(self);
             window.location.replace("/home.html")
@@ -1517,7 +1523,8 @@ function update() {
 
     if(self.game.config.gamePhase == 1){
 
-        self.timerBar.displayWidth = self.game.config.width*(1 - self.timedEvent.getProgress());
+        console.log("Timing");
+        self.timerBar.displayWidth = self.game.config.width*(1 - self.timer.getProgress());
 
         this.playerProjectiles.getChildren().forEach(function(playerProjectile) {//Behaviour of projectiles sent by player
             playerProjectile.setVelocityY(-playerProjectile.speed);
@@ -1528,6 +1535,10 @@ function update() {
             opponentProjectile.setVelocityY(opponentProjectile.speed);
             projectileDealDamage(self, opponentProjectile, self.opponentProjectiles, self.opponent, self.player);
         }, this);
+    }else{
+
+        //Pause timer if game not ongoing
+        self.timer.paused = true;
     }
 
     //Keep track of game phase
@@ -1568,8 +1579,11 @@ function projectileDealDamage(self, projectile, projectiles, caster, defender){
             defender.healthBar.displayWidth = self.game.config.width*(defender.getHealth()/10);
 
             //if someone's health goes to zero, end the game
-            if(defender.getHealth() == 0){
-                endGame(self, 1);
+            if(self.player.getHealth() == 0){
+                endGame(self, false);
+                gameEnd = true;
+            }else if(self.opponent.getHealth() == 0){
+                endGame(self, true);
                 gameEnd = true;
             }
         }
@@ -1806,6 +1820,14 @@ function displayHint(hint, self){
     clearHint(self);
     self.usedHint = true;
 
+    //Sizes for individual characters
+    var singleCharSizeX = self.game.config.width*3/4;
+    var singleCharSizeY = self.game.config.width*21/40;
+
+    //Sizes for paired characters (Lvl 3 spells)
+    var pairCharSizeX = self.game.config.width/2;
+    var pairCharSizeY = self.game.config.width*7/20;
+
     //if user presses button again, clear the hint
     //else, display new hint
 
@@ -1814,66 +1836,66 @@ function displayHint(hint, self){
     }else{
         switch(hint){
             case 'PWater':
-                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
+                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height*3/8, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(singleCharSizeX, singleCharSizeY);
                 break;
             case 'WWater':
-                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
+                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height*3/8, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(singleCharSizeX, singleCharSizeY);
                 break;
             case 'PEarth':
-                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'sa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
+                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height*3/8, 'sa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(singleCharSizeX, singleCharSizeY);
                 break;
             case 'WEarth':
-                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ei_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
+                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height*3/8, 'ei_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(singleCharSizeX, singleCharSizeY);
                 break;
             case 'PSky':
-                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ba_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
+                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height*3/8, 'ba_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(singleCharSizeX, singleCharSizeY);
                 break;
             case 'WSky':
-                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height/2, 'ou_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400,280);
+                self.hintImage2 = self.add.image(self.game.config.width/2, self.game.config.height*3/8, 'ou_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(singleCharSizeX, singleCharSizeY);
                 break;
     
             case 'PWaterII':
-                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'wa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
+                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height*3/8, 'wa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(singleCharSizeX, singleCharSizeY);
                 break;
             case 'WWaterII':
-                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'ya_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
+                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height*3/8, 'ya_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(singleCharSizeX, singleCharSizeY);
                 break;
             case 'PEarthII':
-                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'ka_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
+                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height*3/8, 'ka_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(singleCharSizeX, singleCharSizeY);
                 break;
             case 'WEarthII':
-                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'pa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
+                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height*3/8, 'pa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(singleCharSizeX, singleCharSizeY);
                 break;
             case 'PSkyII':
-                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'la_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
+                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height*3/8, 'la_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(singleCharSizeX, singleCharSizeY);
                 break;
             case 'WSkyII':
-                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height/2, 'ga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(400, 280);
+                self.hintImage2 = self.add.image(self.game.config.width*2/4, self.game.config.height*3/8, 'ga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(singleCharSizeX, singleCharSizeY);
                 break;
 
             case 'PWaterIII':
-                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(266, 186);
-                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'ta_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(266, 186);
+                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height*3/8, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(pairCharSizeX, pairCharSizeY);
+                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height*3/8, 'ta_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(pairCharSizeX, pairCharSizeY);
                 break;
             case 'WWaterIII':
-                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
-                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'da_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
+                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height*3/8, 'a_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(pairCharSizeX, pairCharSizeY);
+                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height*3/8, 'da_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(pairCharSizeX, pairCharSizeY);
                 break;
             case 'PEarthIII':
-                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'sa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
-                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
+                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height*3/8, 'sa_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(pairCharSizeX, pairCharSizeY);
+                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height*3/8, 'ma_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(pairCharSizeX, pairCharSizeY);
                 break;
             case 'WEarthIII':
-                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ei_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
-                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'na_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
+                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height*3/8, 'ei_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(pairCharSizeX, pairCharSizeY);
+                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height*3/8, 'na_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(pairCharSizeX, pairCharSizeY);
                 break;
             case 'PSkyIII':
-                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height/2, 'ba_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
-                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height/2, 'ha_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
+                self.hintImage1 = self.add.image(self.game.config.width/4, self.game.config.height*3/8, 'ba_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(pairCharSizeX, pairCharSizeY);
+                self.hintImage3 = self.add.image(self.game.config.width*3/4, self.game.config.height*3/8, 'ha_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(pairCharSizeX, pairCharSizeY);
                 break;
             case 'WSkyIII':
-                self.hintImage1 = self.add.image(self.game.config.width*3/16, self.game.config.height/2, 'ou_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
-                self.hintImage3 = self.add.image(self.game.config.width*11/16, self.game.config.height/2, 'nga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(280, 200);
+                self.hintImage1 = self.add.image(self.game.config.width*3/16, self.game.config.height*3/8, 'ou_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(pairCharSizeX, pairCharSizeY);
+                self.hintImage3 = self.add.image(self.game.config.width*11/16, self.game.config.height*3/8, 'nga_hint').setOrigin(0.5,0.5).setAlpha(0.5).setDisplaySize(pairCharSizeX, pairCharSizeY);
                 break;
         }
         self.activeHint = hint;//keep track of currently active hint
