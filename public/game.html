@@ -4,13 +4,14 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, 
-    initial-scale=0.85, maximum-scale=1, user-scalable=0;"/>
+    initial-scale=0.85, maximum-scale=1, user-scalable=0"/>
         <link href="css/game.css" rel="stylesheet">
     </head>
  
     <body>
         <script src="js/refreshToken.js"></script>
         <div id="game" ontouchstart="fullScreen()">
+            <p>Test fullscreen</p>
             <script src = "socket.io/socket.io.js"></script>
             <script src="js/phaser.min.js"></script>
             <!-- <script src="js/phaser.js"></script> -->
@@ -35,10 +36,6 @@
                     gameScreen.msRequestFullscreen();
                 }
             }
-
-            document.addEventListener("fullscreenchange", function() {
-                console.log(document.fullscreenElement);
-            });
         </script>
     </body>
  

@@ -1211,8 +1211,6 @@ var config = {
       update: update
     },
     gamePhase: 0,
-    domBehindCanvas: true,
-    fullscreenTarget: "game",
 };
 
 //Global Variables
@@ -1340,6 +1338,8 @@ function preload() {
     this.load.audio('Eshield','assets/audio/Eshield.mp3');
     this.load.audio('Sshield','assets/audio/Sshield.mp3');
 
+    Phaser
+
 }
    
 function create() {
@@ -1351,6 +1351,8 @@ function create() {
     var username = urlParams.get('username');
     isPrivateGame = urlParams.has('roomName');
     privateRoomName = urlParams.get('roomName');
+
+    console.log(this.scale.stopListeners());
 
     this.socket = io();
 
