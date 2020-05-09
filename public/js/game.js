@@ -1195,7 +1195,7 @@ class Log{
 //Phaser config setup
 var config = {
     type: Phaser.AUTO,
-    parent: 'phaser-example',
+    parent: 'game',
     width: (2/3)*window.outerHeight,
     height: window.outerHeight,
     physics: {
@@ -1211,6 +1211,8 @@ var config = {
       update: update
     },
     gamePhase: 0,
+    domBehindCanvas: true,
+    fullscreenTarget: "game",
 };
 
 //Global Variables
@@ -1369,10 +1371,10 @@ function create() {
 
     this.button.setInteractive().on('pointerdown', function(pointer){
 
-        if(!self.scale.isFullscreen){//On first tap, turn the game full screen
-            self.scale.startFullscreen();
-            console.log(self.scale.isFullscreen)
-        }
+        // if(!self.scale.isFullscreen){//On first tap, turn the game full screen
+        //     self.scale.startFullscreen();
+        //     console.log(self.scale.isFullscreen)
+        // }
 
         //Clear game field of hints and strokes
 

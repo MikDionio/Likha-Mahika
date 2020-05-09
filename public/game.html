@@ -10,11 +10,11 @@
  
     <body>
         <script src="js/refreshToken.js"></script>
-        <div>
-            <script type="text/javascript" src="js/gestures.js"></script>
+        <div id="game" ontouchstart="fullScreen()">
             <script src = "socket.io/socket.io.js"></script>
             <script src="js/phaser.min.js"></script>
             <!-- <script src="js/phaser.js"></script> -->
+            <script type="text/javascript" src="js/gestures.js"></script>
             <script src="js/game.js"></script>
         </div>
         <!-- <div> -->
@@ -22,6 +22,24 @@
             
             <!-- <script type="text/javascript" src="js/gesture_list.js"></script> -->
         <!-- </div> -->
+        <script>
+            var gameScreen = document.getElementById("game");
+            function fullScreen(){//change game div to fullscreen
+                if(gameScreen.requestFullscreen){
+                    gameScreen.requestFullscreen();
+                } else if (gameScreen.mozRequestFullScreen) { /* Firefox */
+                    gameScreen.mozRequestFullScreen();
+                } else if (gameScreen.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                    gameScreen.webkitRequestFullscreen();
+                } else if (gameScreen.msRequestFullscreen) { /* IE/Edge */
+                    gameScreen.msRequestFullscreen();
+                }
+            }
+
+            document.addEventListener("fullscreenchange", function() {
+                console.log(document.fullscreenElement);
+            });
+        </script>
     </body>
  
 </html>

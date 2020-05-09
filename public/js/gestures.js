@@ -54,7 +54,7 @@ var gestures = function(config){
 			canvas.style.left = "0px";
 			canvas.id = "gestures_canvas";
 			ctx = canvas.getContext("2d");
-			document.body.appendChild(canvas);
+			document.getElementById("game").appendChild(canvas);//Insert canvas inside game div
 		}
 		if(conf.autoTrack || conf.draw)
 		{
