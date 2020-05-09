@@ -1,7 +1,7 @@
-const express = require('express');
+const express = require('../node_modules/express');
 const asyncMiddleware = require('../middleware/asyncMiddleware');
 const UserModel = require('../models/userModel')
-const jwt = require('jsonwebtoken')
+const jwt = require('../node_modules/jsonwebtoken')
 const router = express.Router();
  
 router.post('/submit-score', asyncMiddleware(async (req, res, next) => {

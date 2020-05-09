@@ -1,6 +1,6 @@
-const passport = require('passport');
-const localStrategy = require('passport-local').Strategy;
-const JWTstrategy = require('passport-jwt').Strategy;
+const passport = require('../node_modules/passport');
+const localStrategy = require('../node_modules/passport-local').Strategy;
+const JWTstrategy = require('../node_modules/passport-jwt').Strategy;
  
 const UserModel = require('../models/userModel');
  

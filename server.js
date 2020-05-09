@@ -1,19 +1,19 @@
 // reads in our .env file and makes those values available as environment variables
 require('dotenv').config();
 
-const express = require('express');
-const bodyParser = require('body-parser');
+const express = require('./node_modules/express');
+const bodyParser = require('./node_modules/body-parser');
 const routes = require('./routes/main');
 const secureRoutes = require('./routes/secure');
-const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
-const passport = require('passport');
+const mongoose = require('./node_modules/mongoose');
+const cookieParser = require('./node_modules/cookie-parser');
+const passport = require('./node_modules/passport');
 
 
 // create an instance of an express app
 const app = express();
 const server = require('http').Server(app);
-const io = require('socket.io').listen(server);
+const io = require('./node_modules/socket.io').listen(server);
 var players = {};
 var roomCount = 0;
 

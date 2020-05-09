@@ -1,6 +1,6 @@
-const passport = require('passport');
-const express = require('express');
-const jwt = require('jsonwebtoken');
+const passport = require('../node_modules/passport');
+const express = require('../node_modules/express');
+const jwt = require('../node_modules/jsonwebtoken');
  
 const tokenList = {};
 const router = express.Router();
