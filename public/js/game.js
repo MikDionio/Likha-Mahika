@@ -2118,7 +2118,7 @@ function identifySpell(string){
             type = "PEarthII";
             break;
         case 'LaLa2':
-        case 'KaLa2':
+        case 'Ka2La2':
             type = "PSkyII";
             break;
         case 'Pa':
