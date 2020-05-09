@@ -1196,8 +1196,8 @@ class Log{
 var config = {
     type: Phaser.AUTO,
     parent: 'game',
-    width: (2/3)*window.outerHeight,
-    height: window.outerHeight,
+    width: window.outerWidth,
+    height: window.outerWidth*(3/2),
     physics: {
       default: 'arcade',
       arcade: {
@@ -1526,6 +1526,10 @@ function update() {
     //and deal damage if applicable
 
     if(self.game.config.gamePhase == 1){
+
+        if(self.timer.paused){
+            self.timer.paused = false;
+        }
 
         console.log("Timing");
         self.timerBar.displayWidth = self.game.config.width*(1 - self.timer.getProgress());
