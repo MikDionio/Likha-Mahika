@@ -2111,8 +2111,10 @@ function identifySpell(string){
             type = "PWaterII";
             break;
         // case 'SaKaKa2Ka3':
-        case 'KaKa2Ka3':
-        case 'LaKa2Ka3':
+        case 'Ka2Ka3Ka2':
+        case 'KaKa3Ka':
+        case 'Ka2Ka3Ka':
+        case 'KaKa3Ka2':
             type = "PEarthII";
             break;
         case 'LaLa2':
