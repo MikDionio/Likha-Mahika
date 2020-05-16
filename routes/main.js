@@ -4,15 +4,18 @@ const jwt = require('jsonwebtoken');
  
 const tokenList = {};
 const router = express.Router();
- 
+
+//check current status of the sit3
 router.get('/status', (req, res, next) => {
   res.status(200).json({ status: 'ok' });
 });
  
+//for making of new accounts, no login yet
 router.post('/signup', passport.authenticate('signup', { session: false }), async (req, res, next) => {
   res.status(200).json({ message: 'signup successful' });
 });
  
+//the login function
 router.post('/login', async (req, res, next) => {
   passport.authenticate('login', async (err, user, info) => {
     try {
@@ -20,6 +23,7 @@ router.post('/login', async (req, res, next) => {
         const error = new Error('An Error occured');
         return next(error);
       }
+      //returns user credentials if a match is found
       req.login(user, { session: false }, async (error) => {
         if (error) return next(error);
         const body = {
@@ -27,7 +31,8 @@ router.post('/login', async (req, res, next) => {
           username: user.username
         };
  
-        const token = jwt.sign({ user: body }, 'top_secret', { expiresIn: 300 });
+        //used for signing jwt-passports
+        const token = jwt.sign({ user: body }, 'top_secret', { expiresIn: 300 }); //key used in auth.js
         const refreshToken = jwt.sign({ user: body }, 'top_secret_refresh', { expiresIn: 86400 });
  
         // store tokens in cookie
@@ -51,6 +56,7 @@ router.post('/login', async (req, res, next) => {
   })(req, res, next);
 });
  
+//get jwt-token
 router.post('/token', (req, res) => {
   const { username, refreshToken } = req.body;
  
@@ -68,6 +74,7 @@ router.post('/token', (req, res) => {
   }
 });
  
+//handles logout and clears all authenticators
 router.post('/logout', (req, res) => {
   if (req.cookies) {
     const refreshToken = req.cookies['refreshJwt'];
