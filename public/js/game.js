@@ -1233,9 +1233,10 @@ var round = 1;
 var totalHintsPage = 1;
 var currHintsPage = 1;
 
+const roundDuration = 30000; //Amount of time per round in milliseconds
 var playerSpellCounter = 0;
 var opponentSpellCounter = 0;
-var spellsPerRound = 3;
+const spellsPerRound = 3;
 
 //global audio variables
 var wProjectile;
@@ -1489,7 +1490,7 @@ function create() {
     }, this);
 
     //Display Timer for each round
-    self.timer = this.time.addEvent({ delay: 30000, callback: endRound, args: [self], callbackScope: this, loop: true });
+    self.timer = this.time.addEvent({ delay: roundDuration, callback: endRound, args: [self], callbackScope: this, loop: true });
     self.timerBar = self.add.sprite(self.game.config.width/2,self.game.config.height-self.game.config.width*19/48,'health_bar').setOrigin(0.5,0.5).setDisplaySize(self.game.config.width,self.game.config.width/30).setTint(0x0000ff);
 
     //Hints UI Elements
@@ -1531,7 +1532,6 @@ function update() {
             self.timer.paused = false;
         }
 
-        console.log("Timing");
         self.timerBar.displayWidth = self.game.config.width*(1 - self.timer.getProgress());
 
         this.playerProjectiles.getChildren().forEach(function(playerProjectile) {//Behaviour of projectiles sent by player
